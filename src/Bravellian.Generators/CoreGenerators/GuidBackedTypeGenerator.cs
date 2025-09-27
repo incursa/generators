@@ -25,7 +25,7 @@ public static class GuidBackedTypeGenerator
     {
         IReadOnlyDictionary<string, string> attributes = xml.GetAttributeDict();
         var useDefaultFormat = attributes.TryGetValue("default-format", out var defaultFormatString) && bool.TryParse(defaultFormatString, out var defaultFormat) && defaultFormat;
-        return new (attributes.TryGetValue("name"), attributes.TryGetValue("namespace"), true, useDefaultFormat);
+        return new (attributes!.TryGetValue("name"), attributes!.TryGetValue("namespace"), true, useDefaultFormat);
     }
 
     public static string? Generate(GeneratorParams? structToGenerate, IBvLogger? logger)

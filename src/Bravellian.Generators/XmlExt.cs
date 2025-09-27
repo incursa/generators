@@ -26,5 +26,5 @@ internal static class XmlExt
 
     public static TValue? TryGetValue<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dict, TKey key)
         where TValue : class
-        => dict.TryGetValue(key, out TValue value) ? value : null;
+        => dict.TryGetValue(key, out TValue? value) ? value : null;
 }

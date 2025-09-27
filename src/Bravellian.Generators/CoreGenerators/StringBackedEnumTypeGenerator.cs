@@ -29,7 +29,7 @@ public static class StringBackedEnumTypeGenerator
         IReadOnlyDictionary<string, string> attributes = xml.GetAttributeDict();
         var enumValues = xml.Elements("Value").Select(e => e.GetAttributeDict()).Select(a => (a["value"].ToString(), a["name"].ToString(), a.TryGetValue("display") ?? a["name"].ToString(), a.TryGetValue("documentation"))).ToList();
         var additionalProperties = xml.Elements("Property").Select(e => e.GetAttributeDict()).Select(a => (a["type"].ToString(), a["name"].ToString())).ToList();
-        return new (attributes.TryGetValue("name"), attributes.TryGetValue("namespace"), true, enumValues, additionalProperties);
+        return new (attributes!.TryGetValue("name"), attributes!.TryGetValue("namespace"), true, enumValues, additionalProperties);
     }
 
     public static string? Generate(GeneratorParams? structToGenerate, IBvLogger? logger)
@@ -46,7 +46,7 @@ public static class StringBackedEnumTypeGenerator
     {
         var constValues = string.Join(
             "\r\n",
-            relatedClass.EnumValues.Select(p => $"    public const string {p.Name}Value = \"{p.Value}\";").Concat(
+            relatedClass!.EnumValues.Select(p => $"    public const string {p.Name}Value = \"{p.Value}\";").Concat(
             relatedClass.EnumValues.Select(p => $"    public const string {p.Name}DisplayName = \"{p.DisplayName}\";")));
 
         var enumDefinitions = string.Join("\r\n\r\n", relatedClass.EnumValues.Select(p =>

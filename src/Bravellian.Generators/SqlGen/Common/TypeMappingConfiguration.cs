@@ -64,7 +64,7 @@ public class TypeMappingConfiguration
         {
             ruleIndex++;
 
-            if (rule.MatchesColumnAndType(schemaName, tableName, columnName, csharpType))
+            if (rule.MatchesColumnAndType(schemaName!, tableName!, columnName!, csharpType))
             {
                 return rule.GetTargetType(columnName);
             }
@@ -112,7 +112,7 @@ public class TypeMappingConfiguration
             foreach (TypeMappingRule rule in this.rules)
             {
                 if (string.IsNullOrEmpty(rule.SchemaNamePattern) &&
-                    rule.MatchesDatabaseTableAndColumn(schemaName, databaseName, tableName, columnName))
+                    rule.MatchesDatabaseTableAndColumn(schemaName!, databaseName, tableName, columnName))
                 {
                     return rule.GetTargetType(columnName);
                 }
@@ -143,7 +143,7 @@ public class TypeMappingConfiguration
         {
             if (string.IsNullOrEmpty(rule.SchemaNamePattern) &&
                 string.IsNullOrEmpty(rule.DatabaseNamePattern) &&
-                rule.MatchesTableAndColumn(schemaName, tableName, columnName))
+                rule.MatchesTableAndColumn(schemaName!, tableName, columnName))
             {
                 return rule.GetTargetType(columnName);
             }
@@ -199,7 +199,7 @@ public class TypeMappingConfiguration
             ruleIndex++;
 
             // Console.WriteLine($"DEBUG: Checking rule #{ruleIndex}: {rule.ColumnNamePattern}:{rule.CSharpTypePattern}={rule.TargetType}");
-            if (rule.MatchesColumnAndType(schemaName, tableName, columnName, csharpType))
+            if (rule.MatchesColumnAndType(schemaName!, tableName!, columnName, csharpType))
             {
                 // Console.WriteLine($"DEBUG: Rule #{ruleIndex} matched for column {columnName} with nullability {rule.IsNullable}");
                 return (rule.GetTargetType(columnName), rule.IsNullable);
@@ -245,7 +245,7 @@ public class TypeMappingConfiguration
             foreach (TypeMappingRule rule in this.rules)
             {
                 if (string.IsNullOrEmpty(rule.SchemaNamePattern) &&
-                    rule.MatchesDatabaseTableAndColumn(schemaName, databaseName, tableName, columnName))
+                    rule.MatchesDatabaseTableAndColumn(schemaName!, databaseName, tableName, columnName))
                 {
                     return (rule.GetTargetType(columnName), rule.IsNullable);
                 }
@@ -276,7 +276,7 @@ public class TypeMappingConfiguration
         {
             if (string.IsNullOrEmpty(rule.SchemaNamePattern) &&
                 string.IsNullOrEmpty(rule.DatabaseNamePattern) &&
-                rule.MatchesTableAndColumn(schemaName, tableName, columnName))
+                rule.MatchesTableAndColumn(schemaName!, tableName, columnName))
             {
                 return (rule.GetTargetType(columnName), rule.IsNullable);
             }

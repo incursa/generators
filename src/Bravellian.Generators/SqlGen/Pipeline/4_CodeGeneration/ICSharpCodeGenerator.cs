@@ -17,22 +17,22 @@ namespace Bravellian.Generators.SqlGen.Pipeline.4_CodeGeneration
     using System.Collections.Generic;
     using Bravellian.Generators.SqlGen.Pipeline._3_CSharpTransformation.Models;
 
-    /// <summary>
-    /// Interface for Phase 4 code generators that render C# source files from the final model.
-    /// </summary>
+/// <summary>
+/// Interface for Phase 4 code generators that render C# source files from the final model.
+/// </summary>
     public interface ICSharpCodeGenerator
-    {
-        /// <summary>
-        /// Generates C# source file contents from the final C#-ready model.
-        /// </summary>
-        /// <param name="generationModel">The final model from Phase 3.</param>
-        /// <returns>A dictionary where keys are file names and values are the generated C# code contents.</returns>
-        Dictionary<string, string> Generate(GenerationModel generationModel);
+{
+    /// <summary>
+    /// Generates C# source file contents from the final C#-ready model.
+    /// </summary>
+    /// <param name="generationModel">The final model from Phase 3.</param>
+    /// <returns>A dictionary where keys are file names and values are the generated C# code contents.</returns>
+    Dictionary<string, string> Generate(GenerationModel generationModel);
 
-        /// <summary>
-        /// Writes the generated files to disk.
-        /// </summary>
-        /// <param name="generatedFiles">Dictionary of file names and their contents.</param>
-        void WriteFilesToDisk(Dictionary<string, string> generatedFiles, string outputDirectory);
-    }
+    /// <summary>
+    /// Writes the generated files to disk.
+    /// </summary>
+    /// <param name="generatedFiles">Dictionary of file names and their contents.</param>
+    void WriteFilesToDisk(Dictionary<string, string> generatedFiles, string outputDirectory);
+}
 }

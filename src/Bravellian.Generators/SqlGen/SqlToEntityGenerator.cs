@@ -11,9 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// This file is temporarily excluded from compilation to prevent build errors
-// while transitioning to the new SqlGenOrchestrator architecture.
-// TODO: Remove this file or update to use the new pipeline components.
 
 #if false
 

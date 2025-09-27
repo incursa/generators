@@ -24,7 +24,7 @@ public static class FastIdBackedTypeGenerator
     public static GeneratorParams? GetParams(XElement xml, IBvLogger? logger)
     {
         IReadOnlyDictionary<string, string> attributes = xml.GetAttributeDict();
-        return new (attributes.TryGetValue("name"), attributes.TryGetValue("namespace"), true);
+        return new (attributes!.TryGetValue("name"), attributes!.TryGetValue("namespace"), true);
     }
 
     public static string? Generate(GeneratorParams? structToGenerate, IBvLogger? logger)

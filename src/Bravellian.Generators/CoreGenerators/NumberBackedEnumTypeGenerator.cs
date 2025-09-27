@@ -30,7 +30,7 @@ public static class NumberBackedEnumTypeGenerator
         var numberType = attributes.TryGetValue("type") ?? "int";
         var enumValues = xml.Elements("Value").Select(e => e.GetAttributeDict()).Select(a => (a["value"].ToString(), a["name"].ToString(), a.TryGetValue("display") ?? a["name"].ToString())).ToList();
         var additionalProperties = xml.Elements("Property").Select(e => e.GetAttributeDict()).Select(a => (a["type"].ToString(), a["name"].ToString())).ToList();
-        return new (attributes.TryGetValue("name"), attributes.TryGetValue("namespace"), true, numberType, enumValues, additionalProperties);
+        return new (attributes!.TryGetValue("name"), attributes!.TryGetValue("namespace"), true, numberType, enumValues, additionalProperties);
     }
 
     public static string? Generate(GeneratorParams? structToGenerate, IBvLogger? logger)
@@ -255,6 +255,8 @@ public readonly partial record struct {{relatedClass.Name}} :
             {
                 {{string.Join("\r\n                ", relatedClass.EnumValues.Select(p =>
                     $"_ when numericValue == {p.Name}Value => {p.Name},"))}}
+
+
 
                 _ => null,
             };

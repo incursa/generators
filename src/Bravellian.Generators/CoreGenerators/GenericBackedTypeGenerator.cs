@@ -24,7 +24,7 @@ public static class GenericBackedTypeGenerator
     public static GeneratorParams? GetParams(XElement xml, IBvLogger? logger)
     {
         IReadOnlyDictionary<string, string> attributes = xml.GetAttributeDict();
-        return new (attributes.TryGetValue("name"), attributes.TryGetValue("namespace"), attributes.TryGetValue("type"), true);
+        return new (attributes!.TryGetValue("name"), attributes!.TryGetValue("namespace"), attributes!.TryGetValue("type"), true);
     }
 
     public static string? Generate(GeneratorParams? structToGenerate, IBvLogger? logger)

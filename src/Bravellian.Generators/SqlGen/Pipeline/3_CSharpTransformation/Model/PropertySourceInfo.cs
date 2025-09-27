@@ -19,30 +19,30 @@ namespace Bravellian.Generators.SqlGen.Pipeline.3_CSharpTransformation.Models
     /// Represents the origin of a specific piece of information about a property (e.g., its type or name).
     /// </summary>
     public class PropertySourceInfo
+{
+    /// <summary>
+    /// Gets the aspect of the property this information pertains to (e.g., "SQL Type", "C# Type", "Property Name").
+    /// </summary>
+    public string Aspect { get; }
+
+    /// <summary>
+    /// Gets the source of the information (e.g., "SQL DDL", "Global Type Mapping", "Column Override").
+    /// </summary>
+    public string Source { get; }
+
+    /// <summary>
+    /// Gets a detailed description of the source (e.g., "Rule with priority 100", "CREATE TABLE statement").
+    /// </summary>
+    public string Details { get; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PropertySourceInfo"/> class.
+    /// </summary>
+    public PropertySourceInfo(string aspect, string source, string details)
     {
-        /// <summary>
-        /// Gets the aspect of the property this information pertains to (e.g., "SQL Type", "C# Type", "Property Name").
-        /// </summary>
-        public string Aspect { get; }
-
-        /// <summary>
-        /// Gets the source of the information (e.g., "SQL DDL", "Global Type Mapping", "Column Override").
-        /// </summary>
-        public string Source { get; }
-
-        /// <summary>
-        /// Gets a detailed description of the source (e.g., "Rule with priority 100", "CREATE TABLE statement").
-        /// </summary>
-        public string Details { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PropertySourceInfo"/> class.
-        /// </summary>
-        public PropertySourceInfo(string aspect, string source, string details)
-        {
-            this.Aspect = aspect;
-            this.Source = source;
-            this.Details = details;
-        }
+        this.Aspect = aspect;
+        this.Source = source;
+        this.Details = details;
     }
+}
 }

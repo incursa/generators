@@ -42,8 +42,8 @@ public class SqlTypeResolverTests
                     {
                         ColumnIdentifier = new Identifier { Value = "Id" },
                         DataType = new SqlDataTypeReference { SqlDataTypeOption = SqlDataTypeOption.Int }
-                    }
-                }
+                    },
+                },
             },
         };
         return new RawDatabaseSchema { TableStatements = { createTable } };

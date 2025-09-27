@@ -21,12 +21,12 @@ namespace Bravellian.Generators.SqlGen.Pipeline.1_Ingestion
     using Bravellian.Generators.SqlGen.Pipeline._1_Ingestion.Model;
     using Microsoft.SqlServer.TransactSql.ScriptDom;
 
-    /// <summary>
-    /// Implements the schema ingestor interface for SQL Server.
-    /// </summary>
+/// <summary>
+/// Implements the schema ingestor interface for SQL Server.
+/// </summary>
     public class SqlSchemaIngestor : ISchemaIngestor
-    {
-        private readonly IBvLogger logger;
+{
+    private readonly IBvLogger logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SqlSchemaIngestor"/> class.
@@ -34,91 +34,91 @@ namespace Bravellian.Generators.SqlGen.Pipeline.1_Ingestion
     /// </summary>
     /// <param name="logger">The logger.</param>
     public SqlSchemaIngestor(IBvLogger logger)
-        {
-            this.logger = logger;
-        }
+    {
+        this.logger = logger;
+    }
 
-        /// <inheritdoc/>
-        public RawDatabaseSchema Ingest(IEnumerable<string> sqlScriptText)
-        {
-            var databaseModel = new RawDatabaseSchema();
+    /// <inheritdoc/>
+    public RawDatabaseSchema Ingest(IEnumerable<string> sqlScriptText)
+    {
+        var databaseModel = new RawDatabaseSchema();
 
-            foreach (var sqlText in sqlScriptText)
+        foreach (var sqlText in sqlScriptText)
+        {
+            try
             {
-                try
+                this.logger.LogMessage($"Processing SQL text: {sqlText.Substring(0, Math.Min(100, sqlText.Length))}...");
+                var parser = new TSql170Parser(true, SqlEngineType.All);
+
+                using var reader = new StringReader(sqlText);
+                var parseResult = parser.Parse(reader, out var errors);
+
+                if (errors != null && errors.Count > 0)
                 {
-                    this.logger.LogMessage($"Processing SQL text: {sqlText.Substring(0, Math.Min(100, sqlText.Length))}...");
-                    var parser = new TSql170Parser(true, SqlEngineType.All);
-
-                    using var reader = new StringReader(sqlText);
-                    var parseResult = parser.Parse(reader, out var errors);
-
-                    if (errors != null && errors.Count > 0)
+                    foreach (var error in errors)
                     {
-                        foreach (var error in errors)
-                        {
-                            this.logger.LogError($"SQL parse error: {error.Message}");
-                        }
-                    }
-
-                    if (parseResult is TSqlScript script)
-                    {
-                        this.ProcessSqlScript(script, databaseModel);
+                        this.logger.LogError($"SQL parse error: {error.Message}");
                     }
                 }
-                catch (Exception ex)
+
+                if (parseResult is TSqlScript script)
                 {
-                    this.logger.LogError($"Error processing SQL text: {ex.Message}");
+                    this.ProcessSqlScript(script, databaseModel);
                 }
             }
-
-            return databaseModel;
-        }
-
-        private void ProcessSqlScript(TSqlScript script, RawDatabaseSchema databaseModel)
-        {
-            foreach (var batch in script.Batches)
+            catch (Exception ex)
             {
-                foreach (var statement in batch.Statements)
-                {
-                    this.ProcessStatement(statement, databaseModel);
-                }
+                this.logger.LogError($"Error processing SQL text: {ex.Message}");
             }
         }
 
-        private void ProcessStatement(TSqlStatement statement, RawDatabaseSchema databaseModel)
+        return databaseModel;
+    }
+
+    private void ProcessSqlScript(TSqlScript script, RawDatabaseSchema databaseModel)
+    {
+        foreach (var batch in script.Batches)
         {
-            switch (statement)
+            foreach (var statement in batch.Statements)
             {
-                case CreateTableStatement createTableStatement:
-                    var tableName = createTableStatement.SchemaObjectName.BaseIdentifier.Value;
-                    if (tableName.StartsWith("#", StringComparison.Ordinal) || tableName.StartsWith("@", StringComparison.Ordinal))
-                    {
-                        this.logger.LogMessage($"Ignoring temporary table: {tableName}");
-                        break;
-                    }
-
-                    databaseModel.TableStatements.Add(createTableStatement);
-                    break;
-                case CreateViewStatement createViewStatement:
-                    var viewName = createViewStatement.SchemaObjectName.BaseIdentifier.Value;
-                    if (viewName.StartsWith("#", StringComparison.Ordinal) || viewName.StartsWith("@", StringComparison.Ordinal))
-                    {
-                        this.logger.LogMessage($"Ignoring temporary view: {viewName}");
-                        break;
-                    }
-
-                    databaseModel.ViewStatements.Add(createViewStatement);
-                    break;
-                case CreateIndexStatement createIndexStatement:
-                    databaseModel.IndexStatements.Add(createIndexStatement);
-                    break;
-
-                // Add more statement types as needed
-                default:
-                    // Ignore unsupported statement types
-                    break;
+                this.ProcessStatement(statement, databaseModel);
             }
         }
     }
+
+    private void ProcessStatement(TSqlStatement statement, RawDatabaseSchema databaseModel)
+    {
+        switch (statement)
+        {
+            case CreateTableStatement createTableStatement:
+                var tableName = createTableStatement.SchemaObjectName.BaseIdentifier.Value;
+                if (tableName.StartsWith("#", StringComparison.Ordinal) || tableName.StartsWith("@", StringComparison.Ordinal))
+                {
+                    this.logger.LogMessage($"Ignoring temporary table: {tableName}");
+                    break;
+                }
+
+                databaseModel.TableStatements.Add(createTableStatement);
+                break;
+            case CreateViewStatement createViewStatement:
+                var viewName = createViewStatement.SchemaObjectName.BaseIdentifier.Value;
+                if (viewName.StartsWith("#", StringComparison.Ordinal) || viewName.StartsWith("@", StringComparison.Ordinal))
+                {
+                    this.logger.LogMessage($"Ignoring temporary view: {viewName}");
+                    break;
+                }
+
+                databaseModel.ViewStatements.Add(createViewStatement);
+                break;
+            case CreateIndexStatement createIndexStatement:
+                databaseModel.IndexStatements.Add(createIndexStatement);
+                break;
+
+            // Add more statement types as needed
+            default:
+                // Ignore unsupported statement types
+                break;
+        }
+    }
+}
 }

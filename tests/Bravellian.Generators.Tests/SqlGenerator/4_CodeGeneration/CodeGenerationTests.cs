@@ -72,8 +72,8 @@ public class CodeGenerationTests
                     SourceSchemaName = "sales",
                     SourceObjectName = "Customer",
                     IsView = false,
-                    Properties =[new () { Name = "Id", Type = "int", IsPrimaryKey = true }],
-                    Methods =[new () { Name = "GetById", Type = MethodType.Read, ReturnType = "Customer" }],
+                    Properties = [new () { Name = "Id", Type = "int", IsPrimaryKey = true }],
+                    Methods = [new () { Name = "GetById", Type = MethodType.Read, ReturnType = "Customer" }],
                     CreateInput = new () { Name = "CustomerCreateInput", Namespace = "MyProject.Data.Sales" },
                 }
 
@@ -114,7 +114,7 @@ public class CodeGenerationTests
                         new () { Name = "CustomerName", Type = "string" },
                         new () { Name = "OrderTotal", Type = "decimal" }
                     ],
-                    Methods =[], // Views shouldn't have data modification methods
+                    Methods = [], // Views shouldn't have data modification methods
                 }
 
             ],

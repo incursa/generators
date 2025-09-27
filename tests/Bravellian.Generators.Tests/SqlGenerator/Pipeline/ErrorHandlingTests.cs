@@ -61,13 +61,13 @@ public class ErrorHandlingTests
 
         var invalidConfig = new SqlConfiguration
         {
-            Tables = new Dictionary<string, TableConfiguration>
-(StringComparer.Ordinal)
+            Tables = new Dictionary<string, TableConfiguration>(
+StringComparer.Ordinal)
             {
                 ["dbo.NonExistentTable"] = new TableConfiguration
                 {
-                    PrimaryKeyOverride = new HashSet<string>(StringComparer.Ordinal) { "NonExistentColumn" } // This column doesn't exist
-                }
+                    PrimaryKeyOverride = new HashSet<string>(StringComparer.Ordinal) { "NonExistentColumn" }, // This column doesn't exist
+                },
             },
         };
 
@@ -104,8 +104,8 @@ public class ErrorHandlingTests
                 {
                     Description = "Invalid mapping",
                     Match = new GlobalTypeMappingMatch { SqlType = new List<string> { "decimal" } },
-                    Apply = new GlobalTypeMappingApply { CSharpType = "NonExistentType" } // Invalid C# type
-                }
+                    Apply = new GlobalTypeMappingApply { CSharpType = "NonExistentType" }, // Invalid C# type
+                },
             },
         };
 

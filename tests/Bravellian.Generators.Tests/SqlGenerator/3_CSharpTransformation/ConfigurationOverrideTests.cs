@@ -54,7 +54,7 @@ public class ConfigurationOverrideTests
 
         return new DatabaseSchema("TestDb")
         {
-            Objects =[dbObject],
+            Objects = [dbObject],
         };
     }
 
@@ -65,10 +65,10 @@ public class ConfigurationOverrideTests
         var schema = this.CreateBasicSchema();
         var config = new SqlConfiguration
         {
-            Tables = new Dictionary<string, TableConfiguration>
-(StringComparer.Ordinal)
+            Tables = new Dictionary<string, TableConfiguration>(
+StringComparer.Ordinal)
             {
-                ["dbo.Users"] = new () { CSharpClassName = "AppUser" }
+                ["dbo.Users"] = new () { CSharpClassName = "AppUser" },
             },
         };
         var transformer = new CSharpModelTransformer(this.logger, config, null);
@@ -88,16 +88,16 @@ public class ConfigurationOverrideTests
         var schema = this.CreateBasicSchema();
         var config = new SqlConfiguration
         {
-            Tables = new Dictionary<string, TableConfiguration>
-(StringComparer.Ordinal)
+            Tables = new Dictionary<string, TableConfiguration>(
+StringComparer.Ordinal)
             {
                 ["dbo.Users"] = new ()
                 {
-                    ColumnOverrides = new Dictionary<string, ColumnOverride>
-(StringComparer.Ordinal)
+                    ColumnOverrides = new Dictionary<string, ColumnOverride>(
+StringComparer.Ordinal)
                     {
-                        ["Id"] = new () { CSharpType = "CustomId" } // Ultimate override
-                    }
+                        ["Id"] = new () { CSharpType = "CustomId" }, // Ultimate override
+                    },
                 },
             },
             GlobalTypeMappings =
@@ -107,8 +107,8 @@ public class ConfigurationOverrideTests
                 new ()
                 {
                     Priority = 100,
-                    Match = new () { SqlType =["int"] },
-                    Apply = new () { CSharpType = "int" }
+                    Match = new () { SqlType = ["int"] },
+                    Apply = new () { CSharpType = "int" },
                 }
 
             ],
@@ -140,15 +140,15 @@ public class ConfigurationOverrideTests
                 {
                     Priority = 10,
                     Match = new () { ColumnNameRegex = "Amount$" },
-                    Apply = new () { CSharpType = "Money" }
+                    Apply = new () { CSharpType = "Money" },
                 },
 
                 // High priority rule for a specific SQL type
                 new ()
                 {
                     Priority = 100,
-                    Match = new () { SqlType =["decimal"] },
-                    Apply = new () { CSharpType = "PreciseDecimal" }
+                    Match = new () { SqlType = ["decimal"] },
+                    Apply = new () { CSharpType = "PreciseDecimal" },
                 }
 
             ],
@@ -186,23 +186,23 @@ public class ConfigurationOverrideTests
                 new ()
                 {
                     Priority = 50,
-                    Match = new () { SqlType =["uniqueidentifier"] },
+                    Match = new () { SqlType = ["uniqueidentifier"] },
                     Apply = new () { CSharpType = "System.Guid" },
                 }
 
             ],
-            Tables = new Dictionary<string, TableConfiguration>
-(StringComparer.Ordinal)
+            Tables = new Dictionary<string, TableConfiguration>(
+StringComparer.Ordinal)
             {
                 ["dbo.Users"] = new ()
                 {
-                    ColumnOverrides = new Dictionary<string, ColumnOverride>
-(StringComparer.Ordinal)
+                    ColumnOverrides = new Dictionary<string, ColumnOverride>(
+StringComparer.Ordinal)
                     {
                         // Specific override for this one column
                         ["UserGuid"] = new () { CSharpType = "StronglyTypedGuid" }
-                    }
-                }
+                    },
+                },
             },
         };
         var transformer = new CSharpModelTransformer(this.logger, config, null);
@@ -251,14 +251,14 @@ public class ConfigurationOverrideTests
         var schema = this.CreateBasicSchema();
         var config = new SqlConfiguration
         {
-            Tables = new Dictionary<string, TableConfiguration>
-(StringComparer.Ordinal)
+            Tables = new Dictionary<string, TableConfiguration>(
+StringComparer.Ordinal)
             {
                 ["dbo.Users"] = new ()
                 {
                     // Override the PK from 'Id' to 'UserGuid' for data access methods
-                    PrimaryKeyOverride =["UserGuid"]
-                }
+                    PrimaryKeyOverride = ["UserGuid"],
+                },
             },
         };
         var transformer = new CSharpModelTransformer(this.logger, config, null);

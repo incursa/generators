@@ -19,12 +19,12 @@ namespace Bravellian.Generators.SqlGen.Pipeline.1_Ingestion
     using Bravellian.Generators.SqlGen.Pipeline._1_Ingestion.Model;
 
     public interface ISchemaIngestor
-    {
-        /// <summary>
-        /// Ingests SQL statements and builds a raw database schema.
-        /// </summary>
-        /// <param name="sqlStatements">Array of SQL DDL statements to parse.</param>
-        /// <returns>A raw database schema representing the SQL objects.</returns>
-        RawDatabaseSchema Ingest(IEnumerable<string> sqlStatements);
-    }
+{
+    /// <summary>
+    /// Ingests SQL statements and builds a raw database schema.
+    /// </summary>
+    /// <param name="sqlStatements">Array of SQL DDL statements to parse.</param>
+    /// <returns>A raw database schema representing the SQL objects.</returns>
+    RawDatabaseSchema Ingest(IEnumerable<string> sqlStatements);
+}
 }

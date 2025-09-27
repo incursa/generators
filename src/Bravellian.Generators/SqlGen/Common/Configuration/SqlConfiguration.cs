@@ -311,7 +311,7 @@ namespace Bravellian.Generators.SqlGen.Common.Configuration
         {
             if (reader.TokenType == JsonTokenType.String)
             {
-                return new List<string> { reader.GetString() };
+                return new List<string> { reader!.GetString() };
             }
 
             if (reader.TokenType == JsonTokenType.StartArray)

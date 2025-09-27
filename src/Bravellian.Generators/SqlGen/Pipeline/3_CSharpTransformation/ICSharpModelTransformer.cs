@@ -18,14 +18,14 @@ namespace Bravellian.Generators.SqlGen.Pipeline.3_CSharpTransformation
     using Bravellian.Generators.SqlGen.Pipeline._3_CSharpTransformation.Models;
 
     public interface ICSharpModelTransformer
-    {
-        /// <summary>
-        /// Transforms the refined database schema into a C# generation model.
-        /// This is Phase 3 of the pipeline, where SQL types are mapped to C# types
-        /// and the data access methods are generated based on the schema and configuration.
-        /// </summary>
-        /// <param name="databaseSchema">The refined database schema from Phase 2.</param>
-        /// <returns>A C#-ready model containing all information needed for code generation.</returns>
-        GenerationModel Transform(DatabaseSchema databaseSchema);
-    }
+{
+    /// <summary>
+    /// Transforms the refined database schema into a C# generation model.
+    /// This is Phase 3 of the pipeline, where SQL types are mapped to C# types
+    /// and the data access methods are generated based on the schema and configuration.
+    /// </summary>
+    /// <param name="databaseSchema">The refined database schema from Phase 2.</param>
+    /// <returns>A C#-ready model containing all information needed for code generation.</returns>
+    GenerationModel Transform(DatabaseSchema databaseSchema);
+}
 }

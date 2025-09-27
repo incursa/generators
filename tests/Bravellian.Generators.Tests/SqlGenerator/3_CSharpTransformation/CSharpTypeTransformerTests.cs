@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// using Bravellian.Generators.SqlGen.Common.TypeMapping; // This namespace doesn't exist
 
 namespace Bravellian.Generators.Tests.SqlGenerator.3_CSharpTransformation
 {
@@ -25,196 +24,196 @@ namespace Bravellian.Generators.Tests.SqlGenerator.3_CSharpTransformation
     using Xunit;
 
     public class CSharpModelTransformerTests
+{
+    private readonly TestLogger logger = new ();
+
+    [Fact]
+    public void Transform_TypePrecedence_ColumnOverrideWinsOverGlobalMapping()
     {
-        private readonly TestLogger logger = new ();
+        // Arrange
+        var transformer = new CSharpModelTransformer(this.logger, this.CreateConfigWithTypeMapping(), null);
+        var schema = this.CreateBasicSchema();
 
-        [Fact]
-        public void Transform_TypePrecedence_ColumnOverrideWinsOverGlobalMapping()
+        // Add a column override for UserGuid to override it to string instead of Guid
+        var config = transformer.Configuration;
+        config.Tables["dbo.Users"].ColumnOverrides["UserGuid"] = new ColumnOverride
         {
-            // Arrange
-            var transformer = new CSharpModelTransformer(this.logger, this.CreateConfigWithTypeMapping(), null);
-            var schema = this.CreateBasicSchema();
+            CSharpType = "string", // This should override the global mapping that would make it a Guid
+        };
 
-            // Add a column override for UserGuid to override it to string instead of Guid
-            var config = transformer.Configuration;
-            config.Tables["dbo.Users"].ColumnOverrides["UserGuid"] = new ColumnOverride
-            {
-                CSharpType = "string", // This should override the global mapping that would make it a Guid
-            };
+        // Act
+        var model = transformer.Transform(schema);
 
-            // Act
-            var model = transformer.Transform(schema);
+        // Assert
+        var userClass = model.Classes.First();
+        var userGuidProperty = userClass.Properties.First(p => string.Equals(p.Name, "UserGuid", StringComparison.Ordinal));
+        Assert.Equal("string", userGuidProperty.Type);
+    }
 
-            // Assert
-            var userClass = model.Classes.First();
-            var userGuidProperty = userClass.Properties.First(p => string.Equals(p.Name, "UserGuid", StringComparison.Ordinal));
-            Assert.Equal("string", userGuidProperty.Type);
-        }
+    [Fact]
+    public void Transform_GlobalMappingPriority_HighestPriorityWins()
+    {
+        // Arrange
+        var config = new SqlConfiguration();
 
-        [Fact]
-        public void Transform_GlobalMappingPriority_HighestPriorityWins()
+        // Add two conflicting mappings for columns ending with "Amount"
+        config.GlobalTypeMappings.Add(new GlobalTypeMapping
         {
-            // Arrange
-            var config = new SqlConfiguration();
+            Priority = 100,
+            Match = new GlobalTypeMappingMatch { ColumnNameRegex = ".*Amount$" },
+            Apply = new GlobalTypeMappingApply { CSharpType = "decimal" },
+        });
 
-            // Add two conflicting mappings for columns ending with "Amount"
-            config.GlobalTypeMappings.Add(new GlobalTypeMapping
-            {
-                Priority = 100,
-                Match = new GlobalTypeMappingMatch { ColumnNameRegex = ".*Amount$" },
-                Apply = new GlobalTypeMappingApply { CSharpType = "decimal" },
-            });
-
-            config.GlobalTypeMappings.Add(new GlobalTypeMapping
-            {
-                Priority = 200, // Higher priority should win
-                Match = new GlobalTypeMappingMatch { ColumnNameRegex = ".*Amount$" },
-                Apply = new GlobalTypeMappingApply { CSharpType = "Money" },
-            });
-
-            var transformer = new CSharpModelTransformer(this.logger, config, null);
-            var schema = this.CreateBasicSchema();
-
-            // Act
-            var model = transformer.Transform(schema);
-
-            // Assert
-            var userClass = model.Classes.First();
-            var amountProperty = userClass.Properties.First(p => string.Equals(p.Name, "Amount", StringComparison.Ordinal));
-            Assert.Equal("Money", amountProperty.Type); // Higher priority mapping should win
-            Assert.True(amountProperty.IsNullable); // Higher priority mapping should win
-        }
-
-        [Fact]
-        public void Transform_PrimaryKeyOverride_ShouldBeUsedForMethods()
+        config.GlobalTypeMappings.Add(new GlobalTypeMapping
         {
-            // Arrange
-            var config = new SqlConfiguration();
-            config.Tables["dbo.Users"] = new TableConfiguration
-            {
-                PrimaryKeyOverride = new HashSet<string>(StringComparer.Ordinal) { "UserGuid" }, // Override PK from Id to UserGuid
-            };
+            Priority = 200, // Higher priority should win
+            Match = new GlobalTypeMappingMatch { ColumnNameRegex = ".*Amount$" },
+            Apply = new GlobalTypeMappingApply { CSharpType = "Money" },
+        });
 
-            var transformer = new CSharpModelTransformer(this.logger, config, null);
-            var schema = this.CreateBasicSchema();
+        var transformer = new CSharpModelTransformer(this.logger, config, null);
+        var schema = this.CreateBasicSchema();
 
-            // Act
-            var model = transformer.Transform(schema);
+        // Act
+        var model = transformer.Transform(schema);
 
-            // Assert
-            var userClass = model.Classes.First();
+        // Assert
+        var userClass = model.Classes.First();
+        var amountProperty = userClass.Properties.First(p => string.Equals(p.Name, "Amount", StringComparison.Ordinal));
+        Assert.Equal("Money", amountProperty.Type); // Higher priority mapping should win
+        Assert.True(amountProperty.IsNullable); // Higher priority mapping should win
+    }
 
-            // Get method should use UserGuid as parameter
-            var getMethod = userClass.Methods.First(m => string.Equals(m.Name, "Get", StringComparison.Ordinal) && m.Type == MethodType.Read);
-            Assert.Single(getMethod.Parameters);
-            Assert.Equal("userGuid", getMethod.Parameters[0].Name);
-            Assert.Equal("UserGuid", getMethod.Parameters[0].SourcePropertyName);
-
-            // Delete method should also use UserGuid
-            var deleteMethod = userClass.Methods.First(m => string.Equals(m.Name, "Delete", StringComparison.Ordinal) && m.Type == MethodType.Delete);
-            Assert.Single(deleteMethod.Parameters);
-            Assert.Equal("userGuid", deleteMethod.Parameters[0].Name);
-            Assert.Equal("UserGuid", deleteMethod.Parameters[0].SourcePropertyName);
-        }
-
-        [Fact]
-        public void Transform_ReadMethods_ConfigurationShouldOverrideIndexes()
+    [Fact]
+    public void Transform_PrimaryKeyOverride_ShouldBeUsedForMethods()
+    {
+        // Arrange
+        var config = new SqlConfiguration();
+        config.Tables["dbo.Users"] = new TableConfiguration
         {
-            // Arrange
-            var config = new SqlConfiguration();
-            config.Tables["dbo.Users"] = new TableConfiguration
-            {
-                ReadMethods = new List<ReadMethod>
+            PrimaryKeyOverride = new HashSet<string>(StringComparer.Ordinal) { "UserGuid" }, // Override PK from Id to UserGuid
+        };
+
+        var transformer = new CSharpModelTransformer(this.logger, config, null);
+        var schema = this.CreateBasicSchema();
+
+        // Act
+        var model = transformer.Transform(schema);
+
+        // Assert
+        var userClass = model.Classes.First();
+
+        // Get method should use UserGuid as parameter
+        var getMethod = userClass.Methods.First(m => string.Equals(m.Name, "Get", StringComparison.Ordinal) && m.Type == MethodType.Read);
+        Assert.Single(getMethod.Parameters);
+        Assert.Equal("userGuid", getMethod.Parameters[0].Name);
+        Assert.Equal("UserGuid", getMethod.Parameters[0].SourcePropertyName);
+
+        // Delete method should also use UserGuid
+        var deleteMethod = userClass.Methods.First(m => string.Equals(m.Name, "Delete", StringComparison.Ordinal) && m.Type == MethodType.Delete);
+        Assert.Single(deleteMethod.Parameters);
+        Assert.Equal("userGuid", deleteMethod.Parameters[0].Name);
+        Assert.Equal("UserGuid", deleteMethod.Parameters[0].SourcePropertyName);
+    }
+
+    [Fact]
+    public void Transform_ReadMethods_ConfigurationShouldOverrideIndexes()
+    {
+        // Arrange
+        var config = new SqlConfiguration();
+        config.Tables["dbo.Users"] = new TableConfiguration
+        {
+            ReadMethods = new List<ReadMethod>
                 {
                     new ReadMethod
                     {
                         Name = "GetByAmountRange",
-                        MatchColumns = new List<string> { "Amount" }
-                    }
+                        MatchColumns = new List<string> { "Amount" },
+                    },
                 },
-            };
+        };
 
-            var transformer = new CSharpModelTransformer(this.logger, config, null);
-            var schema = this.CreateBasicSchema();
+        var transformer = new CSharpModelTransformer(this.logger, config, null);
+        var schema = this.CreateBasicSchema();
 
-            // Add an index to the schema
-            var index = new IndexDefinition("IX_Users_TaxAmount", true, false);
-            index.ColumnNames.Add("TaxAmount");
-            schema.Objects[0].Indexes.Add(index);
+        // Add an index to the schema
+        var index = new IndexDefinition("IX_Users_TaxAmount", true, false);
+        index.ColumnNames.Add("TaxAmount");
+        schema.Objects[0].Indexes.Add(index);
 
-            // Act
-            var model = transformer.Transform(schema);
+        // Act
+        var model = transformer.Transform(schema);
 
-            // Assert
-            var userClass = model.Classes.First();
+        // Assert
+        var userClass = model.Classes.First();
 
-            // Should have the custom read method from config
-            Assert.Contains(userClass.Methods, m => string.Equals(m.Name, "GetByAmountRange", StringComparison.Ordinal));
+        // Should have the custom read method from config
+        Assert.Contains(userClass.Methods, m => string.Equals(m.Name, "GetByAmountRange", StringComparison.Ordinal));
 
-            // Should NOT have an index-based read method for TaxAmount
-            Assert.DoesNotContain(userClass.Methods, m => string.Equals(m.Name, "GetByTaxAmount", StringComparison.Ordinal));
-        }
+        // Should NOT have an index-based read method for TaxAmount
+        Assert.DoesNotContain(userClass.Methods, m => string.Equals(m.Name, "GetByTaxAmount", StringComparison.Ordinal));
+    }
 
-        [Fact]
-        public void Transform_UpdateMethod_ShouldRespectIgnoreColumns()
+    [Fact]
+    public void Transform_UpdateMethod_ShouldRespectIgnoreColumns()
+    {
+        // Arrange
+        var config = new SqlConfiguration();
+        config.Tables["dbo.Users"] = new TableConfiguration
         {
-            // Arrange
-            var config = new SqlConfiguration();
-            config.Tables["dbo.Users"] = new TableConfiguration
+            UpdateConfig = new UpdateConfig
             {
-                UpdateConfig = new UpdateConfig
-                {
-                    IgnoreColumns = new List<string> { "Amount" }
-                },
-            };
+                IgnoreColumns = new List<string> { "Amount" },
+            },
+        };
 
-            var transformer = new CSharpModelTransformer(this.logger, config, null);
-            var schema = this.CreateBasicSchema();
+        var transformer = new CSharpModelTransformer(this.logger, config, null);
+        var schema = this.CreateBasicSchema();
 
-            // Act
-            var model = transformer.Transform(schema);
+        // Act
+        var model = transformer.Transform(schema);
 
-            // Assert
-            var userClass = model.Classes.First();
-            var updateMethod = userClass.Methods.First(m => m.Type == MethodType.Update);
+        // Assert
+        var userClass = model.Classes.First();
+        var updateMethod = userClass.Methods.First(m => m.Type == MethodType.Update);
 
-            // The metadata should contain the ignored columns
-            Assert.True(updateMethod.Metadata.ContainsKey("IgnoredColumns"));
-            var ignoredColumns = updateMethod.Metadata["IgnoredColumns"] as HashSet<string>;
-            Assert.NotNull(ignoredColumns);
-            Assert.Contains("Amount", ignoredColumns);
+        // The metadata should contain the ignored columns
+        Assert.True(updateMethod.Metadata.ContainsKey("IgnoredColumns"));
+        var ignoredColumns = updateMethod.Metadata["IgnoredColumns"] as HashSet<string>;
+        Assert.NotNull(ignoredColumns);
+        Assert.Contains("Amount", ignoredColumns);
 
-            // Primary key column should also be ignored
-            Assert.Contains("Id", ignoredColumns);
-        }
+        // Primary key column should also be ignored
+        Assert.Contains("Id", ignoredColumns);
+    }
 
-        private SqlConfiguration CreateConfigWithTypeMapping()
+    private SqlConfiguration CreateConfigWithTypeMapping()
+    {
+        var config = new SqlConfiguration();
+
+        // Add a global mapping for GUID columns
+        config.GlobalTypeMappings.Add(new GlobalTypeMapping
         {
-            var config = new SqlConfiguration();
+            Priority = 100,
+            Match = new GlobalTypeMappingMatch { SqlType = ["uniqueidentifier"] },
+            Apply = new GlobalTypeMappingApply { CSharpType = "Guid" },
+        });
 
-            // Add a global mapping for GUID columns
-            config.GlobalTypeMappings.Add(new GlobalTypeMapping
-            {
-                Priority = 100,
-                Match = new GlobalTypeMappingMatch { SqlType =["uniqueidentifier"] },
-                Apply = new GlobalTypeMappingApply { CSharpType = "Guid" },
-            });
+        // Add table configuration
+        config.Tables["dbo.Users"] = new TableConfiguration();
 
-            // Add table configuration
-            config.Tables["dbo.Users"] = new TableConfiguration();
+        return config;
+    }
 
-            return config;
-        }
-
-        private DatabaseSchema CreateBasicSchema()
+    private DatabaseSchema CreateBasicSchema()
+    {
+        var dbObject = new DatabaseObject("dbo", "Users", false)
         {
-            var dbObject = new DatabaseObject("dbo", "Users", false)
-            {
-                Columns =
-                [
+            Columns =
+            [
 
-                    // This column is NOT nullable
-                    new DatabaseColumn("Id", PwSqlType.Int, false, true, "dbo", "Users"),
+                // This column is NOT nullable
+                new DatabaseColumn("Id", PwSqlType.Int, false, true, "dbo", "Users"),
 
                 // This column is NOT nullable
                 new DatabaseColumn("UserGuid", PwSqlType.UniqueIdentifier, false, false, "dbo", "Users"),
@@ -225,15 +224,15 @@ namespace Bravellian.Generators.Tests.SqlGenerator.3_CSharpTransformation
                 // This column is NOT nullable
                 new DatabaseColumn("TaxAmount", PwSqlType.Decimal, false, false, "dbo", "Users"),
             ],
-            };
+        };
 
-            // Set the primary key, which is separate from the column definition
-            dbObject.PrimaryKeyColumns.Add("Id");
+        // Set the primary key, which is separate from the column definition
+        dbObject.PrimaryKeyColumns.Add("Id");
 
-            return new DatabaseSchema("TestDb")
-            {
-                Objects =[dbObject],
-            };
-        }
+        return new DatabaseSchema("TestDb")
+        {
+            Objects = [dbObject],
+        };
     }
+}
 }

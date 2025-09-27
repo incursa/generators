@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Roslynator.CodeFixes" Version="4.14.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="System.Text.Json" Version="9.0.7" />
   </ItemGroup>
 
@@ -22,9 +26,9 @@
       <PackageReference Update="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="4.14.0" />
       <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="4.14.0" />
       <PackageReference Update="Microsoft.SourceLink.GitHub" Version="8.0.0" />
-      <PackageReference Update="Roslynator.Analyzers" Version="4.13.1" />
-      <PackageReference Update="Roslynator.CodeAnalysis.Analyzers" Version="4.13.1" />
-      <PackageReference Update="Roslynator.Formatting.Analyzers" Version="4.13.1" />
+      <PackageReference Update="Roslynator.Analyzers" Version="4.14.0" />
+      <PackageReference Update="Roslynator.CodeAnalysis.Analyzers" Version="4.14.0" />
+      <PackageReference Update="Roslynator.Formatting.Analyzers" Version="4.14.0" />
       <PackageReference Update="StyleCop.Analyzers" Version="1.1.118" />
     </ItemGroup>
 

@@ -18,13 +18,13 @@ namespace Bravellian.Generators.SqlGen.Pipeline.2_SchemaRefinement
     using Bravellian.Generators.SqlGen.Pipeline._1_Ingestion.Model;
 
     public interface ITypeResolver
-    {
-        /// <summary>
-        /// Resolves SQL types to C# types based on configuration rules.
-        /// </summary>
-        /// <param name="databaseModel">The raw database model from the ingestion phase.</param>
-        /// <param name="configuration">Optional configuration with type mapping rules.</param>
-        /// <returns>The refined database model with resolved types.</returns>
-        RawDatabaseSchema Resolve(RawDatabaseSchema databaseModel, SqlConfiguration? configuration = null);
-    }
+{
+    /// <summary>
+    /// Resolves SQL types to C# types based on configuration rules.
+    /// </summary>
+    /// <param name="databaseModel">The raw database model from the ingestion phase.</param>
+    /// <param name="configuration">Optional configuration with type mapping rules.</param>
+    /// <returns>The refined database model with resolved types.</returns>
+    RawDatabaseSchema Resolve(RawDatabaseSchema databaseModel, SqlConfiguration? configuration = null);
+}
 }

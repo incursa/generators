@@ -193,10 +193,10 @@ namespace Bravellian.Generators.Tests.SqlGenerator.Configuration
             // Arrange
             var config = new SqlConfiguration
             {
-                Tables = new Dictionary<string, TableConfiguration>
-(StringComparer.Ordinal)
+                Tables = new Dictionary<string, TableConfiguration>(
+StringComparer.Ordinal)
                 {
-                    { "dbo.Customer", new TableConfiguration() }
+                    { "dbo.Customer", new TableConfiguration() },
                 },
             };
 

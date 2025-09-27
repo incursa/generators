@@ -142,8 +142,8 @@ public class BasicSqlGeneratorTests
     public void DatabaseTypes_ShouldMapToCorrectCSharpTypes()
     {
         // Arrange
-        var typeMappings = new Dictionary<string, string>
-(StringComparer.Ordinal)
+        var typeMappings = new Dictionary<string, string>(
+StringComparer.Ordinal)
         {
             { "int", "int" },
             { "nvarchar", "string" },
@@ -222,16 +222,16 @@ public class BasicSqlGeneratorTests
     public void ConfigurationOverride_ShouldAllowCustomization()
     {
         // Arrange
-        var tableOverrides = new Dictionary<string, string>
-(StringComparer.Ordinal)
+        var tableOverrides = new Dictionary<string, string>(
+StringComparer.Ordinal)
         {
             { "Users", "User" },
             { "Orders", "Order" },
             { "Products", "Product" },
         };
 
-        var columnOverrides = new Dictionary<string, string>
-(StringComparer.Ordinal)
+        var columnOverrides = new Dictionary<string, string>(
+StringComparer.Ordinal)
         {
             { "Id", "UserId" },
             { "Name", "FullName" },

@@ -60,42 +60,42 @@ public class SqlGenOrchestratorTests
                     Description = "Custom DECIMAL mapping",
                     Match = new GlobalTypeMappingMatch
                     {
-                        SqlType = new List<string> { "decimal" }
+                        SqlType = new List<string> { "decimal" },
                     },
-                    Apply = new GlobalTypeMappingApply { CSharpType = "decimal?" }
+                    Apply = new GlobalTypeMappingApply { CSharpType = "decimal?" },
                 },
             },
-            Tables = new Dictionary<string, TableConfiguration>
-(StringComparer.Ordinal)
+            Tables = new Dictionary<string, TableConfiguration>(
+StringComparer.Ordinal)
             {
                 ["dbo.Orders"] = new TableConfiguration
                 {
                     CSharpClassName = "Order", // Override default name
-                    ColumnOverrides = new Dictionary<string, ColumnOverride>
-(StringComparer.Ordinal)
+                    ColumnOverrides = new Dictionary<string, ColumnOverride>(
+StringComparer.Ordinal)
                     {
                         ["TotalAmount"] = new ColumnOverride
                         {
-                            CSharpType = "double" // Override type mapping
-                        }
+                            CSharpType = "double", // Override type mapping
+                        },
                     },
                     ReadMethods = new List<ReadMethod>
                     {
                         new ReadMethod
                         {
                             Name = "GetByCustomerId",
-                            MatchColumns = new List<string> { "CustomerId" }
-                        }
+                            MatchColumns = new List<string> { "CustomerId" },
+                        },
                     },
                     UpdateConfig = new UpdateConfig
                     {
-                        IgnoreColumns = new List<string> { "OrderDate" } // Don't include in updates
-                    }
+                        IgnoreColumns = new List<string> { "OrderDate" }, // Don't include in updates
+                    },
                 },
                 ["dbo.vwTopCustomers"] = new TableConfiguration
                 {
-                    ColumnOverrides = new Dictionary<string, ColumnOverride>
-(StringComparer.Ordinal)
+                    ColumnOverrides = new Dictionary<string, ColumnOverride>(
+StringComparer.Ordinal)
                     {
                         ["CustomerId"] = new ColumnOverride
                         {
@@ -184,8 +184,8 @@ public class SqlGenOrchestratorTests
         var config = new SqlConfiguration
         {
             Namespace = "MyCompany.Data.Entities",
-            Tables = new Dictionary<string, TableConfiguration>
-(StringComparer.Ordinal)
+            Tables = new Dictionary<string, TableConfiguration>(
+StringComparer.Ordinal)
             {
                 ["dbo.Products"] = new TableConfiguration
                 {
@@ -193,8 +193,8 @@ public class SqlGenOrchestratorTests
                     {
                         new ReadMethod { Name = "GetBySku", MatchColumns = new List<string> { "Sku" } },
                         new ReadMethod { Name = "GetByName", MatchColumns = new List<string> { "Name" } }
-                    }
-                }
+                    },
+                },
             },
         };
 

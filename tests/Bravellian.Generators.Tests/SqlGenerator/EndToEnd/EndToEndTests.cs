@@ -114,13 +114,13 @@ public class EndToEndTests
             DbContextBaseClass = "PwDbContextBase",
             GenerateDbContext = true,
             Namespace = "Bravellian.Database.PwSql",
-            Tables = new Dictionary<string, TableConfiguration>
-(StringComparer.Ordinal)
+            Tables = new Dictionary<string, TableConfiguration>(
+StringComparer.Ordinal)
             {
                 ["erp.TaxCode"] = new ()
                 {
-                    ColumnOverrides = new Dictionary<string, ColumnOverride>
-(StringComparer.Ordinal)
+                    ColumnOverrides = new Dictionary<string, ColumnOverride>(
+StringComparer.Ordinal)
                     {
                         ["ErpId"] = new ()
                         {
@@ -129,7 +129,7 @@ public class EndToEndTests
                     },
                 },
             },
-            GlobalTypeMappings =[
+            GlobalTypeMappings = [
                 new ()
                 {
                     Match = new ()
@@ -146,7 +146,7 @@ public class EndToEndTests
                     Match = new ()
                     {
                         ColumnNameRegex = "TaxCodeId",
-                        SqlType =["bigint"],
+                        SqlType = ["bigint"],
                     },
                     Apply = new ()
                     {
@@ -212,7 +212,7 @@ public class EndToEndTests
         var orchestrator = new SqlGenOrchestrator(
             new SqlSchemaIngestor(this.logger),
             new SchemaRefiner(this.logger, config),
-            new CSharpModelTransformer(this.logger, config, null),
+            new CSharpModelTransformer(this.logger, config!, null),
             new CSharpCodeGenerator(config, this.logger),
             config,
             this.logger);
@@ -264,7 +264,7 @@ public class EndToEndTests
     public void GenerateFull_FromSingleSql_ShouldProduceCorrectCSharp()
     {
         var configJson = File.ReadAllText(@"C:\src\internal\src\modules\Database\Bravellian.Database.PwSql.Model\sql.generator.config.json");
-        string[] sqlFiles =[
+        string[] sqlFiles = [
             File.ReadAllText(@"C:\src\internal\src\modules\Database\Bravellian.Database.Audit\events\Tables\AuditEntry.sql"),
 
             // File.ReadAllText(@"C:\src\internal\src\modules\Database\Bravellian.Database.PwSql\erp\Tables\ApInvoice.sql"),

@@ -17,16 +17,16 @@ namespace Bravellian.Generators.SqlGen.Pipeline.2_SchemaRefinement
     using Bravellian.Generators.SqlGen.Pipeline._1_Ingestion.Model;
     using Bravellian.Generators.SqlGen.Pipeline._2_SchemaRefinement.Model;
 
-    /// <summary>
-    /// Defines the contract for the schema refinement phase of the pipeline.
-    /// </summary>
+/// <summary>
+/// Defines the contract for the schema refinement phase of the pipeline.
+/// </summary>
     public interface ISchemaRefiner
-    {
-        /// <summary>
-        /// Refines the raw database model by applying configuration overrides.
-        /// </summary>
-        /// <param name="rawSchema">The raw database model from the ingestion phase.</param>
-        /// <returns>A refined and completed database schema model.</returns>
-        DatabaseSchema Refine(RawDatabaseSchema rawSchema);
-    }
+{
+    /// <summary>
+    /// Refines the raw database model by applying configuration overrides.
+    /// </summary>
+    /// <param name="rawSchema">The raw database model from the ingestion phase.</param>
+    /// <returns>A refined and completed database schema model.</returns>
+    DatabaseSchema Refine(RawDatabaseSchema rawSchema);
+}
 }
