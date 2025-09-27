@@ -26,6 +26,14 @@ jobs:
       with:
         global-json-file: global.json
 
+    - name: Cache NuGet
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          nuget-${{ runner.os }}-
+
     - name: Install PowerShell
       uses: PSModule/install-powershell@v1
 
@@ -82,5 +90,29 @@ jobs:
     - name: Pack NuGet packages
       run: dotnet pack Bravellian.Generators.sln --configuration Release --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
 
-    - name: Publish
-      run: dotnet nuget push **\*.nupkg --source Bravellian --api-key az --skip-duplicate
+    - name: Upload package artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: nupkgs
+        path: out/*.nupkg
+
+  publish-github-packages:
+    needs: build
+    runs-on: ubuntu-latest
+    # Pre-release = contains hyphen (e.g., 1.2.3-pre.4)
+    if: ${{ contains(github.ref_name, '-') }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: nupkgs
+          path: out
+      - name: Configure GitHub Packages source
+        run: |
+          dotnet nuget remove source github || true
+          dotnet nuget add source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
+            --name "github" \
+            --username "${{ github.repository_owner }}" \
+            --password "${{ secrets.GITHUB_TOKEN }}" \
+            --store-password-in-clear-text
+      - name: Push to GitHub Packages
+        run: dotnet nuget push "out/*.nupkg" --source "github" --skip-duplicate

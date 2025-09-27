@@ -19,17 +19,24 @@
         <PackageProjectUrl>https://github.com/bravellian/generators</PackageProjectUrl>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/bravellian/generators</RepositoryUrl>
-        <PackageIcon>icon.png</PackageIcon>
+        <PackageIcon>nuget_logo.png</PackageIcon>
         <PackageReleaseNotes>For support, contact oss@bravellian.com</PackageReleaseNotes>
         <NuspecProperties>id=$(PackageId);version=$(Version);authors=$(Authors)</NuspecProperties>
     </PropertyGroup>
+
+    <ItemGroup>
+      <None Include="..\..\assets\nuget_logo.png">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
+      </None>
+    </ItemGroup>
 
     <ItemGroup>
         <!-- The Roslyn APIs for creating generators -->
         <!--<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" PrivateAssets="all" />
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="4.14.0" PrivateAssets="all" />-->
         <PackageReference Include="Humanizer.Core" Version="2.14.1" />
-        <PackageReference Include="Microsoft.SqlServer.TransactSql.ScriptDom" Version="170.64.0" />
+        <PackageReference Include="Microsoft.SqlServer.TransactSql.ScriptDom" Version="170.121.2" />
         <PackageReference Include="Roslynator.CodeFixes" Version="4.14.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -50,7 +57,7 @@
 
     <ItemGroup>
       <PackageReference Update="DotNet.ReproducibleBuilds.Isolated" Version="1.2.25" />
-      <PackageReference Update="Meziantou.Analyzer" Version="2.0.205" />
+      <PackageReference Update="Meziantou.Analyzer" Version="2.0.221" />
       <PackageReference Update="Microsoft.CodeAnalysis.AnalyzerUtilities" Version="4.14.0" />
       <PackageReference Update="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="4.14.0" />
       <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="4.14.0" />
