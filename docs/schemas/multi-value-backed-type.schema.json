@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://bravillian.com/schemas/multi-value-backed-type.schema.json",
+  "$id": "https://bravellian.com/schemas/multi-value-backed-type.schema.json",
   "title": "Multi-Value Backed Type",
-  "description": "Schema for Bravillian multi-value backed types (.multi.json)",
+  "description": "Schema for Bravellian multi-value backed types (.multi.json)",
   "type": "object",
   "required": ["name", "namespace", "values"],
   "properties": {
@@ -71,7 +71,7 @@
   "examples": [
     {
       "name": "ContactMethod",
-      "namespace": "Bravillian.ValueTypes",
+      "namespace": "Bravellian.ValueTypes",
       "values": [
         {
           "name": "Email",

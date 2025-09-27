@@ -1,4 +1,4 @@
-# Bravillian Code Generator CLI Tool
+# Bravellian Code Generator CLI Tool
 
 This is a .NET command-line tool that replaces the Roslyn source generator functionality to generate C# code from definition files.
 
@@ -7,28 +7,28 @@ This is a .NET command-line tool that replaces the Roslyn source generator funct
 To install the tool globally:
 
 ```bash
-dotnet tool install --global Bravillian.Generators.Cli
+dotnet tool install --global Bravellian.Generators.Cli
 ```
 
 Or to install it from a local build:
 
 ```bash
-cd Bravillian.Generators.Cli
+cd Bravellian.Generators.Cli
 dotnet pack
-dotnet tool install --global --add-source ./bin/Debug Bravillian.Generators.Cli
+dotnet tool install --global --add-source ./bin/Debug Bravellian.Generators.Cli
 ```
 
 ## Usage
 
 ```bash
 # Single directory input
-dotnet tool run bravillian-gen --input ./types --output ./Generated
+dotnet tool run bravellian-gen --input ./types --output ./Generated
 
 # Multiple file inputs
-dotnet tool run bravillian-gen --input ./types/Color.enum.json ./types/User.dto.xml --output ./Generated
+dotnet tool run bravellian-gen --input ./types/Color.enum.json ./types/User.dto.xml --output ./Generated
 
 # Mixed file and directory inputs
-dotnet tool run bravillian-gen --input ./types/specific-file.json ./other-types --output ./Generated
+dotnet tool run bravellian-gen --input ./types/specific-file.json ./other-types --output ./Generated
 ```
 
 ### Command Line Arguments
@@ -42,10 +42,10 @@ dotnet tool run bravillian-gen --input ./types/specific-file.json ./other-types 
 
 ```bash
 # Generate code from types in ./definitions to ./Generated folder
-bravillian-gen --input ./definitions --output ./Generated
+bravellian-gen --input ./definitions --output ./Generated
 
 # Dry run to see what would be generated
-bravillian-gen --input ./definitions --output ./Generated --dry-run --verbose
+bravellian-gen --input ./definitions --output ./Generated --dry-run --verbose
 ```
 
 ## Supported File Types
@@ -183,10 +183,10 @@ dotnet build
 dotnet test
 
 # Package the CLI tool
-cd Bravillian.Generators.Cli
+cd Bravellian.Generators.Cli
 dotnet pack
 
 # Install locally for testing
-dotnet tool uninstall --global Bravillian.Generators.Cli
-dotnet tool install --global --add-source ./bin/Debug Bravillian.Generators.Cli
+dotnet tool uninstall --global Bravellian.Generators.Cli
+dotnet tool install --global --add-source ./bin/Debug Bravellian.Generators.Cli
 ```

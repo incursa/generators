@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bravillian.Generators\Bravillian.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\Bravillian.Generators.Markers\Bravillian.Generators.Markers.csproj" />
+    <ProjectReference Include="..\Bravellian.Generators\Bravellian.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Bravellian.Generators.Markers\Bravellian.Generators.Markers.csproj" />
   </ItemGroup>
 
   <ItemGroup>

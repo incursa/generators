@@ -9,6 +9,6 @@
   <!-- Whether to generate a DbContext class (default: true) -->
   <GenerateDbContext>true</GenerateDbContext>
   
-  <!-- The base class for the DbContext (default: "BravillianDbContextBase") -->
-  <DbContextBaseClass>BravillianDbContextBase</DbContextBaseClass>
+  <!-- The base class for the DbContext (default: "BravellianDbContextBase") -->
+  <DbContextBaseClass>BravellianDbContextBase</DbContextBaseClass>
 </SqlGenerationConfiguration>

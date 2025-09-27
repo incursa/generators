@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://bravillian.com/schemas/dto-entity.schema.json",
+  "$id": "https://bravellian.com/schemas/dto-entity.schema.json",
   "title": "DTO/Entity Type",
-  "description": "Schema for Bravillian DTO and Entity types (.dto.json, .entity.json)",
+  "description": "Schema for Bravellian DTO and Entity types (.dto.json, .entity.json)",
   "type": "object",
   "required": ["name", "namespace"],
   "properties": {
@@ -119,7 +119,7 @@
   "examples": [
     {
       "name": "PersonDto",
-      "namespace": "Bravillian.Models.Dtos",
+      "namespace": "Bravellian.Models.Dtos",
       "documentation": "Represents a person data transfer object",
       "properties": [
         {

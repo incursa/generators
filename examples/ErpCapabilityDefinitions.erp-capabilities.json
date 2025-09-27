@@ -1,6 +1,6 @@
 {
-  "generatedCapabilitiesNamespace": "Bravillian.Repositories.Erps",
-  "generatedInterfacesNamespace": "Bravillian.Repositories.Erps",
+  "generatedCapabilitiesNamespace": "Bravellian.Repositories.Erps",
+  "generatedInterfacesNamespace": "Bravellian.Repositories.Erps",
   "capabilities": [
     {
       "name": "Vendor.CanRead",
@@ -291,7 +291,7 @@
   "adapterProfiles": [
     {
       "name": "ViewpointVista",
-      "targetNamespace": "Bravillian.Repositories.Erps.ViewpointVista",
+      "targetNamespace": "Bravellian.Repositories.Erps.ViewpointVista",
       "targetClassName": "ViewpointVistaAdapter",
       "supportedCapabilities": [
         "Vendor.CanRead",
@@ -350,7 +350,7 @@
     },
     {
       "name": "ViewpointSpectrum",
-      "targetNamespace": "Bravillian.Repositories.Erps.ViewpointSpectrum",
+      "targetNamespace": "Bravellian.Repositories.Erps.ViewpointSpectrum",
       "targetClassName": "ViewpointSpectrumAdapter",
       "supportedCapabilities": [
         "Vendor.CanRead",

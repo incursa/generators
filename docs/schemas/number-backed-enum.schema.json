@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://bravillian.com/schemas/number-backed-enum.schema.json",
+  "$id": "https://bravellian.com/schemas/number-backed-enum.schema.json",
   "title": "Number Backed Enum",
-  "description": "Schema for Bravillian number-backed enum types (.number_enum.json)",
+  "description": "Schema for Bravellian number-backed enum types (.number_enum.json)",
   "type": "object",
   "required": ["name", "namespace", "values"],
   "properties": {
@@ -75,7 +75,7 @@
   "examples": [
     {
       "name": "Priority",
-      "namespace": "Bravillian.Enums",
+      "namespace": "Bravellian.Enums",
       "type": "int",
       "values": {
         "Low": {

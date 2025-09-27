@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://bravillian.com/schemas/string-backed-type.schema.json",
+  "$id": "https://bravellian.com/schemas/string-backed-type.schema.json",
   "title": "String Backed Type",
-  "description": "Schema for Bravillian string-backed value types (.string.json)",
+  "description": "Schema for Bravellian string-backed value types (.string.json)",
   "type": "object",
   "required": ["name", "namespace"],
   "properties": {
@@ -50,13 +50,13 @@
   "examples": [
     {
       "name": "EmailAddress",
-      "namespace": "Bravillian.ValueTypes",
+      "namespace": "Bravellian.ValueTypes",
       "validationRegex": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
       "validationRegexConstant": "EmailValidationPattern"
     },
     {
       "name": "PhoneNumber",
-      "namespace": "Bravillian.ValueTypes",
+      "namespace": "Bravellian.ValueTypes",
       "validationRegex": "^\\+?[1-9]\\d{1,14}$",
       "properties": [
         {

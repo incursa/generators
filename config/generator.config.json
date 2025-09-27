@@ -8,7 +8,7 @@
         "columnNameRegex": ".*Amount$"
       },
       "apply": {
-        "csharpType": "Bravillian.Money"
+        "csharpType": "Bravellian.Money"
       }
     },
     {
@@ -19,7 +19,7 @@
         "columnNameRegex": ".*Percentage$"
       },
       "apply": {
-        "csharpType": "Bravillian.Percentage"
+        "csharpType": "Bravellian.Percentage"
       }
     },
     {
@@ -30,7 +30,7 @@
         "columnNameRegex": ".*Context$"
       },
       "apply": {
-        "csharpType": "Bravillian.JsonContext"
+        "csharpType": "Bravellian.JsonContext"
       }
     },
     {
@@ -41,7 +41,7 @@
         "columnNameRegex": ".*Predicate$"
       },
       "apply": {
-        "csharpType": "Bravillian.BasicPredicate"
+        "csharpType": "Bravellian.BasicPredicate"
       }
     },
     {
@@ -52,7 +52,7 @@
         "columnNameRegex": "^ErpInvoiceId$"
       },
       "apply": {
-        "csharpType": "Bravillian.InvoiceIdentifier"
+        "csharpType": "Bravellian.InvoiceIdentifier"
       }
     },
     {
@@ -63,7 +63,7 @@
         "columnNameRegex": "^ErpInvoiceLineItemId$"
       },
       "apply": {
-        "csharpType": "Bravillian.InvoiceLineItemIdentifier"
+        "csharpType": "Bravellian.InvoiceLineItemIdentifier"
       }
     },
     {
@@ -74,7 +74,7 @@
         "columnNameRegex": "^RuleJson$"
       },
       "apply": {
-        "csharpType": "Bravillian.JsonContext"
+        "csharpType": "Bravellian.JsonContext"
       }
     },
     {
@@ -85,7 +85,7 @@
         "columnNameRegex": "^JobErpId$"
       },
       "apply": {
-        "csharpType": "Bravillian.JobErpIdentifier"
+        "csharpType": "Bravellian.JobErpIdentifier"
       }
     },
     {
@@ -96,7 +96,7 @@
         "columnNameRegex": "^VendorErpId$"
       },
       "apply": {
-        "csharpType": "Bravillian.VendorErpIdentifier"
+        "csharpType": "Bravellian.VendorErpIdentifier"
       }
     },
     {
@@ -107,7 +107,7 @@
         "columnNameRegex": "^TaxCodeErpId$"
       },
       "apply": {
-        "csharpType": "Bravillian.TaxCodeErpIdentifier"
+        "csharpType": "Bravellian.TaxCodeErpIdentifier"
       }
     },
     {
@@ -118,7 +118,7 @@
         "columnNameRegex": "^ApInvoiceErpId$"
       },
       "apply": {
-        "csharpType": "Bravillian.ApInvoiceErpIdentifier"
+        "csharpType": "Bravellian.ApInvoiceErpIdentifier"
       }
     },
     {
@@ -129,7 +129,7 @@
         "columnNameRegex": "^ApPaymentErpId$"
       },
       "apply": {
-        "csharpType": "Bravillian.ApPaymentErpIdentifier"
+        "csharpType": "Bravellian.ApPaymentErpIdentifier"
       }
     },
     {
@@ -140,7 +140,7 @@
         "columnNameRegex": "^ApPaymentLineItemErpId$"
       },
       "apply": {
-        "csharpType": "Bravillian.ApPaymentLineItemErpIdentifier"
+        "csharpType": "Bravellian.ApPaymentLineItemErpIdentifier"
       }
     },
     {
@@ -151,7 +151,7 @@
         "columnNameRegex": "^JournalPaymentErpId$"
       },
       "apply": {
-        "csharpType": "Bravillian.ApPaymentErpIdentifier"
+        "csharpType": "Bravellian.ApPaymentErpIdentifier"
       }
     },
     {
@@ -162,7 +162,7 @@
         "columnNameRegex": "^CostTypeErpId$"
       },
       "apply": {
-        "csharpType": "Bravillian.CostTypeErpIdentifier"
+        "csharpType": "Bravellian.CostTypeErpIdentifier"
       }
     },
     {
@@ -173,7 +173,7 @@
         "columnNameRegex": "^CostCodeErpId$"
       },
       "apply": {
-        "csharpType": "Bravillian.CostCodeErpIdentifier"
+        "csharpType": "Bravellian.CostCodeErpIdentifier"
       }
     },
     {
@@ -184,7 +184,7 @@
         "columnNameRegex": "^ApInvoiceLineItemErpId$"
       },
       "apply": {
-        "csharpType": "Bravillian.ApInvoiceLineItemErpIdentifier"
+        "csharpType": "Bravellian.ApInvoiceLineItemErpIdentifier"
       }
     }
   ],
@@ -201,13 +201,13 @@
       "description": "SigningRequest table specific mappings",
       "columnOverrides": {
         "ProviderRequestId": {
-          "csharpType": "Bravillian.ProviderRequestIdentifier"
+          "csharpType": "Bravellian.ProviderRequestIdentifier"
         },
         "Code": {
-          "csharpType": "Bravillian.ShortCode"
+          "csharpType": "Bravellian.ShortCode"
         },
         "Workflow": {
-          "csharpType": "Bravillian.SigningWorkflow"
+          "csharpType": "Bravellian.SigningWorkflow"
         }
       }
     },
@@ -215,7 +215,7 @@
       "description": "Job table specific mappings",
       "columnOverrides": {
         "ErpId": {
-          "csharpType": "Bravillian.JobErpIdentifier"
+          "csharpType": "Bravellian.JobErpIdentifier"
         }
       }
     },
@@ -223,7 +223,7 @@
       "description": "Vendor table specific mappings",
       "columnOverrides": {
         "ErpId": {
-          "csharpType": "Bravillian.VendorErpIdentifier"
+          "csharpType": "Bravellian.VendorErpIdentifier"
         }
       }
     },
@@ -231,7 +231,7 @@
       "description": "TaxCode table specific mappings",
       "columnOverrides": {
         "ErpId": {
-          "csharpType": "Bravillian.TaxCodeErpIdentifier"
+          "csharpType": "Bravellian.TaxCodeErpIdentifier"
         }
       }
     }

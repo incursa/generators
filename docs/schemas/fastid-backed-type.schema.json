@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://bravillian.com/schemas/fastid-backed-type.schema.json",
+  "$id": "https://bravellian.com/schemas/fastid-backed-type.schema.json",
   "title": "FastId Backed Type",
-  "description": "Schema for Bravillian FastId-backed value types (.fastid.json)",
+  "description": "Schema for Bravellian FastId-backed value types (.fastid.json)",
   "type": "object",
   "required": ["name", "namespace"],
   "properties": {
@@ -42,11 +42,11 @@
   "examples": [
     {
       "name": "UserId",
-      "namespace": "Bravillian.Identifiers"
+      "namespace": "Bravellian.Identifiers"
     },
     {
       "name": "OrderId",
-      "namespace": "Bravillian.Identifiers",
+      "namespace": "Bravellian.Identifiers",
       "properties": [
         {
           "name": "CreationTimestamp",

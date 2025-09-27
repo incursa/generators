@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Bravillian.Generators.sln",
+                "${workspaceFolder}/Bravellian.Generators.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -23,7 +23,7 @@
             "type": "process",
             "args": [
                 "test",
-                "${workspaceFolder}/tests/Bravillian.Generators.Tests/Bravillian.Generators.Tests.csproj"
+                "${workspaceFolder}/tests/Bravellian.Generators.Tests/Bravellian.Generators.Tests.csproj"
             ],
             "group": {
                 "kind": "test",
@@ -64,9 +64,9 @@
             "args": [
                 "nuget",
                 "push",
-                "${workspaceFolder}/src/Bravillian.Generators.Cli/bin/Release/Bravillian.Generators.Cli.${input:versionNumber}.nupkg",
+                "${workspaceFolder}/src/Bravellian.Generators.Cli/bin/Release/Bravellian.Generators.Cli.${input:versionNumber}.nupkg",
                 "--source",
-                "Bravillian",
+                "Bravellian",
                 "--api-key",
                 "az"
             ],

@@ -1,6 +1,6 @@
-# Bravillian Code Generator JSON Schemas
+# Bravellian Code Generator JSON Schemas
 
-This directory contains JSON Schema files for validating definition files used with the Bravillian Code Generator CLI tool.
+This directory contains JSON Schema files for validating definition files used with the Bravellian Code Generator CLI tool.
 
 ## Available Schemas
 

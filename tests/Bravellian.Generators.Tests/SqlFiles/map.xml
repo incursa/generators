@@ -1,0 +1,490 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--<TypeMappingRules>
+	<TypeMappingRule ColumnNamePattern=".*Amount" IsRegexPattern="true" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern=".*Percentage" IsRegexPattern="true" TargetType="Bravellian.Core.Percentage" />
+	<TypeMappingRule ColumnNamePattern=".*Context$" IsRegexPattern="true" TargetType="Bravellian.Core.JsonContext" />
+	<TypeMappingRule ColumnNamePattern=".*Predicate$" IsRegexPattern="true" TargetType="Bravellian.Core.BasicPredicate" />
+	<TypeMappingRule ColumnNamePattern="ErpInvoiceId" TargetType="Bravellian.Core.InvoiceIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpInvoiceLineItemId" TargetType="Bravellian.Core.InvoiceLineItemIdentifier" />
+	<TypeMappingRule ColumnNamePattern="RuleJson" TargetType="Bravellian.Core.JsonContext" />
+	<TypeMappingRule ColumnNamePattern="QueueItemId" TableNamePattern="QueueItem" TargetType="long" />
+	<TypeMappingRule ColumnNamePattern="JobErpId" TargetType="Bravellian.JobErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="VendorErpId" TargetType="Bravellian.VendorErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="TaxCodeErpId" TargetType="Bravellian.TaxCodeErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ApInvoiceErpId" TargetType="Bravellian.ApInvoiceErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ApPaymentErpId" TargetType="Bravellian.ApPaymentErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ApPaymentLineItemErpId" TargetType="Bravellian.ApPaymentLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="JournalPaymentErpId" TargetType="Bravellian.ApPaymentErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CostTypeErpId" TargetType="Bravellian.CostTypeErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CostCodeErpId" TargetType="Bravellian.CostCodeErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ApInvoiceLineItemErpId" TargetType="Bravellian.ApInvoiceLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SubcontractErpId" TargetType="Bravellian.SubcontractErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SubcontractLineItemErpId" TargetType="Bravellian.SubcontractLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="PurchaseOrderErpId" TargetType="Bravellian.PurchaseOrderErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="PurchaseOrderLineItemErpId" TargetType="Bravellian.PurchaseOrderLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="JournalPaymentLineItemErpId" TargetType="Bravellian.ApPaymentLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="UserObjectId" TargetType="Bravellian.Core.UserObjectId" />
+	<TypeMappingRule ColumnNamePattern="OrganizationSubscriptionId" TargetType="Bravellian.Core.OrganizationSubscriptionIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpRecordSource" TargetType="Bravellian.Core.ErpRecordSource" />
+	<TypeMappingRule ColumnNamePattern="ErpSystem" TargetType="Bravellian.Core.ErpSystem" />
+	<TypeMappingRule ColumnNamePattern="SignatureRequestExternalId" TargetType="Bravellian.Core.SignatureRequestExternalIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SupplierErpId" TargetType="Bravellian.Core.SupplierErpId" />
+	<TypeMappingRule ColumnNamePattern="StripeCustomerId" TargetType="Bravellian.Core.StripeCustomerIdentifier" />
+	<TypeMappingRule ColumnNamePattern="RowFingerprint" TargetType="Bravellian.DataFingerprint" />
+	<TypeMappingRule ColumnNamePattern="ProviderRequestId" TargetType="Bravellian.ProviderRequestIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ProviderRequestId" TableNamePattern="SigningRequest" TargetType="Bravellian.ProviderRequestIdentifier" />
+	<TypeMappingRule ColumnNamePattern="Code" TableNamePattern="SigningRequest" TargetType="Bravellian.Core.Common.ShortCode" />
+	<TypeMappingRule ColumnNamePattern="Workflow" TableNamePattern="SigningRequest" TargetType="Bravellian.SigningWorkflow" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="Job" TargetType="Bravellian.JobErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="Vendor" TargetType="Bravellian.VendorErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="TaxCode" TargetType="Bravellian.TaxCodeErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="ApInvoice" TargetType="Bravellian.ApInvoiceErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="ApInvoiceLineItem" TargetType="Bravellian.ApInvoiceLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="ApPayment" TargetType="Bravellian.ApPaymentErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="ApPaymentLineItem" TargetType="Bravellian.ApPaymentLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="CostType" TargetType="Bravellian.CostTypeErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="CostCode" TargetType="Bravellian.CostCodeErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="ApInvoiceLineItems" TargetType="Bravellian.ApInvoiceLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="Subcontract" TargetType="Bravellian.SubcontractErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="SubcontractChangeOrder" TargetType="Bravellian.SubcontractChangeOrderErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="SubcontractLineItem" TargetType="Bravellian.SubcontractLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="PurchaseOrder" TargetType="Bravellian.PurchaseOrderErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="PurchaseOrderLineItem" TargetType="Bravellian.PurchaseOrderLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="PurchaseOrderChangeOrder" TargetType="Bravellian.PurchaseOrderChangeOrderErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="JournalPaymentLineItem" TargetType="Bravellian.ApPaymentLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="JobDetail" TargetType="Bravellian.JobErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="VendorDetail" TargetType="Bravellian.VendorErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="TaxCodeDetail" TargetType="Bravellian.TaxCodeErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="ApInvoiceDetail" TargetType="Bravellian.ApInvoiceErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="ApPaymentDetail" TargetType="Bravellian.ApPaymentErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="ApPaymentLineItemDetail" TargetType="Bravellian.ApPaymentLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="CostTypeDetail" TargetType="Bravellian.CostTypeErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="CostCodeDetail" TargetType="Bravellian.CostCodeErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="ApInvoiceLineItemsDetail" TargetType="Bravellian.ApInvoiceLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="SubcontractDetail" TargetType="Bravellian.SubcontractErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="SubcontractLineItemDetail" TargetType="Bravellian.SubcontractLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="PurchaseOrderDetail" TargetType="Bravellian.PurchaseOrderErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="PurchaseOrderLineItemDetail" TargetType="Bravellian.PurchaseOrderLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="JournalPaymentLineItemDetail" TargetType="Bravellian.ApPaymentLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpConnectionString" TargetType="Bravellian.EncryptedErpConnectionString" />
+	<TypeMappingRule ColumnNamePattern="VistaErpConnectionString" TargetType="Bravellian.EncryptedVistaErpConnectionString" />
+	<TypeMappingRule ColumnNamePattern="SpectrumErpConnectionString" TargetType="Bravellian.EncryptedSpectrumErpConnectionString" />
+	<TypeMappingRule ColumnNamePattern="EncryptedErpConnectionString" TargetType="Bravellian.EncryptedErpConnectionString" />
+	<TypeMappingRule ColumnNamePattern="EncryptedVistaErpConnectionString" TargetType="Bravellian.EncryptedVistaErpConnectionString" />
+	<TypeMappingRule ColumnNamePattern="EncryptedSpectrumErpConnectionString" TargetType="Bravellian.EncryptedSpectrumErpConnectionString" />
+	<TypeMappingRule ColumnNamePattern="PaymentWaiverGroupCommitmentKey" TargetType="Bravellian.Core.PaymentWaiverGroupCommitmentKey" />
+	<TypeMappingRule ColumnNamePattern="PaymentWaiverGroupPurchaseOrderKey" TargetType="Bravellian.Core.PaymentWaiverGroupPurchaseOrderKey" />
+	<TypeMappingRule ColumnNamePattern="PaymentWaiverGroupJobKey" TargetType="Bravellian.Core.PaymentWaiverGroupJobKey" />
+	<TypeMappingRule ColumnNamePattern="PaymentWaiverGroupApPaymentKey" TargetType="Bravellian.Core.PaymentWaiverGroupApPaymentKey" />
+	<TypeMappingRule ColumnNamePattern="AzureMarketplaceSubscriptionId" TargetType="Bravellian.Core.AzureMarketplaceSubscriptionIdentifier" />
+	<TypeMappingRule ColumnNamePattern="BillingFrequencyId" TargetType="Bravellian.Core.BillingFrequencyIdentifier" />
+	<TypeMappingRule ColumnNamePattern="AccountingSystemId" TargetType="Bravellian.Core.AccountingSystemIdentifier" />
+	<TypeMappingRule ColumnNamePattern="AddressUsaRawId" TargetType="Bravellian.Core.AddressUsaRawIdentifier" />
+	<TypeMappingRule ColumnNamePattern="AddressUsaStandardizedId" TargetType="Bravellian.Core.AddressUsaStandardizedIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpCompanyId" TargetType="Bravellian.ErpCompanyIdentifier" />
+	<TypeMappingRule ColumnNamePattern="BillingPeriodId" TargetType="Bravellian.Core.BillingPeriodIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CalendarId" TargetType="Bravellian.Core.CalendarIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CodeId" TargetType="Bravellian.Core.CodeIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ComplianceItemDefinitionId" TargetType="Bravellian.Core.ComplianceItemDefinitionIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ComplianceItemEvidenceId" TargetType="Bravellian.Core.ComplianceItemEvidenceIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ComplianceItemSubmitterId" TargetType="Bravellian.Core.ComplianceItemSubmitterIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ComplianceItemId" TargetType="Bravellian.Core.ComplianceItemIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ComplianceEvidenceId" TargetType="Bravellian.Core.ComplianceEvidenceIdentifier" />
+	<TypeMappingRule ColumnNamePattern="DocumentId" TargetType="Bravellian.Core.DocumentIdentifier" />
+	<TypeMappingRule ColumnNamePattern="DocuSignTemplateId" TargetType="Bravellian.Core.DocuSignTemplateIdentifier" />
+	<TypeMappingRule ColumnNamePattern="EmailHistoryId" TargetType="Bravellian.Core.EmailHistoryIdentifier" />
+	<TypeMappingRule ColumnNamePattern="EntityLookupId" TargetType="Bravellian.Core.EntityLookupIdentifier" />
+	<TypeMappingRule ColumnNamePattern="HelloSignEventId" TargetType="Bravellian.Core.HelloSignEventIdentifier" />
+	<TypeMappingRule ColumnNamePattern="HelloSignSignatureRequestId" TargetType="Bravellian.Core.HelloSignSignatureRequestIdentifier" />
+	<TypeMappingRule ColumnNamePattern="JobAddressUsaId" TargetType="Bravellian.Core.JobAddressUsaIdentifier" />
+	<TypeMappingRule ColumnNamePattern="JobDetailId" TargetType="Bravellian.Core.JobDetailIdentifier" />
+	<TypeMappingRule ColumnNamePattern="JobMemberId" TargetType="Bravellian.Core.JobMemberIdentifier" />
+	<TypeMappingRule ColumnNamePattern="JobSettingsId" TargetType="Bravellian.Core.JobSettingsIdentifier" />
+	<TypeMappingRule ColumnNamePattern="JobSupplierId" TargetType="Bravellian.Core.JobSupplierIdentifier" />
+	<TypeMappingRule ColumnNamePattern="JobWaiverId" TargetType="Bravellian.Core.JobWaiverIdentifier" />
+	<TypeMappingRule ColumnNamePattern="JsonDataId" TargetType="Bravellian.Core.JsonDataIdentifier" />
+	<TypeMappingRule ColumnNamePattern="MetricId" TargetType="Bravellian.Core.MetricIdentifier" />
+	<TypeMappingRule ColumnNamePattern="MostRecentlyVisitedId" TargetType="Bravellian.Core.MostRecentlyVisitedIdentifier" />
+	<TypeMappingRule ColumnNamePattern="OrganizationId" TargetType="Bravellian.Core.OrganizationIdentifier" />
+	<TypeMappingRule ColumnNamePattern="BravellianTenantId" TargetType="Bravellian.Core.BravellianTenantIdentifier" />
+	<TypeMappingRule ColumnNamePattern="BravellianTenantAddressUsaId" TargetType="Bravellian.Core.BravellianTenantAddressUsaIdentifier" />
+	<TypeMappingRule ColumnNamePattern="BravellianTenantGeneralSettingsId" TargetType="Bravellian.Core.BravellianTenantGeneralSettingsIdentifier" />
+	<TypeMappingRule ColumnNamePattern="BravellianTenantUserId" TargetType="Bravellian.Core.BravellianTenantUserIdentifier" />
+	<TypeMappingRule ColumnNamePattern="BravellianTenantWorkflowId" TargetType="Bravellian.Core.BravellianTenantWorkflowIdentifier" />
+	<TypeMappingRule ColumnNamePattern="PaymentApplicationId" TargetType="Bravellian.Core.PaymentApplicationIdentifier" />
+	<TypeMappingRule ColumnNamePattern="PaymentApplicationNoteId" TargetType="Bravellian.Core.PaymentApplicationNoteIdentifier" />
+	<TypeMappingRule ColumnNamePattern="PaymentApplicationCommitmentAllocationId" TargetType="Bravellian.Core.PaymentApplicationCommitmentAllocationIdentifier" />
+	<TypeMappingRule ColumnNamePattern="PaymentApplicationCommitmentAllocationSalesTaxId" TargetType="Bravellian.Core.PaymentApplicationCommitmentAllocationSalesTaxIdentifier" />
+	<TypeMappingRule ColumnNamePattern="PaymentWaiverGroupAttachmentId" TargetType="Bravellian.Core.PaymentWaiverGroupAttachmentIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SigningRequestId" TargetType="Bravellian.Core.SigningRequestIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SpectrumIntegrationId" TargetType="Bravellian.Core.SpectrumIntegrationIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CommitmentorAssociationCodeId" TargetType="Bravellian.Core.CommitmentorAssociationCodeIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CommitmentorNotaryId" TargetType="Bravellian.Core.CommitmentorNotaryIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CommitmentorSignerId" TargetType="Bravellian.Core.CommitmentorSignerIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CommitmentorTenantId" TargetType="Bravellian.Core.CommitmentorTenantIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SupplierId" TargetType="Bravellian.Core.SupplierIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SystemEventId" TargetType="Bravellian.Core.SystemEventIdentifier" />
+	<TypeMappingRule ColumnNamePattern="TemplateDocumentId" TargetType="Bravellian.Core.TemplateDocumentIdentifier" />
+	<TypeMappingRule ColumnNamePattern="TenantControllerId" TargetType="Bravellian.Core.TenantControllerIdentifier" />
+	<TypeMappingRule ColumnNamePattern="VendorAddressUsaId" TargetType="Bravellian.Core.VendorAddressUsaIdentifier" />
+	<TypeMappingRule ColumnNamePattern="VendorContactId" TargetType="Bravellian.Core.ContactIdentifier" />
+	<TypeMappingRule ColumnNamePattern="VendorContactRoleId" TargetType="Bravellian.Core.VendorContactRoleIdentifier" />
+	<TypeMappingRule ColumnNamePattern="VistaIntegrationId" TargetType="Bravellian.Core.VistaIntegrationIdentifier" />
+	<TypeMappingRule ColumnNamePattern="WaiverGroupPaymentRecipientId" TargetType="Bravellian.Core.WaiverGroupPaymentRecipientIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CheckpointId" TargetType="Bravellian.Core.CheckpointIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CheckpointTaskEvidenceId" TargetType="Bravellian.Core.CheckpointTaskEvidenceIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CheckpointTaskId" TargetType="Bravellian.Core.CheckpointTaskIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CheckpointTriggerId" TargetType="Bravellian.Core.CheckpointTriggerIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ResponsiblePartyId" TargetType="Bravellian.Core.ComplianceItemResponsiblePartyIdentifier" />
+	<TypeMappingRule ColumnNamePattern="TemplateCheckpointId" TargetType="Bravellian.Core.TemplateCheckpointIdentifier" />
+	<TypeMappingRule ColumnNamePattern="TemplateCheckpointTaskId" TargetType="Bravellian.Core.TemplateCheckpointTaskIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ChangeOrderId" TargetType="Bravellian.Core.ChangeOrderIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ChangeOrderLineItemId" TargetType="Bravellian.Core.ChangeOrderLineItemIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ContactId" TargetType="Bravellian.Core.ContactIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CostTypeId" TargetType="Bravellian.Core.CostTypeIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CostCodeId" TargetType="Bravellian.Core.PhaseIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ParentCostCodeId" TargetType="Bravellian.Core.PhaseIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CustomerContractId" TargetType="Bravellian.Core.CustomerContractIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CustomerContractLineItemId" TargetType="Bravellian.Core.CustomerContractLineItemIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CustomerId" TargetType="Bravellian.Core.CustomerIdentifier" />
+	<TypeMappingRule ColumnNamePattern="FirmContactId" TargetType="Bravellian.Core.FirmContactIdentifier" />
+	<TypeMappingRule ColumnNamePattern="FirmId" TargetType="Bravellian.Core.FirmIdentifier" />
+	<TypeMappingRule ColumnNamePattern="HeadquarterDataId" TargetType="Bravellian.Core.HeadquarterDataIdentifier" />
+	<TypeMappingRule ColumnNamePattern="InvoiceId" TargetType="Bravellian.Core.InvoiceIdentifier" />
+	<TypeMappingRule ColumnNamePattern="InvoiceLineItemId" TargetType="Bravellian.Core.InvoiceLineItemIdentifier" />
+	<TypeMappingRule ColumnNamePattern="JobId" TargetType="Bravellian.Core.JobIdentifier" />
+	<TypeMappingRule ColumnNamePattern="JournalPaymentId" TargetType="Bravellian.Core.JournalPaymentIdentifier" />
+	<TypeMappingRule ColumnNamePattern="JournalPaymentLineItemId" TargetType="Bravellian.Core.JournalPaymentLineItemIdentifier" />
+	<TypeMappingRule ColumnNamePattern="OpenBatchInvoiceId" TargetType="Bravellian.Core.OpenBatchInvoiceIdentifier" />
+	<TypeMappingRule ColumnNamePattern="OpenBatchInvoiceLineItemId" TargetType="Bravellian.Core.OpenBatchInvoiceLineItemIdentifier" />
+	<TypeMappingRule ColumnNamePattern="PhaseId" TargetType="Bravellian.Core.PhaseIdentifier" />
+	<TypeMappingRule ColumnNamePattern="PurchaseOrderId" TargetType="Bravellian.Core.PurchaseOrderIdentifier" />
+	<TypeMappingRule ColumnNamePattern="PurchaseOrderLineItemId" TargetType="Bravellian.Core.PurchaseOrderLineItemIdentifier" />
+	<TypeMappingRule ColumnNamePattern="PurchaseOrderChangeOrderId" TargetType="Bravellian.PurchaseOrderChangeOrderIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CommitmentId" TargetType="Bravellian.Core.CommitmentIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CommitmentLineItemId" TargetType="Bravellian.Core.CommitmentLineItemIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CommitmentChangeOrderId" TargetType="Bravellian.CommitmentChangeOrderIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CommitmentChangeOrderLineItemId" TargetType="Bravellian.CommitmentChangeOrderLineItemIdentifier" />
+	<TypeMappingRule ColumnNamePattern="TaxCodeId" TargetType="Bravellian.Core.TaxCodeIdentifier" />
+	<TypeMappingRule ColumnNamePattern="VendorId" TargetType="Bravellian.Core.VendorIdentifier" />
+	<TypeMappingRule ColumnNamePattern="BoxSignatureRequestId" TargetType="Bravellian.Core.BoxSignatureRequestIdentifier" />
+	<TypeMappingRule ColumnNamePattern="WebhookPayloadId" TargetType="Bravellian.Core.WebhookPayloadIdentifier" />
+	<TypeMappingRule ColumnNamePattern="DisbursementBatchId" TargetType="Bravellian.Core.DisbursementBatchIdentifier" />
+	<TypeMappingRule ColumnNamePattern="DisbursementLineItemId" TargetType="Bravellian.Core.DisbursementLineItemIdentifier" />
+	<TypeMappingRule ColumnNamePattern="DisbursementId" TargetType="Bravellian.Core.DisbursementIdentifier" />
+	<TypeMappingRule ColumnNamePattern="NatPayEntryAddendaId" TargetType="Bravellian.Core.NatPayEntryAddendaIdentifier" />
+	<TypeMappingRule ColumnNamePattern="NatPayBatchId" TargetType="Bravellian.Core.NatPayBatchIdentifier" />
+	<TypeMappingRule ColumnNamePattern="NatPayEntryId" TargetType="Bravellian.Core.NatPayEntryIdentifier" />
+	<TypeMappingRule ColumnNamePattern="DisbursementAccountId" TargetType="Bravellian.Core.DisbursementAccountIdentifier" />
+	<TypeMappingRule ColumnNamePattern="GlobalTemplateDocumentId" TargetType="Bravellian.Core.GlobalTemplateDocumentIdentifier" />
+	<TypeMappingRule ColumnNamePattern="GlobalDocumentId" TargetType="Bravellian.Core.GlobalDocumentIdentifier" />
+	<TypeMappingRule ColumnNamePattern="MarketplaceSubscriptionId" TargetType="Bravellian.Core.MarketplaceSubscriptionIdentifier" />
+	<TypeMappingRule ColumnNamePattern="MarketplaceSubscriptionHistoryId" TargetType="Bravellian.Core.MarketplaceSubscriptionHistoryIdentifier" />
+	<TypeMappingRule ColumnNamePattern="MarketplaceOnboardingId" TargetType="Bravellian.Core.MarketplaceOnboardingIdentifier" />
+	<TypeMappingRule ColumnNamePattern="NatPayPaymentId" TargetType="Bravellian.Core.NatPayPaymentIdentifier" />
+	<TypeMappingRule ColumnNamePattern="StripePaymentId" TargetType="Bravellian.Core.StripePaymentIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SigningRequestWebhookRegistrationId" TargetType="Bravellian.Core.SigningRequestWebhookRegistrationIdentifier" />
+	<TypeMappingRule ColumnNamePattern="TenantUserRoleId" TargetType="Bravellian.Core.TenantUserRoleIdentifier" />
+	<TypeMappingRule ColumnNamePattern="OrganizationUserId" TargetType="Bravellian.Core.OrganizationUserIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CustomerRoles" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="InternalRoles" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="ApPaymentId" TargetType="Bravellian.Core.JournalPaymentIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ApPaymentLineItemId" TargetType="Bravellian.Core.JournalPaymentLineItemIdentifier" />
+	<TypeMappingRule ColumnNamePattern="Timestamp" TargetType="System.DateTimeOffset" />
+	<TypeMappingRule ColumnNamePattern="BravellianTenantId" TargetType="Bravellian.Core.BravellianTenantIdentifier" />
+	<TypeMappingRule ColumnNamePattern="OrganizationId" TargetType="Bravellian.Core.OrganizationIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ApInvoiceId" TargetType="Bravellian.Core.InvoiceIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ApInvoiceLineItemId" TargetType="Bravellian.Core.InvoiceLineItemIdentifier" />
+	<TypeMappingRule ColumnNamePattern="InvoiceVendorId" TargetType="Bravellian.Core.VendorIdentifier" />
+	<TypeMappingRule ColumnNamePattern="TenantId" TargetType="Bravellian.Core.BravellianTenantIdentifier" />
+	<TypeMappingRule ColumnNamePattern="OriginalBillingPeriodId" TargetType="Bravellian.Core.BillingPeriodIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SyncLockId" TargetType="Bravellian.Core.SyncLockIdentifier" />
+	<TypeMappingRule ColumnNamePattern="OwnerVendorId" TargetType="Bravellian.Core.VendorIdentifier" />
+	<TypeMappingRule ColumnNamePattern="OwnerTenantId" TargetType="Bravellian.Core.BravellianTenantIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SourceDocumentId" TargetType="Bravellian.Core.DocumentIdentifier" />
+	<TypeMappingRule ColumnNamePattern="EntityFieldLookupKeyId" TargetType="Bravellian.EntityFieldLookupKeyIdentifier" />
+	<TypeMappingRule ColumnNamePattern="VendorRole" TargetType="Bravellian.Core.VendorUserRole" />
+	<TypeMappingRule ColumnNamePattern="PaymentWaiverGroupType" TargetType="Bravellian.Core.PaymentWaiverGroupType" />
+	<TypeMappingRule ColumnNamePattern="BillingFrequencyType" TargetType="Bravellian.Core.BillingFrequencyType" />
+	<TypeMappingRule ColumnNamePattern="EventType" TargetType="Bravellian.Core.PwEventType" />
+	<TypeMappingRule ColumnNamePattern="MeteredBillingEvent" TargetType="Bravellian.Core.MeteredBillingEvent" />
+	<TypeMappingRule ColumnNamePattern="ApPayType" TargetType="Bravellian.App.Infrastructure.IntegrationFacade.Vista.ApPayType" />
+	<TypeMappingRule ColumnNamePattern="CheckpointType" TargetType="Bravellian.Core.CheckpointType" />
+	<TypeMappingRule ColumnNamePattern="HelloSignEventType" TargetType="Bravellian.Core.Enums.HelloSignEventType" />
+	<TypeMappingRule ColumnNamePattern="MetricGroupType" TargetType="Bravellian.Core.Enums.MetricGroupType" />
+	<TypeMappingRule ColumnNamePattern="HttpMethod" TargetType="Bravellian.Core.Enums.PwHttpMethod" />
+	<TypeMappingRule ColumnNamePattern="RetentionStatus" TargetType="Bravellian.Core.RetentionStatus" />
+	<TypeMappingRule ColumnNamePattern="TemplateDocumentPredicateType" TargetType="Bravellian.Core.TemplateDocumentPredicateType" />
+	<TypeMappingRule ColumnNamePattern="PaymentApplicationCompliancePredicateType" TargetType="Bravellian.Core.PaymentApplicationCompliancePredicateType" />
+	<TypeMappingRule ColumnNamePattern="PaymentCompliancePredicateType" TargetType="Bravellian.Core.PaymentCompliancePredicateType" />
+	<TypeMappingRule ColumnNamePattern="State" TargetType="Bravellian.Core.UsaState" />
+	<TypeMappingRule ColumnNamePattern="State" TableNamePattern="APVM" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="UserWorkflow" TargetType="Bravellian.Core.UserWorkflow" />
+	<TypeMappingRule ColumnNamePattern="AccountingSystem" TargetType="Bravellian.Core.AccountingSystemEnum" />
+	<TypeMappingRule ColumnNamePattern="DocumentType" TargetType="Bravellian.Core.DocumentType" />
+	<TypeMappingRule ColumnNamePattern="InvoiceLineItemPaymentPayType" TargetType="Bravellian.Core.InvoiceLineItemPaymentPayType" />
+	<TypeMappingRule ColumnNamePattern="PaymentApplicationStatus" TargetType="Bravellian.Core.PaymentApplicationStatus" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="PaymentApplication" TargetType="Bravellian.Core.PaymentApplicationStatus" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="PaymentApplicationDetail" TargetType="Bravellian.Core.PaymentApplicationStatus" />
+	<TypeMappingRule ColumnNamePattern="PaymentApplicationType" TargetType="Bravellian.Core.PaymentApplicationType" />
+	<TypeMappingRule ColumnNamePattern="PaymentWaiverGroupEnvelopeStatus" TargetType="Bravellian.Core.PaymentWaiverGroupEnvelopeStatus" />
+	<TypeMappingRule ColumnNamePattern="PrefillSource" TargetType="Bravellian.Core.PrefillSource" />
+	<TypeMappingRule ColumnNamePattern="TemplateDocumentAutographType" TargetType="Bravellian.Core.TemplateDocumentAutographType" />
+	<TypeMappingRule ColumnNamePattern="SystemComponent" TargetType="Bravellian.Tests.Shared.CustomAttributes.PwSystemComponent" />
+	<TypeMappingRule ColumnNamePattern="ContractType" TargetType="Bravellian.ErpContractType" />
+	<TypeMappingRule ColumnNamePattern="ChangeOrderStatus" TargetType="Bravellian.ErpChangeOrderStatus" />
+	<TypeMappingRule ColumnNamePattern="PurchaseOrderStatus" TargetType="Bravellian.ErpPurchaseOrderStatus" />
+	<TypeMappingRule ColumnNamePattern="CommitmentStatus" TargetType="Bravellian.ErpCommitmentStatus" />
+	<TypeMappingRule ColumnNamePattern="ApPaymentStatus" TargetType="Bravellian.ErpApPaymentStatus" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="ApPaymentDetail" TargetType="Bravellian.ErpApPaymentStatus" />
+	<TypeMappingRule ColumnNamePattern="ApPaymentMethod" TargetType="Bravellian.ErpApPaymentMethod" />
+	<TypeMappingRule ColumnNamePattern="ApInvoiceStatus" TargetType="Bravellian.ErpApInvoiceStatus" />
+	<TypeMappingRule ColumnNamePattern="ApInvoiceType" TargetType="Bravellian.ErpApInvoiceType" />
+	<TypeMappingRule ColumnNamePattern="JobStatus" TargetType="Bravellian.ErpJobStatus" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="JobDetail" TargetType="Bravellian.ErpJobStatus" />
+	<TypeMappingRule ColumnNamePattern="TotalCommitmentBalance" TableNamePattern="JobDetail" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="TotalCommitmentPercentageCompleted" TableNamePattern="JobDetail" TargetType="Bravellian.Core.Percentage" />
+	<TypeMappingRule ColumnNamePattern="HourBlockUtc" TargetType="Bravellian.ErpHourBlockUtc" />
+	<TypeMappingRule ColumnNamePattern="HourBlockRange" TargetType="Bravellian.ErpHourBlockRange" />
+	<TypeMappingRule ColumnNamePattern="ResponsiblePartyType" TargetType="Bravellian.Core.ResponsiblePartyType" />
+	<TypeMappingRule ColumnNamePattern="TaskKeyTemplateType" TargetType="Bravellian.Core.TaskKeyTemplateType" />
+	<TypeMappingRule ColumnNamePattern="ComplianceItemType" TargetType="Bravellian.Core.ComplianceItemType" />
+	<TypeMappingRule ColumnNamePattern="BasicComplianceItemType" TargetType="Bravellian.Core.BasicComplianceItemType" />
+	<TypeMappingRule ColumnNamePattern="SigningProvider" TargetType="Bravellian.Core.SigningProvider" />
+	<TypeMappingRule ColumnNamePattern="SigningRequestStatus" TargetType="Bravellian.Core.SigningRequestStatus" />
+	<TypeMappingRule ColumnNamePattern="WorkflowType" TargetType="Bravellian.Core.WorkflowType" />
+	<TypeMappingRule ColumnNamePattern="WorkflowPredicateOperator" TargetType="Bravellian.Core.WorkflowPredicateOperator" />
+	<TypeMappingRule ColumnNamePattern="WorkflowPredicateType" TargetType="Bravellian.Core.WorkflowPredicateType" />
+	<TypeMappingRule ColumnNamePattern="WorkflowCriteriaType" TargetType="Bravellian.Core.WorkflowCriteriaType" />
+	<TypeMappingRule ColumnNamePattern="DisbursementMethod" TargetType="Bravellian.Core.DisbursementMethod" />
+	<TypeMappingRule ColumnNamePattern="DisbursementProcessor" TargetType="Bravellian.Core.DisbursementProcessor" />
+	<TypeMappingRule ColumnNamePattern="DisbursementStatus" TargetType="Bravellian.Core.DisbursementStatus" />
+	<TypeMappingRule ColumnNamePattern="BankAccountType" TargetType="Bravellian.Core.BankAccountType" />
+	<TypeMappingRule ColumnNamePattern="NatPayEntryType" TargetType="Bravellian.Core.NatPayEntryType" />
+	<TypeMappingRule ColumnNamePattern="NatPayBatchStatus" TargetType="Bravellian.Core.NatPayBatchStatus" />
+	<TypeMappingRule ColumnNamePattern="ExternalIdentifierEntityType" TargetType="Bravellian.Core.ExternalIdentifierEntityType" />
+	<TypeMappingRule ColumnNamePattern="ExternalIdentifierType" TargetType="Bravellian.Core.ExternalIdentifierType" />
+	<TypeMappingRule ColumnNamePattern="ComplianceItemEvidenceType" TargetType="Bravellian.Core.ComplianceItemEvidenceType" />
+	<TypeMappingRule ColumnNamePattern="ComplianceItemStatus" TargetType="Bravellian.Core.ComplianceItemStatus" />
+	<TypeMappingRule ColumnNamePattern="ComplianceItemSubmitterType" TargetType="Bravellian.Core.ComplianceItemSubmitterType" />
+	<TypeMappingRule ColumnNamePattern="ComplianceItemResponsibleParty" TargetType="Bravellian.Core.ComplianceItemResponsibleParty" />
+	<TypeMappingRule ColumnNamePattern="ComplianceWorkflowType" TargetType="Bravellian.Core.ComplianceWorkflowType" />
+	<TypeMappingRule ColumnNamePattern="ComplianceWorkflowCategory" TargetType="Bravellian.Core.ComplianceWorkflowCategory" />
+	<TypeMappingRule ColumnNamePattern="ComplianceItemDefinitionExpiryNotificationsStart" TargetType="Bravellian.Core.ComplianceItemDefinitionExpiryNotificationsStart" />
+	<TypeMappingRule ColumnNamePattern="MarketplaceSubscriptionStatus" TargetType="Bravellian.Core.MarketplaceSubscriptionStatus" />
+	<TypeMappingRule ColumnNamePattern="MarketplaceSubscriptionProvider" TargetType="Bravellian.Core.MarketplaceSubscriptionProvider" />
+	<TypeMappingRule ColumnNamePattern="TenantDataSyncStatus" TargetType="Bravellian.Core.TenantDataSyncStatus" />
+	<TypeMappingRule ColumnNamePattern="SyncType" TargetType="Bravellian.Core.SyncType" />
+	<TypeMappingRule ColumnNamePattern="ContextTokenType" TargetType="Bravellian.Core.ContextTokenType" />
+	<TypeMappingRule ColumnNamePattern="ConnectedEntityType" TargetType="Bravellian.Core.ConnectedEntityType" />
+	<TypeMappingRule ColumnNamePattern="UserPermission" TargetType="Bravellian.Core.UserPermission" />
+	<TypeMappingRule ColumnNamePattern="InternalUserRole" TargetType="Bravellian.Core.InternalUserRole" />
+	<TypeMappingRule ColumnNamePattern="CustomerUserRole" TargetType="Bravellian.Core.CustomerUserRole" />
+	<TypeMappingRule ColumnNamePattern="GlobalAdminUserId" TargetType="Bravellian.Core.UserObjectId" />
+	<TypeMappingRule ColumnNamePattern="SubscriptionProvider" TargetType="Bravellian.Core.MarketplaceSubscriptionProvider" />
+	<TypeMappingRule ColumnNamePattern="ExternalSubscriptionId" TargetType="Bravellian.Core.OrganizationSubscriptionIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SubscriptionStatus" TargetType="Bravellian.Core.MarketplaceSubscriptionStatus" />
+	<TypeMappingRule ColumnNamePattern="Context" TargetType="Bravellian.Core.JsonContext" />
+	<TypeMappingRule ColumnNamePattern="Metadata" TargetType="Bravellian.Core.JsonContext" />
+	<TypeMappingRule ColumnNamePattern="UserId" TargetType="Bravellian.Core.UserObjectId" />
+	<TypeMappingRule ColumnNamePattern="Email" TargetType="Bravellian.EmailAddress" />
+	<TypeMappingRule ColumnNamePattern="Role" TableNamePattern="VendorUser" TargetType="Bravellian.Core.VendorUserRole" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="PaymentWaiverGroup" TargetType="Bravellian.Core.PaymentWaiverGroupType" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="BillingFrequencie" TargetType="Bravellian.Core.BillingFrequencyType" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="Event" TargetType="Bravellian.Core.PwEventType" />
+	<TypeMappingRule ColumnNamePattern="Event" TableNamePattern="Billin" TargetType="Bravellian.Core.MeteredBillingEvent" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="ApPayment" TargetType="Bravellian.App.Infrastructure.IntegrationFacade.Vista.ApPayType" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="Checkpoint" TargetType="Bravellian.Core.CheckpointType" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="HelloSignEvent" TargetType="Bravellian.Core.Enums.HelloSignEventType" />
+	<TypeMappingRule ColumnNamePattern="GroupType" TableNamePattern="Metric" TargetType="Bravellian.Core.Enums.MetricGroupType" />
+	<TypeMappingRule ColumnNamePattern="Method" TableNamePattern="HttpRequest" TargetType="Bravellian.Core.Enums.PwHttpMethod" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="Retention" TargetType="Bravellian.Core.RetentionStatus" />
+	<TypeMappingRule ColumnNamePattern="PredicateType" TableNamePattern="TemplateDocument" TargetType="Bravellian.Core.TemplateDocumentPredicateType" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="PaymentApplication" TargetType="Bravellian.Core.PaymentApplicationStatus" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="PaymentApplication" TargetType="Bravellian.Core.PaymentApplicationType" />
+	<TypeMappingRule ColumnNamePattern="EnvelopeStatus" TableNamePattern="PaymentWaiverGroup" TargetType="Bravellian.Core.PaymentWaiverGroupEnvelopeStatus" />
+	<TypeMappingRule ColumnNamePattern="PrefillSource" TableNamePattern="Template" TargetType="Bravellian.Core.PrefillSource" />
+	<TypeMappingRule ColumnNamePattern="AutographType" TableNamePattern="TemplateDocument" TargetType="Bravellian.Core.TemplateDocumentAutographType" />
+	<TypeMappingRule ColumnNamePattern="Component" TableNamePattern="System" TargetType="Bravellian.Tests.Shared.CustomAttributes.PwSystemComponent" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="Contract" TargetType="Bravellian.ErpContractType" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="ChangeOrder" TargetType="Bravellian.ErpChangeOrderStatus" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="PurchaseOrder" TargetType="Bravellian.ErpPurchaseOrderStatus" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="Commitment" TargetType="Bravellian.ErpCommitmentStatus" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="ApPayment" TargetType="Bravellian.ErpApPaymentStatus" />
+	<TypeMappingRule ColumnNamePattern="Method" TableNamePattern="ApPayment" TargetType="Bravellian.ErpApPaymentMethod" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="ApInvoice" TargetType="Bravellian.ErpApInvoiceStatus" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="ApInvoice" TargetType="Bravellian.ErpApInvoiceType" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="Job" TargetType="Bravellian.ErpJobStatus" />
+	<TypeMappingRule ColumnNamePattern="HourUtc" TableNamePattern="TimeBlock" TargetType="Bravellian.ErpHourBlockUtc" />
+	<TypeMappingRule ColumnNamePattern="Range" TableNamePattern="TimeBlock" TargetType="Bravellian.ErpHourBlockRange" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="ResponsiblePartie" TargetType="Bravellian.Core.ResponsiblePartyType" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="TaskKeyTemplate" TargetType="Bravellian.Core.TaskKeyTemplateType" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="ComplianceItem" TargetType="Bravellian.Core.ComplianceItemType" />
+	<TypeMappingRule ColumnNamePattern="BasicType" TableNamePattern="ComplianceItem" TargetType="Bravellian.Core.BasicComplianceItemType" />
+	<TypeMappingRule ColumnNamePattern="Provider" TableNamePattern="SigningRequest" TargetType="Bravellian.Core.SigningProvider" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="SigningRequest" TargetType="Bravellian.Core.SigningRequestStatus" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="Workflow" TargetType="Bravellian.Core.WorkflowType" />
+	<TypeMappingRule ColumnNamePattern="Operator" TableNamePattern="WorkflowPredicate" TargetType="Bravellian.Core.WorkflowPredicateOperator" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="WorkflowPredicate" TargetType="Bravellian.Core.WorkflowPredicateType" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="WorkflowCriteri" TargetType="Bravellian.Core.WorkflowCriteriaType" />
+	<TypeMappingRule ColumnNamePattern="Method" TableNamePattern="Payment" TargetType="Bravellian.Core.PaymentMethod" />
+	<TypeMappingRule ColumnNamePattern="Processor" TableNamePattern="Payment" TargetType="Bravellian.Core.PaymentProcessor" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="Payment" TargetType="Bravellian.Core.DisbursementStatus" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="BankAccount" TargetType="Bravellian.Core.BankAccountType" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="NatPayEntrie" TargetType="Bravellian.Core.NatPayEntryType" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="NatPayBatche" TargetType="Bravellian.Core.NatPayBatchStatus" />
+	<TypeMappingRule ColumnNamePattern="EntityType" TableNamePattern="ExternalIdentifier" TargetType="Bravellian.Core.ExternalIdentifierEntityType" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="ExternalIdentifier" TargetType="Bravellian.Core.ExternalIdentifierType" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="ComplianceItemEvidenc" TargetType="Bravellian.Core.ComplianceItemEvidenceType" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="ComplianceItem" TargetType="Bravellian.Core.ComplianceItemStatus" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="ComplianceItemSubmitter" TargetType="Bravellian.Core.ComplianceItemSubmitterType" />
+	<TypeMappingRule ColumnNamePattern="ResponsibleParty" TableNamePattern="ComplianceItem" TargetType="Bravellian.Core.ComplianceItemResponsibleParty" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="ComplianceWorkflow" TargetType="Bravellian.Core.ComplianceWorkflowType" />
+	<TypeMappingRule ColumnNamePattern="Category" TableNamePattern="ComplianceWorkflow" TargetType="Bravellian.Core.ComplianceWorkflowCategory" />
+	<TypeMappingRule ColumnNamePattern="ExpiryNotificationsStart" TableNamePattern="ComplianceItemDefinition" TargetType="Bravellian.Core.ComplianceItemDefinitionExpiryNotificationsStart" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="MarketplaceSubscription" TargetType="Bravellian.Core.MarketplaceSubscriptionStatus" />
+	<TypeMappingRule ColumnNamePattern="Provider" TableNamePattern="MarketplaceSubscription" TargetType="Bravellian.Core.MarketplaceSubscriptionProvider" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="ContextToken" TargetType="Bravellian.Core.ContextTokenType" />
+	<TypeMappingRule ColumnNamePattern="Rate" TableNamePattern="TaxCode" TargetType="Bravellian.Core.Percentage" />
+	<TypeMappingRule ColumnNamePattern="DbConnectionString" TableNamePattern="Organization" TargetType="Bravellian.Server.EncryptedOrganizationDbConnectionString" />
+	<TypeMappingRule ColumnNamePattern="DbConnectionString" TableNamePattern="OrganizationDetail" TargetType="Bravellian.Server.EncryptedOrganizationDbConnectionString" />
+	<TypeMappingRule ColumnNamePattern="PayAppCount" TableNamePattern="BillingPeriodDetail" TargetType="int" />
+	<TypeMappingRule ColumnNamePattern="PendingPayAppCount" TableNamePattern="BillingPeriodDetail" TargetType="int" />
+	<TypeMappingRule ColumnNamePattern="ApprovedPayAppCount" TableNamePattern="BillingPeriodDetail" TargetType="int" />
+	<TypeMappingRule ColumnNamePattern="RejectedPayAppCount" TableNamePattern="BillingPeriodDetail" TargetType="int" />
+	<TypeMappingRule ColumnNamePattern="IssueCount" TableNamePattern="BillingPeriodDetail" TargetType="int" />
+	<TypeMappingRule ColumnNamePattern="TotalInvoiceGrossAmount" TableNamePattern="BillingPeriodDetail" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="InvoiceLineItemUnitPrice" TableNamePattern="DisbursementLineItemDetail" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="InvoiceLineItemAmount" TableNamePattern="DisbursementLineItemDetail" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="InvoiceDueOn" TableNamePattern="DisbursementLineItemDetail" TargetType="DateOnly" />
+	<TypeMappingRule ColumnNamePattern="InvoiceIssuedOn" TableNamePattern="DisbursementLineItemDetail" TargetType="DateOnly" />
+	<TypeMappingRule ColumnNamePattern="FundingAccountIsAvailableForFunding" TableNamePattern="DisbursementDetail" TargetType="bool" />
+	<TypeMappingRule ColumnNamePattern="FundingAccountIsActive" TableNamePattern="DisbursementDetail" TargetType="bool" />
+	<TypeMappingRule ColumnNamePattern="FundingAccountOwnerTenantId" TableNamePattern="DisbursementDetail" TargetType="Bravellian.Core.BravellianTenantIdentifier" />
+	<TypeMappingRule ColumnNamePattern="FundingAccountOwnerVendorId" TableNamePattern="DisbursementDetail" TargetType="Bravellian.Core.VendorIdentifier" />
+	<TypeMappingRule ColumnNamePattern="DisbursementAccountIsAvailableForDisbursement" TableNamePattern="DisbursementDetail" TargetType="bool" />
+	<TypeMappingRule ColumnNamePattern="DisbursementAccountIsActive" TableNamePattern="DisbursementDetail" TargetType="bool" />
+	<TypeMappingRule ColumnNamePattern="DisbursementAccountOwnerTenantId" TableNamePattern="DisbursementDetail" TargetType="Bravellian.Core.BravellianTenantIdentifier" />
+	<TypeMappingRule ColumnNamePattern="DisbursementAccountOwnerVendorId" TableNamePattern="DisbursementDetail" TargetType="Bravellian.Core.VendorIdentifier" />
+	<TypeMappingRule ColumnNamePattern="TotalAmount" TableNamePattern="DisbursementDetail" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="BravellianTenantId" TableNamePattern="PayAppRequestedEvent" TargetType="Bravellian.Core.BravellianTenantIdentifier" />
+	<TypeMappingRule ColumnNamePattern="OrganizationId" TableNamePattern="PayAppRequestedEvent" TargetType="Bravellian.Core.OrganizationIdentifier" />
+	<TypeMappingRule ColumnNamePattern="Timestamp" TableNamePattern="PayAppRequestedEvent" TargetType="System.DateTimeOffset" />
+	<TypeMappingRule ColumnNamePattern="PaymentApplicationId" TableNamePattern="PayAppRequestedEvent" TargetType="Bravellian.Core.PaymentApplicationIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CommitmentId" TableNamePattern="PayAppRequestedEvent" TargetType="Bravellian.Core.CommitmentIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ContractType" TableNamePattern="PayAppRequestedEvent" TargetType="Bravellian.ErpContractType" />
+	<TypeMappingRule ColumnNamePattern="BravellianTenantId" TableNamePattern="SignatureSignedEvent" TargetType="Bravellian.Core.BravellianTenantIdentifier" />
+	<TypeMappingRule ColumnNamePattern="OrganizationId" TableNamePattern="SignatureSignedEvent" TargetType="Bravellian.Core.OrganizationIdentifier" />
+	<TypeMappingRule ColumnNamePattern="Timestamp" TableNamePattern="SignatureSignedEvent" TargetType="System.DateTimeOffset" />
+	<TypeMappingRule ColumnNamePattern="EnvelopeId" TableNamePattern="SignatureSignedEvent" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="Signer" TableNamePattern="SignatureSignedEvent" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="Character" TableNamePattern="RandomCharacters" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="Character" TableNamePattern="RandomUserCodeCharacters" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="Provider" TableNamePattern="SigningRequestWebhookRegistration" TargetType="Bravellian.Core.SigningProvider" />
+	<TypeMappingRule ColumnNamePattern="AutographType" TableNamePattern="GlobalTemplateDocument" TargetType="Bravellian.Core.TemplateDocumentAutographType" />
+	<TypeMappingRule ColumnNamePattern="UsaState" TableNamePattern="GlobalTemplateDocument" TargetType="Bravellian.Core.UsaState" />
+	<TypeMappingRule ColumnNamePattern="Key" TableNamePattern="VendorContextValue" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="Value" TableNamePattern="VendorContextValue" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="Key" TableNamePattern="TenantContextValue" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="Value" TableNamePattern="TenantContextValue" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="BravellianTenantId" TableNamePattern="TenantContextValue" TargetType="Bravellian.Core.BravellianTenantIdentifier" />
+	<TypeMappingRule ColumnNamePattern="Key" TableNamePattern="CommitmentContextValue" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="Value" TableNamePattern="CommitmentContextValue" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="BravellianTenantId" TableNamePattern="CommitmentContextValue" TargetType="Bravellian.Core.BravellianTenantIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CommitmentId" TableNamePattern="CommitmentContextValue" TargetType="Bravellian.Core.CommitmentIdentifier" />
+	<TypeMappingRule ColumnNamePattern="JobId" TableNamePattern="CommitmentContextValue" TargetType="Bravellian.Core.JobIdentifier" />
+	<TypeMappingRule ColumnNamePattern="Key" TableNamePattern="PurchaseOrderContextValue" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="Value" TableNamePattern="PurchaseOrderContextValue" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="BravellianTenantId" TableNamePattern="PurchaseOrderContextValue" TargetType="Bravellian.Core.BravellianTenantIdentifier" />
+	<TypeMappingRule ColumnNamePattern="PurchaseOrderId" TableNamePattern="PurchaseOrderContextValue" TargetType="Bravellian.Core.PurchaseOrderIdentifier" />
+	<TypeMappingRule ColumnNamePattern="JobId" TableNamePattern="PurchaseOrderContextValue" TargetType="Bravellian.Core.JobIdentifier" />
+	<TypeMappingRule ColumnNamePattern="VendorId" TableNamePattern="PurchaseOrderContextValue" TargetType="Bravellian.Core.VendorIdentifier" />
+	<TypeMappingRule ColumnNamePattern="Key" TableNamePattern="PaymentWaiverGroupContextValue" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="Value" TableNamePattern="PaymentWaiverGroupContextValue" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="BravellianTenantId" TableNamePattern="PaymentWaiverGroupContextValue" TargetType="Bravellian.Core.BravellianTenantIdentifier" />
+	<TypeMappingRule ColumnNamePattern="LastBillingDate" TableNamePattern="StripeCustomerDetail" TargetType="System.DateOnly" />
+	<TypeMappingRule ColumnNamePattern="NextBillingDate" TableNamePattern="StripeCustomerDetail" TargetType="System.DateOnly" />
+	<TypeMappingRule ColumnNamePattern="GcName" TableNamePattern="TenantTemplateFields" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="GcCity" TableNamePattern="TenantTemplateFields" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="GcState" TableNamePattern="TenantTemplateFields" TargetType="Bravellian.Core.UsaState" />
+	<TypeMappingRule ColumnNamePattern="GcZip" TableNamePattern="TenantTemplateFields" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="GcAddressLine1" TableNamePattern="TenantTemplateFields" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="SourceGlobalTemplateDocumentId" TableNamePattern="TemplateDocument" TargetType="Bravellian.Core.GlobalTemplateDocumentIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SourceGlobalTemplateDocumentId" TableNamePattern="TemplateDocumentDetail" TargetType="Bravellian.Core.GlobalTemplateDocumentIdentifier" />
+	<TypeMappingRule ColumnNamePattern="DocumentContext" TableNamePattern="TemplateDocumentDetail" TargetType="Bravellian.Core.JsonContext" />
+	<TypeMappingRule ColumnNamePattern="DocumentType" TableNamePattern="TemplateDocumentDetail" TargetType="Bravellian.Core.DocumentType" />
+	<TypeMappingRule ColumnNamePattern="TotalPaidAmount" TableNamePattern="ApInvoiceDetail" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="TotalPaidRetentionAmount" TableNamePattern="ApInvoiceDetail" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="Balance" TableNamePattern="ApInvoiceDetail" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="VendorName" TableNamePattern="ApInvoiceDetail" TargetType="string" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="ApInvoiceDetail" TargetType="Bravellian.ErpApInvoiceStatus" />
+	<TypeMappingRule ColumnNamePattern="FundingAccountId" TargetType="Bravellian.Core.DisbursementAccountIdentifier" />
+	<TypeMappingRule ColumnNamePattern="DisbursementAccountId" TargetType="Bravellian.Core.DisbursementAccountIdentifier" />
+	<TypeMappingRule ColumnNamePattern="Value" TableNamePattern="Code" TargetType="Bravellian.Core.Common.ShortCode" />
+	<TypeMappingRule ColumnNamePattern="CodeType" TableNamePattern="Code" TargetType="Bravellian.Core.ContextTokenType" />
+	<TypeMappingRule ColumnNamePattern="UnitCost" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="Balance" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="DebitTotal" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="CreditTotal" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="DocumentContext" TargetType="Bravellian.Core.JsonContext" />
+	<TypeMappingRule ColumnNamePattern="DataSyncStatus" TargetType="Bravellian.Core.TenantDataSyncStatus" />
+	<TypeMappingRule ColumnNamePattern="Context" TableNamePattern="SigningRequest" TargetType="Bravellian.Core.JsonContext" />
+	<TypeMappingRule ColumnNamePattern="ExternalEnvelopeId" TargetType="Bravellian.Core.SignatureRequestExternalIdentifier" />
+	<TypeMappingRule ColumnNamePattern="PrimaryAddressState" TargetType="Bravellian.Core.UsaState" />
+	<TypeMappingRule ColumnNamePattern="PrimaryAddressId" TargetType="Bravellian.Core.AddressUsaRawIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ResponsibleParty" TargetType="Bravellian.Core.ComplianceItemResponsibleParty" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="ComplianceItemDefinition" TargetType="Bravellian.Core.ComplianceItemType" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="ComplianceItemDetail" TargetType="Bravellian.Core.ComplianceItemStatus" />
+	<TypeMappingRule ColumnNamePattern="EvidenceType" TargetType="Bravellian.Core.ComplianceItemEvidenceType" />
+	<TypeMappingRule ColumnNamePattern="EvidenceId" TargetType="Bravellian.Core.ComplianceItemEvidenceIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SubmitterType" TargetType="Bravellian.Core.ComplianceItemSubmitterType" />
+	<TypeMappingRule ColumnNamePattern="SubmitterId" TargetType="Bravellian.Core.ComplianceItemSubmitterIdentifier" />
+	<TypeMappingRule ColumnNamePattern="EncryptedConnectionString" TableNamePattern="VistaIntegration" TargetType="Bravellian.Server.EncryptedViewpointVistaDbConnectionString" />
+	<TypeMappingRule ColumnNamePattern="AddressState" TargetType="Bravellian.Core.UsaState" />
+	<TypeMappingRule ColumnNamePattern="ErpIntegrationConnectionString" TargetType="Bravellian.EncryptedErpConnectionString" />
+	<TypeMappingRule ColumnNamePattern="AzureMarketplaceSubscriptionId" TargetType="Bravellian.Core.AzureMarketplaceSubscriptionIdentifier" />
+	<TypeMappingRule ColumnNamePattern="Type" TableNamePattern="PaymentApplicationDetail" TargetType="Bravellian.Core.PaymentApplicationType" />
+	<TypeMappingRule ColumnNamePattern="TotalContractAmount" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="TotalChangeAmount" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="TotalInvoiceAmount" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="TotalInvoicedRetentionAmount" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="OriginalAmount" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="Retention" TargetType="Bravellian.Core.Money" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="PurchaseOrder" TargetType="Bravellian.ErpPurchaseOrderStatus" />
+	<TypeMappingRule ColumnNamePattern="Status" TableNamePattern="Commitment" TargetType="Bravellian.ErpCommitmentStatus" />
+	<TypeMappingRule ColumnNamePattern="RecordSource" TargetType="Bravellian.RecordSource" />
+	<TypeMappingRule ColumnNamePattern="RecordSource" TargetType="Bravellian.RecordSource" />
+	<TypeMappingRule ColumnNamePattern="RetentionPercentage" TargetType="Bravellian.Core.Percentage" />
+	<TypeMappingRule ColumnNamePattern="DefaultRetentionPercentage" TargetType="Bravellian.Core.Percentage" />
+	<TypeMappingRule ColumnNamePattern="JobId" TargetType="Bravellian.Core.JobIdentifier" />
+	<TypeMappingRule ColumnNamePattern="VendorId" TargetType="Bravellian.Core.VendorIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CommitmentId" TargetType="Bravellian.Core.CommitmentIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CommitmentLineItemId" TargetType="Bravellian.Core.CommitmentLineItemIdentifier" />
+	<TypeMappingRule ColumnNamePattern="PurchaseOrderId" TargetType="Bravellian.Core.PurchaseOrderIdentifier" />
+	<TypeMappingRule ColumnNamePattern="PurchaseOrderLineItemId" TargetType="Bravellian.Core.PurchaseOrderLineItemIdentifier" />
+	<TypeMappingRule ColumnNamePattern="VendorContactId" TargetType="Bravellian.Core.ContactIdentifier" />
+	<TypeMappingRule ColumnNamePattern="JobErpId" TargetType="Bravellian.JobErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="VendorErpId" TargetType="Bravellian.VendorErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="VendorContactErpId" TargetType="Bravellian.VendorContactErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SubcontractErpId" TargetType="Bravellian.SubcontractErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SubcontractLineItemErpId" TargetType="Bravellian.SubcontractLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="PurchaseOrderErpId" TargetType="Bravellian.PurchaseOrderErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="PurchaseOrderLineItemErpId" TargetType="Bravellian.PurchaseOrderLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="Email" TargetType="Bravellian.EmailAddress" />
+	<TypeMappingRule ColumnNamePattern="JobErpId" TableNamePattern="PayAppJobSetupView" TargetType="Bravellian.JobErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="PayAppPurchaseOrderLineItemSetupView" TargetType="Bravellian.PurchaseOrderLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="PayAppSubcontractLineItemSetupView" TargetType="Bravellian.SubcontractLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="PayAppSubcontractSetupView" TargetType="Bravellian.SubcontractErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="VendorContactErpId" TableNamePattern="PayAppVendorContactSetupView" TargetType="Bravellian.VendorContactErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="VendorErpId" TableNamePattern="PayAppVendorSetupView" TargetType="Bravellian.VendorErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="JobErpId" TableNamePattern="PayAppJobWorkflowView" TargetType="Bravellian.JobErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="PayAppPurchaseOrderLineItemWorkflowView" TargetType="Bravellian.PurchaseOrderLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="PayAppSubcontractLineItemWorkflowView" TargetType="Bravellian.SubcontractLineItemErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="ErpId" TableNamePattern="PayAppSubcontractWorkflowView" TargetType="Bravellian.SubcontractErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="VendorContactErpId" TableNamePattern="PayAppVendorContactWorkflowView" TargetType="Bravellian.VendorContactErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="VendorErpId" TableNamePattern="PayAppVendorWorkflowView" TargetType="Bravellian.VendorErpIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SyncTaskLogId" TargetType="Bravellian.SyncTaskLogIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SyncJobId" TargetType="Bravellian.SyncJobIdentifier" />
+	<TypeMappingRule ColumnNamePattern="SyncManualTriggerId" TargetType="Bravellian.SyncManualTriggerIdentifier" />
+	<TypeMappingRule ColumnNamePattern="CommitmentType" TargetType="Bravellian.CommitmentType" />
+</TypeMappingRules>-->

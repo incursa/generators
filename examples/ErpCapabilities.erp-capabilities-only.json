@@ -1,6 +1,6 @@
 {
-  "generatedCapabilitiesNamespace": "Bravillian.Repositories.Erps",
-  "generatedInterfacesNamespace": "Bravillian.Repositories.Erps",
+  "generatedCapabilitiesNamespace": "Bravellian.Repositories.Erps",
+  "generatedInterfacesNamespace": "Bravellian.Repositories.Erps",
   "capabilities": [
     {
       "name": "Vendor.CanRead",

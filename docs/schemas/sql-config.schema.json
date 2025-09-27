@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://bravillian.com/schemas/dto-entity.schema.json",
+  "$id": "https://bravellian.com/schemas/dto-entity.schema.json",
   "title": "C# Code Generator Configuration",
   "description": "Configuration file for driving the SQL-based C# code generator.",
   "type": "object",

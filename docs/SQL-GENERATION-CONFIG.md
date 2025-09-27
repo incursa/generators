@@ -19,7 +19,7 @@ SQL Generation configuration files should follow the naming pattern `*SqlGenerat
   <GenerateDbContext>true</GenerateDbContext>
   
   <!-- The base class for the DbContext -->
-  <DbContextBaseClass>BravillianDbContextBase</DbContextBaseClass>
+  <DbContextBaseClass>BravellianDbContextBase</DbContextBaseClass>
 </SqlGenerationConfiguration>
 ```
 
@@ -46,7 +46,7 @@ SQL Generation configuration files should follow the naming pattern `*SqlGenerat
 ### DbContextBaseClass
 
 - **Type**: `string`
-- **Default**: `"BravillianDbContextBase"`
+- **Default**: `"BravellianDbContextBase"`
 - **Description**: Specifies the base class to use for the generated DbContext.
 - **Default**: `true`
 - **Description**: Controls whether navigation properties are generated between related entities.
