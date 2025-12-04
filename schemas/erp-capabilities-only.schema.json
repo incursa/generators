@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ERP Capability Definitions Only",
+  "description": "Schema for defining ERP capabilities without adapter profiles",
+  "type": "object",
+  "required": ["generatedCapabilitiesNamespace", "generatedInterfacesNamespace", "capabilities"],
+  "properties": {
+    "generatedCapabilitiesNamespace": {
+      "type": "string",
+      "description": "The namespace for generated capability classes"
+    },
+    "generatedInterfacesNamespace": {
+      "type": "string", 
+      "description": "The namespace for generated interface definitions"
+    },
+    "capabilities": {
+      "type": "array",
+      "description": "List of all possible ERP capabilities",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The unique name of the capability (e.g., 'Vendor.CanRead'). Interface name will be derived as 'I' + name with dots removed (e.g., 'IVendorCanRead')"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of what this capability does"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

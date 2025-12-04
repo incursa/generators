@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://bravellian.com/schemas/number-backed-enum.schema.json",
+  "title": "Number Backed Enum",
+  "description": "Schema for Bravellian number-backed enum types (.number_enum.json)",
+  "type": "object",
+  "required": ["name", "namespace", "values"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the enum type",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+    },
+    "namespace": {
+      "type": "string",
+      "description": "The .NET namespace for the generated enum",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_.]*$"
+    },
+    "type": {
+      "type": "string",
+      "description": "The underlying numeric type for the enum",
+      "enum": ["int", "long", "short", "byte", "uint", "ulong", "ushort", "sbyte"],
+      "default": "int"
+    },
+    "values": {
+      "type": "object",
+      "description": "The enum values and their configurations",
+      "patternProperties": {
+        "^[A-Za-z_][A-Za-z0-9_]*$": {
+          "type": "object",
+          "required": ["value"],
+          "properties": {
+            "value": {
+              "type": "number",
+              "description": "The numeric value for this enum member"
+            },
+            "display": {
+              "type": "string",
+              "description": "The display name for this enum member (defaults to the property name)"
+            },
+            "documentation": {
+              "type": "string",
+              "description": "XML documentation comment for this enum member"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 1
+    },
+    "properties": {
+      "type": "array",
+      "description": "Additional properties to add to the enum type",
+      "items": {
+        "type": "object",
+        "required": ["name", "type"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The property name",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+          },
+          "type": {
+            "type": "string",
+            "description": "The .NET type for this property",
+            "examples": ["string", "int", "bool", "DateTime", "decimal"]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "name": "Priority",
+      "namespace": "Bravellian.Enums",
+      "type": "int",
+      "values": {
+        "Low": {
+          "value": 1,
+          "display": "Low Priority",
+          "documentation": "Low priority level"
+        },
+        "Medium": {
+          "value": 2,
+          "display": "Medium Priority",
+          "documentation": "Medium priority level"
+        },
+        "High": {
+          "value": 3,
+          "display": "High Priority",
+          "documentation": "High priority level"
+        },
+        "Critical": {
+          "value": 4,
+          "display": "Critical Priority",
+          "documentation": "Critical priority level"
+        }
+      }
+    }
+  ]
+}
