@@ -36,6 +36,7 @@
 
     <ItemGroup>
         <!-- The Roslyn APIs for creating generators -->
+        <PackageReference Include="FluentValidation" Version="11.12.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" Version="5.0.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" Version="3.11.0" />
         <PackageReference Include="System.Text.Json" PrivateAssets="all" GeneratePathProperty="true" Version="10.0.0" />
@@ -80,19 +81,14 @@
 	<!-- Define a stub content file to make NuGet happy -->
 	<ItemGroup>
 		<!-- Put the stub in obj/ and pack it as contentFiles -->
-		<None Include="$(IntermediateOutputPath)contentStub\_._"
-			  Pack="true"
-			  PackagePath="contentFiles/any/any/" />
+		<None Include="$(IntermediateOutputPath)contentStub\_._" Pack="true" PackagePath="contentFiles/any/any/" />
 	</ItemGroup>
 
 	<!-- Create the stub file before packing -->
 	<Target Name="CreateContentStub" BeforeTargets="Build">
 		<MakeDir Directories="$(IntermediateOutputPath)contentStub" />
 		<!-- Empty file is fine -->
-		<WriteLinesToFile
-			File="$(IntermediateOutputPath)contentStub\_._"
-			Lines=""
-			Overwrite="true" />
+		<WriteLinesToFile File="$(IntermediateOutputPath)contentStub\_._" Lines="" Overwrite="true" />
 	</Target>
 
 </Project>
