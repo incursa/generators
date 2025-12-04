@@ -1,12 +1,13 @@
 // Licensed under the Apache License, Version 2.0.
 // See LICENSE file in the project root for full license information.
 
-namespace Bravellian.Generators;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+
+namespace Bravellian.Generators;
 
 public static class StringBackedEnumTypeGenerator
 {
@@ -88,11 +89,11 @@ public static class StringBackedEnumTypeGenerator
         if (relatedClass.AdditionalProperties is { Count: > 0 })
         {
             additionalProperties = "\r\n\r\n" + string.Join("\r\n\r\n", relatedClass.AdditionalProperties.Select(p => $"    public {p.Type} {p.Name} {{ get; init; }}"));
-            var outParams = string.Join(", ", relatedClass.AdditionalProperties.Select(p => $"out {p.Type} {p.Name.ToLower()}"));
+            var outParams = string.Join(", ", relatedClass.AdditionalProperties.Select(p => $"out {p.Type} {p.Name.ToLowerInvariant()}"));
             processValueSignature = $"private static partial void ProcessValue(string value, {outParams});";
             constructorInit = $$"""
-                    ProcessValue(value, {{string.Join(", ", relatedClass.AdditionalProperties.Select(p => $"out {p.Type} {p.Name.ToLower()}"))}});
-            {{string.Join("\r\n", relatedClass.AdditionalProperties.Select(p => $"        this.{p.Name} = {p.Name.ToLower()};"))}}
+                    ProcessValue(value, {{string.Join(", ", relatedClass.AdditionalProperties.Select(p => $"out {p.Type} {p.Name.ToLowerInvariant()}"))}});
+            {{string.Join("\r\n", relatedClass.AdditionalProperties.Select(p => $"        this.{p.Name} = {p.Name.ToLowerInvariant()};"))}}
             """;
         }
 
@@ -181,35 +182,35 @@ public readonly partial record struct {{relatedClass.Name}}
 
     /// <summary>
     /// Matches the current enum value against all possible cases and executes the corresponding delegate.
-    /// Throws <see cref="Bravellian.UnhandledEnumValueException"/> if no match is found.
+    /// Throws <see cref="ArgumentOutOfRangeException."/> if no match is found.
     /// </summary>
 {{string.Join("\r\n", relatedClass.EnumValues.Select(p => $"    /// <param name=\"case{p.Name}\">The delegate to execute for the {p.Name} case.</param>"))}}
-    /// <exception cref="Bravellian.UnhandledEnumValueException">Thrown when the current value is not handled by any case.</exception>
+    /// <exception cref="ArgumentOutOfRangeException.">Thrown when the current value is not handled by any case.</exception>
     public void Match({{matchParams}})
     {
         switch (this.Value)
         {
 {{matchCases}}
             default:
-                throw new Bravellian.UnhandledEnumValueException(this);
+                throw new ArgumentOutOfRangeException.(this);
         }
     }
 
     /// <summary>
     /// Matches the current enum value against all possible cases and returns the result of executing the corresponding delegate.
-    /// Throws <see cref="Bravellian.UnhandledEnumValueException"/> if no match is found.
+    /// Throws <see cref="ArgumentOutOfRangeException."/> if no match is found.
     /// </summary>
     /// <typeparam name="T">The type of the result.</typeparam>
 {{string.Join("\r\n", relatedClass.EnumValues.Select(p => $"    /// <param name=\"case{p.Name}\">The delegate to execute for the {p.Name} case.</param>"))}}
     /// <returns>The result of executing the matching delegate.</returns>
-    /// <exception cref="Bravellian.UnhandledEnumValueException">Thrown when the current value is not handled by any case.</exception>
+    /// <exception cref="ArgumentOutOfRangeException.">Thrown when the current value is not handled by any case.</exception>
     public T Match<T>({{matchTParams}})
     {
         switch (this.Value)
         {
 {{matchTCases}}
             default:
-                throw new Bravellian.UnhandledEnumValueException(this);
+                throw new ArgumentOutOfRangeException.(this);
         }
     }
 
@@ -366,14 +367,14 @@ public readonly partial record struct {{relatedClass.Name}}
 
         public GeneratorParams(string name, string ns, bool isPublic, IReadOnlyList<(string Value, string Name, string? DisplayName, string? Documentation)>? enumValues, IReadOnlyList<(string Type, string Name)>? additionalProperties, string? sourceFilePath, string? licenseHeader = null)
         {
-            this.Name = name;
-            this.Namespace = ns;
-            this.IsPublic = isPublic;
-            this.FullyQualifiedName = string.Join(".", ns, name);
-            this.EnumValues = enumValues;
-            this.AdditionalProperties = additionalProperties;
-            this.SourceFilePath = sourceFilePath;
-            this.LicenseHeader = licenseHeader;
+            Name = name;
+            Namespace = ns;
+            IsPublic = isPublic;
+            FullyQualifiedName = string.Join(".", ns, name);
+            EnumValues = enumValues;
+            AdditionalProperties = additionalProperties;
+            SourceFilePath = sourceFilePath;
+            LicenseHeader = licenseHeader;
         }
     }
 }

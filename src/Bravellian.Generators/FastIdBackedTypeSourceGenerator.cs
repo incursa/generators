@@ -1,4 +1,3 @@
-namespace Bravellian.Generators;
 
 using System;
 using System.Collections.Generic;
@@ -7,6 +6,8 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using Microsoft.CodeAnalysis;
+
+namespace Bravellian.Generators;
 
 [Generator(LanguageNames.CSharp)]
 public sealed class FastIdBackedTypeSourceGenerator : IIncrementalGenerator
@@ -139,7 +140,7 @@ public sealed class FastIdBackedTypeSourceGenerator : IIncrementalGenerator
                 return null;
             }
 
-            var fileName = $"{namespaceName!}.{name!}.{Path.GetFileName(sourceFilePath)}.g.cs";
+            var fileName = $"{namespaceName!}.{name!}.g.cs";
             var results = new List<(string fileName, string source)> { (fileName, generatedCode!) };
 
             // Generate ValueConverter if path is configured
@@ -148,7 +149,7 @@ public sealed class FastIdBackedTypeSourceGenerator : IIncrementalGenerator
                 var converterCode = FastIdBackedTypeGenerator.GenerateValueConverter(genParams, null);
                 if (!string.IsNullOrEmpty(converterCode))
                 {
-                    var converterFileName = $"{namespaceName!}.{name!}ValueConverter.{Path.GetFileName(sourceFilePath)}.g.cs";
+                    var converterFileName = $"{namespaceName!}.{name!}ValueConverter.g.cs";
                     results.Add((converterFileName, converterCode!));
                 }
             }

@@ -87,11 +87,11 @@ public static class NumberBackedEnumTypeGenerator
         if (relatedClass.AdditionalProperties is { Count: > 0 })
         {
             additionalProperties = "\r\n\r\n" + string.Join("\r\n\r\n", relatedClass.AdditionalProperties.Select(p => $"    public {p.Type} {p.Name} {{ get; init; }}"));
-            var outParams = string.Join(", ", relatedClass.AdditionalProperties.Select(p => $"out {p.Type} {p.Name.ToLower()}"));
+            var outParams = string.Join(", ", relatedClass.AdditionalProperties.Select(p => $"out {p.Type} {p.Name.ToLowerInvariant()}"));
             processValueSignature = $"private static partial void ProcessValue({relatedClass.NumberType} value, {outParams});";
             constructorInit = $$"""
-                    ProcessValue(value, {{string.Join(", ", relatedClass.AdditionalProperties.Select(p => $"out {p.Type} {p.Name.ToLower()}"))}});
-            {{string.Join("\r\n", relatedClass.AdditionalProperties.Select(p => $"        this.{p.Name} = {p.Name.ToLower()};"))}}
+                    ProcessValue(value, {{string.Join(", ", relatedClass.AdditionalProperties.Select(p => $"out {p.Type} {p.Name.ToLowerInvariant()}"))}});
+            {{string.Join("\r\n", relatedClass.AdditionalProperties.Select(p => $"        this.{p.Name} = {p.Name.ToLowerInvariant()};"))}}
             """;
         }
 
@@ -168,35 +168,35 @@ public readonly partial record struct {{relatedClass.Name}}
 
     /// <summary>
     /// Matches the current enum value against all possible cases and executes the corresponding delegate.
-    /// Throws <see cref="UnhandledEnumValueException"/> if no match is found.
+    /// Throws <see cref="ArgumentOutOfRangeException"/> if no match is found.
     /// </summary>
     /// <param name="{{string.Join(", ", relatedClass.EnumValues.Select(p => $"case{p.Name}"))}}">The delegates to execute for each case.</param>
-    /// <exception cref="UnhandledEnumValueException">Thrown when the current value is not handled by any case.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the current value is not handled by any case.</exception>
     public void Match({{matchParams}})
     {
         switch (this.Value)
         {
 {{matchCases}}
             default:
-                throw new Bravellian.UnhandledEnumValueException(this);
+                throw new ArgumentOutOfRangeException(this);
         }
     }
 
     /// <summary>
     /// Matches the current enum value against all possible cases and returns the result of executing the corresponding delegate.
-    /// Throws <see cref="UnhandledEnumValueException"/> if no match is found.
+    /// Throws <see cref="ArgumentOutOfRangeException"/> if no match is found.
     /// </summary>
     /// <typeparam name="T">The type of the result.</typeparam>
     /// <param name="{{string.Join(", ", relatedClass.EnumValues.Select(p => $"case{p.Name}"))}}">The delegates to execute for each case.</param>
     /// <returns>The result of executing the matching delegate.</returns>
-    /// <exception cref="UnhandledEnumValueException">Thrown when the current value is not handled by any case.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the current value is not handled by any case.</exception>
     public T Match<T>({{matchTParams}})
     {
         switch (this.Value)
         {
 {{matchTCases}}
             default:
-                throw new Bravellian.UnhandledEnumValueException(this);
+                throw new Bravellian.ArgumentOutOfRangeException(this);
         }
     }
 

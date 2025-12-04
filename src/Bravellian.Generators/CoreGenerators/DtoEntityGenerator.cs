@@ -1,12 +1,13 @@
 // Licensed under the Apache License, Version 2.0.
 // See LICENSE file in the project root for full license information.
 
-namespace Bravellian.Generators;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
+namespace Bravellian.Generators;
 
 public static class DtoEntityGenerator
 {
@@ -346,8 +347,8 @@ using FluentValidation;
         public string? Inherits { get; set; }
         public string? Abstract { get; set; }
         public string Accessibility { get; set; } = "public";
-        public List<PropertyDescriptor> Properties { get; set; } = new();
-        public List<GeneratorParams> NestedEntities { get; set; } = new(); // Use init
+        public IReadOnlyList<PropertyDescriptor> Properties { get; set; } = new List<PropertyDescriptor>();
+        public IReadOnlyList<GeneratorParams> NestedEntities { get; set; } = new List<GeneratorParams>(); // Use init
         public string? Documentation { get; set; }
         public bool ClassOnly { get; set; } // Indicates if it should only generate the class content
         public string? SourceFilePath { get; set; } // Path to the source XML file that generated this
@@ -391,8 +392,8 @@ using FluentValidation;
             bool isAbstract,
             string? accessibility,
             string sourceFilePath,
-            List<PropertyDescriptor> properties,
-            List<GeneratorParams>? nestedEntities = null,
+            IReadOnlyList<PropertyDescriptor> properties,
+            IReadOnlyList<GeneratorParams>? nestedEntities = null,
             string? documentation = null,
             bool classOnly = false, // Added classOnly parameter
             bool isStrict = false,
@@ -401,29 +402,29 @@ using FluentValidation;
             bool isRecordStruct = false
             )
         {
-            this.Name = name;
-            this.Namespace = ns;
-            this.ParentName = parentName; // Store parentName
-            this.Inherits = !string.IsNullOrWhiteSpace(inherits) ? $" : {inherits}" : string.Empty;
-            this.Abstract = isAbstract ? " abstract" : string.Empty;
-            this.Accessibility = string.IsNullOrEmpty(accessibility) ? "public" : accessibility!;
-            this.Properties = properties;
-            this.NestedEntities = nestedEntities ?? []; // Initialize if null
+            Name = name;
+            Namespace = ns;
+            ParentName = parentName; // Store parentName
+            Inherits = !string.IsNullOrWhiteSpace(inherits) ? $" : {inherits}" : string.Empty;
+            Abstract = isAbstract ? " abstract" : string.Empty;
+            Accessibility = string.IsNullOrEmpty(accessibility) ? "public" : accessibility!;
+            Properties = properties;
+            NestedEntities = nestedEntities ?? []; // Initialize if null
             // Update FullyQualifiedName calculation
-            this.FullyQualifiedName = string.IsNullOrEmpty(parentName)
+            FullyQualifiedName = string.IsNullOrEmpty(parentName)
                 ? string.Join(".", ns, name)
                 : string.Join(".", ns, parentName, name); // Include parent name
-            this.Documentation = documentation;
-            this.ClassOnly = classOnly; // Store classOnly
-            this.SourceFilePath = sourceFilePath; // Store sourceFilePath
-            this.IsStrict = isStrict;
-            this.UseParentValidator = useParentValidator;
-            this.NoCreateMethod = noCreateMethod;
-            this.IsRecordStruct = isRecordStruct;
+            Documentation = documentation;
+            ClassOnly = classOnly; // Store classOnly
+            SourceFilePath = sourceFilePath; // Store sourceFilePath
+            IsStrict = isStrict;
+            UseParentValidator = useParentValidator;
+            NoCreateMethod = noCreateMethod;
+            IsRecordStruct = isRecordStruct;
 
             if (!string.IsNullOrEmpty(parentName))
             {
-                this.IsNestedViewModelOwnedType = true;
+                IsNestedViewModelOwnedType = true;
             }
         }
     }
@@ -461,20 +462,20 @@ using FluentValidation;
             string? defaultValue = null,
             bool nonWhitespace = false)
         {
-            this.Name = name;
-            this.Type = type;
-            this.IsRequired = isRequired;
-            this.IsNullable = isNullable;
-            this.Max = max;
-            this.Min = min;
-            this.Regex = regex;
-            this.JsonProperty = jsonProperty;
-            this.NoDefault = noDefault;
-            this.IsSettable = isSettable;
-            this.Expression = expression;
-            this.Documentation = documentation;
-            this.DefaultValue = defaultValue;
-            this.NonWhitespace = nonWhitespace;
+            Name = name;
+            Type = type;
+            IsRequired = isRequired;
+            IsNullable = isNullable;
+            Max = max;
+            Min = min;
+            Regex = regex;
+            JsonProperty = jsonProperty;
+            NoDefault = noDefault;
+            IsSettable = isSettable;
+            Expression = expression;
+            Documentation = documentation;
+            DefaultValue = defaultValue;
+            NonWhitespace = nonWhitespace;
         }
     }
 }

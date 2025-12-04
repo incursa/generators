@@ -13,6 +13,7 @@
     <AdditionalFiles Include="$(ProjectDir)**\*.entity.json" Exclude="$(BaseIntermediateOutputPath)**\*;$(OutputPath)**\*;$(ProjectDir)**\bin\**\*;$(ProjectDir)**\obj\**\*" />
 
     <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="SourceItemType" />
+    <CompilerVisibleProperty Include="GeneratedCodeLicenseHeader" />
   </ItemGroup>
 
   <!--Fix for Source Generator: https://github.com/dotnet/roslyn/issues/47786 -->
