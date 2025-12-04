@@ -182,35 +182,35 @@ public readonly partial record struct {{relatedClass.Name}}
 
     /// <summary>
     /// Matches the current enum value against all possible cases and executes the corresponding delegate.
-    /// Throws <see cref="Bravellian.UnhandledEnumValueException"/> if no match is found.
+    /// Throws <see cref="ArgumentOutOfRangeException."/> if no match is found.
     /// </summary>
 {{string.Join("\r\n", relatedClass.EnumValues.Select(p => $"    /// <param name=\"case{p.Name}\">The delegate to execute for the {p.Name} case.</param>"))}}
-    /// <exception cref="Bravellian.UnhandledEnumValueException">Thrown when the current value is not handled by any case.</exception>
+    /// <exception cref="ArgumentOutOfRangeException.">Thrown when the current value is not handled by any case.</exception>
     public void Match({{matchParams}})
     {
         switch (this.Value)
         {
 {{matchCases}}
             default:
-                throw new Bravellian.UnhandledEnumValueException(this);
+                throw new ArgumentOutOfRangeException.(this);
         }
     }
 
     /// <summary>
     /// Matches the current enum value against all possible cases and returns the result of executing the corresponding delegate.
-    /// Throws <see cref="Bravellian.UnhandledEnumValueException"/> if no match is found.
+    /// Throws <see cref="ArgumentOutOfRangeException."/> if no match is found.
     /// </summary>
     /// <typeparam name="T">The type of the result.</typeparam>
 {{string.Join("\r\n", relatedClass.EnumValues.Select(p => $"    /// <param name=\"case{p.Name}\">The delegate to execute for the {p.Name} case.</param>"))}}
     /// <returns>The result of executing the matching delegate.</returns>
-    /// <exception cref="Bravellian.UnhandledEnumValueException">Thrown when the current value is not handled by any case.</exception>
+    /// <exception cref="ArgumentOutOfRangeException.">Thrown when the current value is not handled by any case.</exception>
     public T Match<T>({{matchTParams}})
     {
         switch (this.Value)
         {
 {{matchTCases}}
             default:
-                throw new Bravellian.UnhandledEnumValueException(this);
+                throw new ArgumentOutOfRangeException.(this);
         }
     }
 
