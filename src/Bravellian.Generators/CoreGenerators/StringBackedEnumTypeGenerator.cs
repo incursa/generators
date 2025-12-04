@@ -1,12 +1,13 @@
 // Licensed under the Apache License, Version 2.0.
 // See LICENSE file in the project root for full license information.
 
-namespace Bravellian.Generators;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+
+namespace Bravellian.Generators;
 
 public static class StringBackedEnumTypeGenerator
 {
@@ -88,11 +89,11 @@ public static class StringBackedEnumTypeGenerator
         if (relatedClass.AdditionalProperties is { Count: > 0 })
         {
             additionalProperties = "\r\n\r\n" + string.Join("\r\n\r\n", relatedClass.AdditionalProperties.Select(p => $"    public {p.Type} {p.Name} {{ get; init; }}"));
-            var outParams = string.Join(", ", relatedClass.AdditionalProperties.Select(p => $"out {p.Type} {p.Name.ToLower()}"));
+            var outParams = string.Join(", ", relatedClass.AdditionalProperties.Select(p => $"out {p.Type} {p.Name.ToLowerInvariant()}"));
             processValueSignature = $"private static partial void ProcessValue(string value, {outParams});";
             constructorInit = $$"""
-                    ProcessValue(value, {{string.Join(", ", relatedClass.AdditionalProperties.Select(p => $"out {p.Type} {p.Name.ToLower()}"))}});
-            {{string.Join("\r\n", relatedClass.AdditionalProperties.Select(p => $"        this.{p.Name} = {p.Name.ToLower()};"))}}
+                    ProcessValue(value, {{string.Join(", ", relatedClass.AdditionalProperties.Select(p => $"out {p.Type} {p.Name.ToLowerInvariant()}"))}});
+            {{string.Join("\r\n", relatedClass.AdditionalProperties.Select(p => $"        this.{p.Name} = {p.Name.ToLowerInvariant()};"))}}
             """;
         }
 
@@ -366,14 +367,14 @@ public readonly partial record struct {{relatedClass.Name}}
 
         public GeneratorParams(string name, string ns, bool isPublic, IReadOnlyList<(string Value, string Name, string? DisplayName, string? Documentation)>? enumValues, IReadOnlyList<(string Type, string Name)>? additionalProperties, string? sourceFilePath, string? licenseHeader = null)
         {
-            this.Name = name;
-            this.Namespace = ns;
-            this.IsPublic = isPublic;
-            this.FullyQualifiedName = string.Join(".", ns, name);
-            this.EnumValues = enumValues;
-            this.AdditionalProperties = additionalProperties;
-            this.SourceFilePath = sourceFilePath;
-            this.LicenseHeader = licenseHeader;
+            Name = name;
+            Namespace = ns;
+            IsPublic = isPublic;
+            FullyQualifiedName = string.Join(".", ns, name);
+            EnumValues = enumValues;
+            AdditionalProperties = additionalProperties;
+            SourceFilePath = sourceFilePath;
+            LicenseHeader = licenseHeader;
         }
     }
 }

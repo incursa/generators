@@ -87,11 +87,11 @@ public static class NumberBackedEnumTypeGenerator
         if (relatedClass.AdditionalProperties is { Count: > 0 })
         {
             additionalProperties = "\r\n\r\n" + string.Join("\r\n\r\n", relatedClass.AdditionalProperties.Select(p => $"    public {p.Type} {p.Name} {{ get; init; }}"));
-            var outParams = string.Join(", ", relatedClass.AdditionalProperties.Select(p => $"out {p.Type} {p.Name.ToLower()}"));
+            var outParams = string.Join(", ", relatedClass.AdditionalProperties.Select(p => $"out {p.Type} {p.Name.ToLowerInvariant()}"));
             processValueSignature = $"private static partial void ProcessValue({relatedClass.NumberType} value, {outParams});";
             constructorInit = $$"""
-                    ProcessValue(value, {{string.Join(", ", relatedClass.AdditionalProperties.Select(p => $"out {p.Type} {p.Name.ToLower()}"))}});
-            {{string.Join("\r\n", relatedClass.AdditionalProperties.Select(p => $"        this.{p.Name} = {p.Name.ToLower()};"))}}
+                    ProcessValue(value, {{string.Join(", ", relatedClass.AdditionalProperties.Select(p => $"out {p.Type} {p.Name.ToLowerInvariant()}"))}});
+            {{string.Join("\r\n", relatedClass.AdditionalProperties.Select(p => $"        this.{p.Name} = {p.Name.ToLowerInvariant()};"))}}
             """;
         }
 

@@ -185,7 +185,7 @@ public sealed class NumberBackedEnumTypeSourceGenerator : IIncrementalGenerator
                 return null;
             }
 
-            var fileName = $"{namespaceName!}.{name!}.{Path.GetFileName(sourceFilePath)}.g.cs";
+            var fileName = $"{namespaceName!}.{name!}.g.cs";
             var results = new List<(string fileName, string source)> { (fileName, generatedCode!) };
 
             // Generate ValueConverter if path is configured
@@ -194,7 +194,7 @@ public sealed class NumberBackedEnumTypeSourceGenerator : IIncrementalGenerator
                 var converterCode = NumberBackedEnumTypeGenerator.GenerateValueConverter(genParams, null);
                 if (!string.IsNullOrEmpty(converterCode))
                 {
-                    var converterFileName = $"{namespaceName!}.{name!}ValueConverter.{Path.GetFileName(sourceFilePath)}.g.cs";
+                    var converterFileName = $"{namespaceName!}.{name!}ValueConverter.g.cs";
                     results.Add((converterFileName, converterCode!));
                 }
             }

@@ -80,7 +80,7 @@ public static class MultiValueBackedTypeGenerator
         bool hasBookend = !string.IsNullOrWhiteSpace(relatedClass.Bookend);
 
         var nonConstantFields = relatedClass.Fields.Where(f => f.ConstantValue == null && f.ConstantTypeValue == null).ToList();
-        var ctorParameters = string.Join(", ", nonConstantFields.Select(f => $"{f.FieldType}{(f.IsNullable ? "?" : "")} {f.FieldName.ToLower()}"));
+        var ctorParameters = string.Join(", ", nonConstantFields.Select(f => $"{f.FieldType}{(f.IsNullable ? "?" : "")} {f.FieldName.ToLowerInvariant()}"));
         var ctorPropertyAssignments = string.Join("\r\n", relatedClass.Fields.Select(f =>
         {
             if (f.ConstantValue != null)
@@ -98,7 +98,7 @@ public static class MultiValueBackedTypeGenerator
                 return $"        this.{f.FieldName} = {f.ConstantTypeValue};";
             }
 
-            return $"        this.{f.FieldName} = {f.FieldName.ToLower()};";
+            return $"        this.{f.FieldName} = {f.FieldName.ToLowerInvariant()};";
         }));
 
         if (useSeparator && !hasSerializedNames)
@@ -119,10 +119,10 @@ public static class MultiValueBackedTypeGenerator
 
                     if (f.IsNullable)
                     {
-                        return $"{{{f.FieldName.ToLower()}?.ToString() ?? \"{f.NullIdentifier}\"}}";
+                        return $"{{{f.FieldName.ToLowerInvariant()}?.ToString() ?? \"{f.NullIdentifier}\"}}";
                     }
 
-                    return $"{{{f.FieldName.ToLower()}}}";
+                    return $"{{{f.FieldName.ToLowerInvariant()}}}";
                 }))
                 + (hasBookend ? "{Bookend}" : "")
                 + "\"";
@@ -201,16 +201,16 @@ public static class MultiValueBackedTypeGenerator
                         {
                             if (hasBookend)
                             {
-                                regexPattern = Regex.Replace(regexPattern, $"\\\\{{{field.FieldName}}}", $"(?<{field.FieldName.ToLower()}>[^{relatedClass.Bookend}]*)", RegexOptions.Compiled, TimeSpan.FromSeconds(2));
+                                regexPattern = Regex.Replace(regexPattern, $"\\\\{{{field.FieldName}}}", $"(?<{field.FieldName.ToLowerInvariant()}>[^{relatedClass.Bookend}]*)", RegexOptions.Compiled, TimeSpan.FromSeconds(2));
                             }
                             else
                             {
-                                regexPattern = Regex.Replace(regexPattern, $"\\\\{{{field.FieldName}}}", $"(?<{field.FieldName.ToLower()}>.*)", RegexOptions.Compiled, TimeSpan.FromSeconds(2));
+                                regexPattern = Regex.Replace(regexPattern, $"\\\\{{{field.FieldName}}}", $"(?<{field.FieldName.ToLowerInvariant()}>.*)", RegexOptions.Compiled, TimeSpan.FromSeconds(2));
                             }
                         }
                         else
                         {
-                            regexPattern = Regex.Replace(regexPattern, $"\\\\{{{field.FieldName}}}", $"(?<{field.FieldName.ToLower()}>[^{relatedClass.Separator ?? "|"}]*)", RegexOptions.Compiled, TimeSpan.FromSeconds(2));
+                            regexPattern = Regex.Replace(regexPattern, $"\\\\{{{field.FieldName}}}", $"(?<{field.FieldName.ToLowerInvariant()}>[^{relatedClass.Separator ?? "|"}]*)", RegexOptions.Compiled, TimeSpan.FromSeconds(2));
                         }
                     }
                 }
@@ -249,7 +249,7 @@ public static class MultiValueBackedTypeGenerator
             var hasNonStringFields = nonConstantFields.Any(f => !f.IsString);
 
             var tryParse = hasNonStringFields
-                ? string.Join("\r\n                  && ", nonConstantFields.Where(f => !f.IsString).Select((f, i) => f.IsNullable ? $"TryParseNullable(split[{i}], \"{f.NullIdentifier}\", out {f.FieldType}? {f.FieldName.ToLower()})" : $"{f.FieldType}.TryParse(split[{i}], out {f.FieldType} {f.FieldName.ToLower()})"))
+                ? string.Join("\r\n                  && ", nonConstantFields.Where(f => !f.IsString).Select((f, i) => f.IsNullable ? $"TryParseNullable(split[{i}], \"{f.NullIdentifier}\", out {f.FieldType}? {f.FieldName.ToLowerInvariant()})" : $"{f.FieldType}.TryParse(split[{i}], out {f.FieldType} {f.FieldName.ToLowerInvariant()})"))
                 : null;
 
             var tryParseConstructorParams = string.Join(", ", relatedClass.Fields.Where(f => f.ConstantValue == null && f.ConstantTypeValue == null).Select(f =>
@@ -265,7 +265,7 @@ public static class MultiValueBackedTypeGenerator
                 }
                 else
                 {
-                    return f.FieldName.ToLower();
+                    return f.FieldName.ToLowerInvariant();
                 }
             }));
 
@@ -315,14 +315,14 @@ public static class MultiValueBackedTypeGenerator
                     // else
                     if (!field.IsString)
                     {
-                        parseVars.Add($"            if (!{field.FieldType}.TryParse(match.Groups[\"{field.FieldName.ToLower()}\"].Value, out {field.FieldType} {field.FieldName.ToLower()})) return false;");
-                        validationChecks.Add($"            if ({field.FieldName.ToLower()} != {field.FieldType}.Parse(\"{field.ConstantValue}\")) return false;");
+                        parseVars.Add($"            if (!{field.FieldType}.TryParse(match.Groups[\"{field.FieldName.ToLowerInvariant()}\"].Value, out {field.FieldType} {field.FieldName.ToLowerInvariant()})) return false;");
+                        validationChecks.Add($"            if ({field.FieldName.ToLowerInvariant()} != {field.FieldType}.Parse(\"{field.ConstantValue}\")) return false;");
                     }
                 }
                 else if (field.ConstantTypeValue != null)
                 {
-                    parseVars.Add($"            if (!{field.FieldType}.TryParse(match.Groups[\"{field.FieldName.ToLower()}\"].Value, out {field.FieldType} {field.FieldName.ToLower()})) return false;");
-                    validationChecks.Add($"            if ({field.FieldName.ToLower()} != {field.ConstantTypeValue}) return false;");
+                    parseVars.Add($"            if (!{field.FieldType}.TryParse(match.Groups[\"{field.FieldName.ToLowerInvariant()}\"].Value, out {field.FieldType} {field.FieldName.ToLowerInvariant()})) return false;");
+                    validationChecks.Add($"            if ({field.FieldName.ToLowerInvariant()} != {field.ConstantTypeValue}) return false;");
                 }
                 else
                 {
@@ -330,28 +330,28 @@ public static class MultiValueBackedTypeGenerator
                     {
                         if (field.IsNullable)
                         {
-                            parseVars.Add($"            var {field.FieldName.ToLower()} = NullableString(match.Groups[\"{field.FieldName.ToLower()}\"].Value, \"{field.NullIdentifier}\");");
+                            parseVars.Add($"            var {field.FieldName.ToLowerInvariant()} = NullableString(match.Groups[\"{field.FieldName.ToLowerInvariant()}\"].Value, \"{field.NullIdentifier}\");");
                         }
                         else
                         {
-                            parseVars.Add($"            var {field.FieldName.ToLower()} = match.Groups[\"{field.FieldName.ToLower()}\"].Value;");
+                            parseVars.Add($"            var {field.FieldName.ToLowerInvariant()} = match.Groups[\"{field.FieldName.ToLowerInvariant()}\"].Value;");
                         }
                     }
                     else
                     {
                         if (field.IsNullable)
                         {
-                            parseVars.Add($"            if (!TryParseNullable(match.Groups[\"{field.FieldName.ToLower()}\"].Value, \"{field.NullIdentifier}\", out {field.FieldType}? {field.FieldName.ToLower()})) return false;");
+                            parseVars.Add($"            if (!TryParseNullable(match.Groups[\"{field.FieldName.ToLowerInvariant()}\"].Value, \"{field.NullIdentifier}\", out {field.FieldType}? {field.FieldName.ToLowerInvariant()})) return false;");
                         }
                         else
                         {
-                            parseVars.Add($"            if (!{field.FieldType}.TryParse(match.Groups[\"{field.FieldName.ToLower()}\"].Value, out {field.FieldType} {field.FieldName.ToLower()})) return false;");
+                            parseVars.Add($"            if (!{field.FieldType}.TryParse(match.Groups[\"{field.FieldName.ToLowerInvariant()}\"].Value, out {field.FieldType} {field.FieldName.ToLowerInvariant()})) return false;");
                         }
                     }
                 }
             }
 
-            var initParams = string.Join(", ", relatedClass.Fields.Where(f => f.ConstantValue == null && f.ConstantTypeValue == null).Select(f => f.FieldName.ToLower()));
+            var initParams = string.Join(", ", relatedClass.Fields.Where(f => f.ConstantValue == null && f.ConstantTypeValue == null).Select(f => f.FieldName.ToLowerInvariant()));
 
             return $$"""
 
