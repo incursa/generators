@@ -1,71 +1,98 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
         <LangVersion>12.0</LangVersion>
         <Nullable>enable</Nullable>
         <Deterministic>true</Deterministic>
-        
-        <!-- Package metadata -->
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
+        <NoWarn>$(NoWarn);CS8632</NoWarn>
+
+        <!-- This ensures the generator dll is included as an analyzer -->
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <IsRoslynComponent>true</IsRoslynComponent>
+
+
+
+        <!-- Package metadata -->
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <PackageId>Bravellian.Generators</PackageId>
         <Version>1.0.0</Version>
         <Authors>Bravellian</Authors>
         <Owners>Bravellian</Owners>
-        <Description>Source generators for C# code generation from SQL schemas and other sources</Description>
-        <PackageProjectUrl>https://github.com/bravellian/generators</PackageProjectUrl>
+        <Description>Source generators for C# types and classes.</Description>
+        <PackageProjectUrl>https://github.com/bravellian/platform</PackageProjectUrl>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-        <RepositoryUrl>https://github.com/bravellian/generators</RepositoryUrl>
+        <RepositoryUrl>https://github.com/bravellian/platform</RepositoryUrl>
         <PackageIcon>nuget_logo.png</PackageIcon>
         <PackageReleaseNotes>For support, contact oss@bravellian.com</PackageReleaseNotes>
         <NuspecProperties>id=$(PackageId);version=$(Version);authors=$(Authors)</NuspecProperties>
+        <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     </PropertyGroup>
 
     <ItemGroup>
-      <None Include="..\..\assets\nuget_logo.png">
-        <Pack>True</Pack>
-        <PackagePath>\</PackagePath>
-      </None>
+        <!-- The Roslyn APIs for creating generators -->
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" Version="5.0.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" Version="3.11.0" />
+        <PackageReference Include="System.Text.Json" PrivateAssets="all" GeneratePathProperty="true" Version="10.0.0" />
+        <PackageReference Include="System.IO.Pipelines" PrivateAssets="all" GeneratePathProperty="true" Version="10.0.0" />
+
+        <None Include="$(PKGSystem_Text_Json)/lib/netstandard2.0/System.Text.Json.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Include="$(PKGSystem_IO_Pipelines)/lib/netstandard2.0/System.IO.Pipelines.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Remove="bin\Debug\\Bravellian.Generators.dll" />
+        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+        <None Include="..\..\assets\nuget_logo.png" Link="nuget_logo.png">
+          <PackagePath>\</PackagePath>
+          <Pack>True</Pack>
+        </None>
+		<None Include="Bravellian.Generators.props" Pack="true" PackagePath="build\" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Humanizer.Core" Version="2.14.1" />
-        <PackageReference Include="Microsoft.SqlServer.TransactSql.ScriptDom" Version="170.121.2" />
-        <PackageReference Include="Roslynator.CodeFixes" Version="4.14.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-	</ItemGroup>
-
-    <ItemGroup>
-		<!--<ProjectReference Include="..\Bravellian.Generators.Markers\Bravellian.Generators.Markers.csproj" PrivateAssets="all" />-->
-		<ProjectReference Include="..\Bravellian.Generators.Markers\Bravellian.Generators.Markers.csproj" />
+      <PackageReference Update="DotNet.ReproducibleBuilds.Isolated" Version="1.2.39" />
+      <PackageReference Update="Meziantou.Analyzer" Version="2.0.257" />
+      <PackageReference Update="Roslynator.Analyzers" Version="4.14.1" />
+      <PackageReference Update="Roslynator.CodeAnalysis.Analyzers" Version="4.14.1" />
+      <PackageReference Update="Roslynator.Formatting.Analyzers" Version="4.14.1" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Update="DotNet.ReproducibleBuilds.Isolated" Version="1.2.25" />
-      <PackageReference Update="Meziantou.Analyzer" Version="2.0.221" />
-      <PackageReference Update="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="4.14.0" />
-      <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="4.14.0" />
-      <PackageReference Update="Microsoft.SourceLink.GitHub" Version="8.0.0" />
-      <PackageReference Update="Roslynator.Analyzers" Version="4.14.0" />
-      <PackageReference Update="Roslynator.CodeAnalysis.Analyzers" Version="4.14.0" />
-      <PackageReference Update="Roslynator.Formatting.Analyzers" Version="4.14.0" />
-      <PackageReference Update="StyleCop.Analyzers" Version="1.1.118" />
-    </ItemGroup>
-
-   <!--<PropertyGroup>
-      <GetTargetPathDependsOn>
-          $(GetTargetPathDependsOn);GetDependencyTargetPaths
-      </GetTargetPathDependsOn>
-   </PropertyGroup>
+    <PropertyGroup>
+        <GetTargetPathDependsOn>
+            $(GetTargetPathDependsOn);GetDependencyTargetPaths
+        </GetTargetPathDependsOn>
+    </PropertyGroup>
     <Target Name="GetDependencyTargetPaths">
         <ItemGroup>
-            <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_SqlServer_TransactSql_ScriptDom)/lib/netstandard2.0/Microsoft.SqlServer.TransactSql.ScriptDom.dll" IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Text_Json)/lib/netstandard2.0/System.Text.Json.dll" IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_IO_Pipelines)/lib/netstandard2.0/System.IO.Pipelines.dll" IncludeRuntimeDependency="false" />
         </ItemGroup>
-    </Target>-->
+    </Target>
+
+
+	<!-- Define a stub content file to make NuGet happy -->
+	<ItemGroup>
+		<!-- Put the stub in obj/ and pack it as contentFiles -->
+		<None Include="$(IntermediateOutputPath)contentStub\_._"
+			  Pack="true"
+			  PackagePath="contentFiles/any/any/" />
+	</ItemGroup>
+
+	<!-- Create the stub file before packing -->
+	<Target Name="CreateContentStub" BeforeTargets="Build">
+		<MakeDir Directories="$(IntermediateOutputPath)contentStub" />
+		<!-- Empty file is fine -->
+		<WriteLinesToFile
+			File="$(IntermediateOutputPath)contentStub\_._"
+			Lines=""
+			Overwrite="true" />
+	</Target>
 
 </Project>

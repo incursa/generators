@@ -1,111 +1,143 @@
-﻿// Copyright (c) Bravellian
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 namespace Bravellian.Generators;
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Threading;
-using System.Xml.Linq;
+using Microsoft.CodeAnalysis;
 
-// 1. Inherit from the base class for single files
-// [Generator]
-public class StringBackedTypeSourceGenerator
+[Generator(LanguageNames.CSharp)]
+public sealed class StringBackedTypeSourceGenerator : IIncrementalGenerator
 {
-    // 2. Specify which files to watch
-    protected Regex FileExtensionRegex { get; } = new Regex(@"(?:.*\.types\.xml|.*\.sbt\.xml|_generate\.xml|.*\.string\.json)$");
-
-    // 3. Implement the generation logic
-    protected IEnumerable<(string fileName, string source)>? Generate(string filePath, string fileContent, CancellationToken cancellationToken)
+    private static readonly string[] CandidateSuffixes = new[]
     {
-        var fileExtension = Path.GetExtension(filePath).ToLowerInvariant();
-        if (string.Equals(fileExtension, ".json", System.StringComparison.Ordinal))
+        ".string.json",
+    };
+
+    private readonly record struct InputFile
+    {
+        public string Path { get; }
+        public string? Content { get; }
+
+        public InputFile(string path, string? content)
         {
-            return this.GenerateFromJson(fileContent);
+            Path = path;
+            Content = content;
         }
-        else
+    }
+
+    public void Initialize(IncrementalGeneratorInitializationContext context)
+    {
+        // Get license header from MSBuild property
+        var licenseHeaderProvider = context.AnalyzerConfigOptionsProvider
+            .Select(static (provider, _) =>
+            {
+                provider.GlobalOptions.TryGetValue("build_property.GeneratedCodeLicenseHeader", out var header);
+                return header ?? string.Empty;
+            });
+
+        var candidateFiles = context.AdditionalTextsProvider
+            .Where(static text => IsCandidateFile(text.Path))
+            .Select(static (text, cancellationToken) => new InputFile(text.Path, text.GetText(cancellationToken)?.ToString()))
+            .Where(static input => !string.IsNullOrWhiteSpace(input.Content));
+
+        // Combine files with license header
+        var filesWithLicense = candidateFiles.Combine(licenseHeaderProvider);
+
+        context.RegisterSourceOutput(filesWithLicense, static (productionContext, input) =>
         {
-            return this.GenerateFromXml(fileContent);
-        }
+            var (file, licenseHeader) = input;
+            try
+            {
+                var generated = Generate(file.Path, file.Content!, licenseHeader, productionContext.CancellationToken);
+                if (generated == null || !generated.Any())
+                {
+                    GeneratorDiagnostics.ReportSkipped(productionContext, 
+                        "No output generated. Ensure required 'name' and 'namespace' properties are present and valid.", 
+                        file.Path);
+                    return;
+                }
+
+                var addedHintNames = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var (fileName, source) in generated)
+                {
+                    productionContext.CancellationToken.ThrowIfCancellationRequested();
+                    if (!addedHintNames.Add(fileName))
+                    {
+                        GeneratorDiagnostics.ReportDuplicateHintName(productionContext, fileName);
+                        continue;
+                    }
+                    productionContext.AddSource(fileName, source);
+                }
+            }
+            catch (Exception ex)
+            {
+                GeneratorDiagnostics.ReportError(productionContext, 
+                    "StringBackedTypeSourceGenerator failed to generate code.", 
+                    ex, 
+                    file.Path);
+            }
+        });
     }
 
     /// <summary>
-    /// Public wrapper for CLI usage.
+    /// Public wrapper for CLI usage
     /// </summary>
     public IEnumerable<(string fileName, string source)>? GenerateFromFiles(string filePath, string fileContent, CancellationToken cancellationToken = default)
     {
-        return this.Generate(filePath, fileContent, cancellationToken);
+        return Generate(filePath, fileContent, string.Empty, cancellationToken);
     }
 
-    private IEnumerable<(string fileName, string source)>? GenerateFromXml(string fileContent)
+    private static bool IsCandidateFile(string path)
     {
-        var xdoc = XDocument.Parse(fileContent);
-        if (xdoc.Root == null)
+        for (var i = 0; i < CandidateSuffixes.Length; i++)
         {
-            return null;
-        }
-
-        var elements = xdoc.Root.Elements("StringBacked");
-        if (!elements.Any())
-        {
-            return null;
-        }
-
-        List<(string fileName, string source)> generated = new ();
-        foreach (var element in elements)
-        {
-            var genParams = StringBackedTypeGenerator.GetParams(element, null);
-            if (genParams == null)
+            if (path.EndsWith(CandidateSuffixes[i], StringComparison.OrdinalIgnoreCase))
             {
-                continue;
+                return true;
             }
-
-            var generatedCode = StringBackedTypeGenerator.Generate(genParams, null);
-            if (string.IsNullOrEmpty(generatedCode))
-            {
-                continue;
-            }
-
-            var fileName = $"{genParams.Value.Namespace}.{genParams.Value.Name}.g.cs";
-
-            generated.Add((fileName, generatedCode!));
         }
 
-        return generated;
+        return false;
     }
 
-    private IEnumerable<(string fileName, string source)>? GenerateFromJson(string fileContent)
+    private static IEnumerable<(string fileName, string source)>? Generate(string filePath, string fileContent, string licenseHeader, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        return GenerateFromJson(fileContent, filePath, licenseHeader, cancellationToken);
+    }
+
+    private static IEnumerable<(string fileName, string source)>? GenerateFromJson(string fileContent, string? filePath, string licenseHeader, CancellationToken cancellationToken)
     {
         try
         {
             using var document = JsonDocument.Parse(fileContent);
             var root = document.RootElement;
 
-            if (!root.TryGetProperty("name", out var nameElement) ||
-                !root.TryGetProperty("namespace", out var namespaceElement))
+            if (!root.TryGetProperty("name", out var nameElement))
             {
-                return null;
+                throw new InvalidDataException($"Required property 'name' is missing. Each type definition must have a 'name' property.");
+            }
+
+            if (!root.TryGetProperty("namespace", out var namespaceElement))
+            {
+                throw new InvalidDataException($"Required property 'namespace' is missing. Each type definition must have a 'namespace' property.");
             }
 
             var name = nameElement.GetString();
             var namespaceName = namespaceElement.GetString();
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(namespaceName))
+            
+            if (string.IsNullOrWhiteSpace(name))
             {
-                return null;
+                throw new InvalidDataException($"Property 'name' must be a non-empty string. Current value: '{name ?? "null"}'");
+            }
+            
+            if (string.IsNullOrWhiteSpace(namespaceName))
+            {
+                throw new InvalidDataException($"Property 'namespace' must be a non-empty string. Current value: '{namespaceName ?? "null"}'");
             }
 
             string? regex = null;
@@ -125,12 +157,25 @@ public class StringBackedTypeSourceGenerator
             {
                 foreach (var prop in propertiesElement.EnumerateArray())
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     var propName = prop.TryGetProperty("name", out var n) ? n.GetString() : null;
                     var propType = prop.TryGetProperty("type", out var t) ? t.GetString() : null;
-                    if (!string.IsNullOrEmpty(propName) && !string.IsNullOrEmpty(propType))
+                    
+                    // Both must be present and non-empty, or both must be absent/empty
+                    var hasName = !string.IsNullOrWhiteSpace(propName);
+                    var hasType = !string.IsNullOrWhiteSpace(propType);
+                    
+                    if (hasName && hasType)
                     {
                         additionalProperties.Add((propType!, propName!));
                     }
+                    else if (hasName != hasType)
+                    {
+                        // Exactly one is set - this is an error
+                        throw new InvalidDataException($"Property definition incomplete. Both 'name' and 'type' must be specified for additional properties. Got name: '{propName ?? "null"}', type: '{propType ?? "null"}'");
+                    }
+                    // else: both are empty/null, which is valid - just skip this entry
                 }
             }
 
@@ -140,20 +185,46 @@ public class StringBackedTypeSourceGenerator
                 true,
                 regex,
                 regexConst,
-                additionalProperties);
+                additionalProperties,
+                filePath,
+                licenseHeader
+            );
 
             var generatedCode = StringBackedTypeGenerator.Generate(genParams, null);
             if (string.IsNullOrEmpty(generatedCode))
             {
+                // This shouldn't happen with valid parameters, but handle gracefully
                 return null;
             }
 
-            var fileName = $"{namespaceName!}.{name!}.g.cs";
-            return new[] { (fileName, generatedCode!) };
+            var fileName = $"{namespaceName!}.{name!}.{Path.GetFileName(filePath)}.g.cs";
+            var results = new List<(string fileName, string source)> { (fileName, generatedCode!) };
+
+            // Generate ValueConverter if path is configured
+            if (ValueConverterConfig.IsEnabled)
+            {
+                var converterCode = StringBackedTypeGenerator.GenerateValueConverter(genParams, null);
+                if (!string.IsNullOrEmpty(converterCode))
+                {
+                    var converterFileName = $"{namespaceName!}.{name!}ValueConverter.{Path.GetFileName(filePath)}.g.cs";
+                    results.Add((converterFileName, converterCode!));
+                }
+            }
+
+            return results;
         }
-        catch
+        catch (JsonException jsonEx)
         {
-            return null;
+            throw new InvalidDataException($"Failed to parse JSON. Ensure the file is valid JSON. Details: {jsonEx.Message}", jsonEx);
+        }
+        catch (InvalidDataException)
+        {
+            // Re-throw validation errors as-is
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Unexpected error during code generation. Details: {ex.Message}", ex);
         }
     }
 }

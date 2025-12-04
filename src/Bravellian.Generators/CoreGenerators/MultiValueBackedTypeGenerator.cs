@@ -1,31 +1,17 @@
-// Copyright (c) Bravellian
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-#nullable enable
+// Licensed under the Apache License, Version 2.0.
+// See LICENSE file in the project root for full license information.
 
 namespace Bravellian.Generators;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 public static class MultiValueBackedTypeGenerator
 {
-    public static GeneratorParams? GetParams(XElement xml, IBvLogger? logger)
+    public static GeneratorParams? GetParams(XElement xml, IBgLogger? logger, string sourceFilePath)
     {
         IReadOnlyDictionary<string, string> attributes = xml.GetAttributeDict();
 
@@ -57,14 +43,28 @@ public static class MultiValueBackedTypeGenerator
                 }
             })
             .ToList();
-        return new (attributes.TryGetValue("name") ?? string.Empty, attributes.TryGetValue("namespace") ?? string.Empty, true, attributes.TryGetValue("separator") ?? "|", attributes.TryGetValue("format") ?? string.Empty, attributes.TryGetValue("regex") ?? string.Empty, attributes.TryGetValue("bookend") ?? string.Empty, fields);
+        return new(attributes.TryGetValue("name") ?? string.Empty, attributes.TryGetValue("namespace") ?? string.Empty, true, attributes.TryGetValue("separator") ?? "|", attributes.TryGetValue("format") ?? string.Empty, attributes.TryGetValue("regex") ?? string.Empty, attributes.TryGetValue("bookend") ?? string.Empty, fields, sourceFilePath);
     }
 
-    public static string? Generate(GeneratorParams? structToGenerate, IBvLogger? logger)
+    public static string? Generate(GeneratorParams? structToGenerate, IBgLogger? logger)
     {
         if (structToGenerate.HasValue)
         {
             return GenerateWithPattern(structToGenerate.Value);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public static string? GenerateValueConverter(GeneratorParams? structToGenerate, IBgLogger? logger)
+    {
+        if (structToGenerate.HasValue)
+        {
+            return ValueConverterGenerator.GenerateMultiValueBackedConverter(
+                structToGenerate.Value.Name,
+                structToGenerate.Value.Namespace);
         }
         else
         {
@@ -80,7 +80,7 @@ public static class MultiValueBackedTypeGenerator
         bool hasBookend = !string.IsNullOrWhiteSpace(relatedClass.Bookend);
 
         var nonConstantFields = relatedClass.Fields.Where(f => f.ConstantValue == null && f.ConstantTypeValue == null).ToList();
-        var ctorParameters = string.Join(", ", nonConstantFields.Select(f => $"{f.FieldType}{(f.IsNullable ? "?" : string.Empty)} {f.FieldName.ToLower()}"));
+        var ctorParameters = string.Join(", ", nonConstantFields.Select(f => $"{f.FieldType}{(f.IsNullable ? "?" : "")} {f.FieldName.ToLower()}"));
         var ctorPropertyAssignments = string.Join("\r\n", relatedClass.Fields.Select(f =>
         {
             if (f.ConstantValue != null)
@@ -104,7 +104,7 @@ public static class MultiValueBackedTypeGenerator
         if (useSeparator && !hasSerializedNames)
         {
             var ctorValue = "$\""
-                + (hasBookend ? "{Bookend}" : string.Empty)
+                + (hasBookend ? "{Bookend}" : "")
                 + string.Join("{Separator}", relatedClass.Fields.Select(f =>
                 {
                     if (f.ConstantValue != null)
@@ -124,7 +124,7 @@ public static class MultiValueBackedTypeGenerator
 
                     return $"{{{f.FieldName.ToLower()}}}";
                 }))
-                + (hasBookend ? "{Bookend}" : string.Empty)
+                + (hasBookend ? "{Bookend}" : "")
                 + "\"";
 
             var bookendConst = hasBookend ? $"\r\n    public const string Bookend = \"{relatedClass.Bookend}\";" : string.Empty;
@@ -179,9 +179,9 @@ public static class MultiValueBackedTypeGenerator
             var formatPattern = string.Join(relatedClass.Separator ?? "|", formatParts);
             var regexTempPattern = string.Join(relatedClass.Separator ?? "|", regexParts);
             var ctorValue = "$\""
-                + (hasBookend ? "{Bookend}" : string.Empty)
+                + (hasBookend ? "{Bookend}" : "")
                 + formatPattern
-                + (hasBookend ? "{Bookend}" : string.Empty)
+                + (hasBookend ? "{Bookend}" : "")
                 + "\"";
 
             string regexPattern = relatedClass.Regex;
@@ -396,7 +396,7 @@ public static class MultiValueBackedTypeGenerator
 
     private static string GenerateWithPattern(in GeneratorParams relatedClass)
     {
-        var properties = string.Join("\r\n\r\n", relatedClass.Fields.Select(f => $"    public {f.FieldType}{(f.IsNullable ? "?" : string.Empty)} {f.FieldName} {{ get; }}"));
+        var properties = string.Join("\r\n\r\n", relatedClass.Fields.Select(f => $"    public {f.FieldType}{(f.IsNullable ? "?" : "")} {f.FieldName} {{ get; }}"));
 
         var fieldTypes = string.Join(", ", relatedClass.Fields.Select(f => f.FieldType));
 
@@ -423,10 +423,11 @@ public static class MultiValueBackedTypeGenerator
 """
             : string.Empty;
 
+        var licenseHeader = relatedClass.LicenseHeader ?? string.Empty;
+
         return $$"""
 // <auto-generated/>
-// CONFIDENTIAL - Copyright (c) Bravellian LLC. All rights reserved.
-// See NOTICE.md for full restrictions and usage terms.
+{{licenseHeader}}
 
 #nullable enable
 
@@ -447,17 +448,17 @@ public readonly partial record struct {{relatedClass.Name}}
         : IComparable,
           IComparable<{{relatedClass.Name}}>,
           IEquatable<{{relatedClass.Name}}>,
-          IParsable<{{relatedClass.Name}}>,
-          Bravellian.IHasValueConverter,
-          Bravellian.IPwParsable<{{relatedClass.Name}}>,
-          Bravellian.IStringBackedType<{{relatedClass.Name}}>,
-          Bravellian.IMultiBackedType<{{relatedClass.Name}}, {{fieldTypes}}>
+          IParsable<{{relatedClass.Name}}>
 {
     private readonly string internalValue;
 
 {{GenerateTypedConstructor(relatedClass)}}
 
 {{properties}}
+
+    public string Value => this.ToString();
+
+    public static {{relatedClass.Name}} From(string value) => Parse(value);
 
     public override string ToString() => this.internalValue;
 
@@ -480,6 +481,14 @@ public readonly partial record struct {{relatedClass.Name}}
     {
         return obj is {{relatedClass.Name}} id ? this.internalValue.CompareTo(id.internalValue) : this.internalValue.CompareTo(obj);
     }
+
+    public static bool operator <({{relatedClass.Name}} left, {{relatedClass.Name}} right) => left.CompareTo(right) < 0;
+
+    public static bool operator <=({{relatedClass.Name}} left, {{relatedClass.Name}} right) => left.CompareTo(right) <= 0;
+
+    public static bool operator >({{relatedClass.Name}} left, {{relatedClass.Name}} right) => left.CompareTo(right) > 0;
+
+    public static bool operator >=({{relatedClass.Name}} left, {{relatedClass.Name}} right) => left.CompareTo(right) >= 0;
 
     public static {{relatedClass.Name}}? TryParse(string? value)
     {
@@ -579,8 +588,10 @@ public readonly partial record struct {{relatedClass.Name}}
         public readonly string Regex;
         public readonly string Bookend;
         public readonly IReadOnlyList<FieldInfo> Fields;
+        public readonly string? SourceFilePath;
+        public readonly string? LicenseHeader;
 
-        public GeneratorParams(string name, string ns, bool isPublic, string separator, string format, string regex, string bookend, IReadOnlyList<FieldInfo> fields)
+        public GeneratorParams(string name, string ns, bool isPublic, string separator, string format, string regex, string bookend, IReadOnlyList<FieldInfo> fields, string? sourceFilePath, string? licenseHeader = null)
         {
             this.Name = name;
             this.Namespace = ns;
@@ -591,6 +602,8 @@ public readonly partial record struct {{relatedClass.Name}}
             this.Bookend = bookend;
             this.FullyQualifiedName = string.Join(".", ns, name);
             this.Fields = fields;
+            this.SourceFilePath = sourceFilePath;
+            this.LicenseHeader = licenseHeader;
         }
     }
 

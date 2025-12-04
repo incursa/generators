@@ -1,235 +1,256 @@
-// Copyright (c) Bravellian
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 namespace Bravellian.Generators;
 
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Text.Json;
 using System.Threading;
-using System.Xml.Linq;
+using Microsoft.CodeAnalysis;
 
-// 1. Inherit from the base class for single files
-// [Generator]
-public class DtoEntitySourceGenerator
+[Generator(LanguageNames.CSharp)]
+public sealed class DtoEntitySourceGenerator : IIncrementalGenerator
 {
-    // 2. Specify which files to watch for DTO definitions
-    protected Regex FileExtensionRegex { get; } = new Regex(@"(?:.*\.dto\.xml|.*\.entities\.xml|.*\.viewmodels\.xml|_generate\.xml|.*\.dto\.json|.*\.entity\.json)$");
-
-    // 3. Implement the generation logic
-    protected IEnumerable<(string fileName, string source)>? Generate(string filePath, string fileContent, CancellationToken cancellationToken)
+    private static readonly string[] CandidateSuffixes = new[]
     {
-        var fileExtension = System.IO.Path.GetExtension(filePath).ToLowerInvariant();
-        if (string.Equals(fileExtension, ".json", System.StringComparison.Ordinal))
+        ".dto.json",
+        ".entity.json",
+    };
+
+    private readonly record struct InputFile
+    {
+        public string Path { get; }
+        public string? Content { get; }
+
+        public InputFile(string path, string? content)
         {
-            return this.GenerateFromJson(fileContent);
+            Path = path;
+            Content = content;
         }
-        else
+    }
+
+    public void Initialize(IncrementalGeneratorInitializationContext context)
+    {
+        // Get license header from MSBuild property
+        var licenseHeaderProvider = context.AnalyzerConfigOptionsProvider
+            .Select(static (provider, _) =>
+            {
+                provider.GlobalOptions.TryGetValue("build_property.GeneratedCodeLicenseHeader", out var header);
+                return header ?? string.Empty;
+            });
+
+        var candidateFiles = context.AdditionalTextsProvider
+            .Where(static text => IsCandidateFile(text.Path))
+            .Select(static (text, cancellationToken) => new InputFile(text.Path, text.GetText(cancellationToken)?.ToString()))
+            .Where(static input => !string.IsNullOrWhiteSpace(input.Content));
+
+        // Combine files with license header
+        var filesWithLicense = candidateFiles.Combine(licenseHeaderProvider);
+
+        context.RegisterSourceOutput(filesWithLicense, static (productionContext, input) =>
         {
-            return this.GenerateFromXml(fileContent);
-        }
+            var (file, licenseHeader) = input;
+            try
+            {
+                var generated = Generate(file.Path, file.Content!, licenseHeader, productionContext.CancellationToken);
+                if (generated == null || !generated.Any())
+                {
+                    GeneratorDiagnostics.ReportSkipped(productionContext, $"No output generated for '{file.Path}'. Ensure required DTO elements or JSON fields are present.");
+                    return;
+                }
+
+                var addedHintNames = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var (fileName, source) in generated)
+                {
+                    productionContext.CancellationToken.ThrowIfCancellationRequested();
+                    if (!addedHintNames.Add(fileName))
+                    {
+                        GeneratorDiagnostics.ReportDuplicateHintName(productionContext, fileName);
+                        continue;
+                    }
+                    productionContext.AddSource(fileName, source);
+                }
+            }
+            catch (Exception ex)
+            {
+                GeneratorDiagnostics.ReportError(productionContext, $"DtoEntitySourceGenerator failed for '{file.Path}'", ex);
+            }
+        });
     }
 
     /// <summary>
-    /// Public wrapper for CLI usage.
+    /// Public wrapper for CLI usage
     /// </summary>
     public IEnumerable<(string fileName, string source)>? GenerateFromFiles(string filePath, string fileContent, CancellationToken cancellationToken = default)
     {
-        return this.Generate(filePath, fileContent, cancellationToken);
+        return Generate(filePath, fileContent, string.Empty, cancellationToken);
     }
 
-    private IEnumerable<(string fileName, string source)>? GenerateFromXml(string fileContent)
+    private static bool IsCandidateFile(string path)
     {
-        var xdoc = XDocument.Parse(fileContent);
-        if (xdoc.Root == null)
+        for (var i = 0; i < CandidateSuffixes.Length; i++)
         {
-            return null;
-        }
-
-        // Look for DtoEntity, Entity, ViewModel, or Dto elements
-        var elements = xdoc.Root.Elements()
-            .Where(e => string.Equals(e.Name.LocalName, "DtoEntity", System.StringComparison.Ordinal) ||
-string.Equals(e.Name.LocalName, "Entity", System.StringComparison.Ordinal) ||
-string.Equals(e.Name.LocalName, "ViewModel", System.StringComparison.Ordinal) ||
-string.Equals(e.Name.LocalName, "Dto", System.StringComparison.Ordinal));
-
-        if (!elements.Any())
-        {
-            return null;
-        }
-
-        List<(string fileName, string source)> generated = new ();
-
-        foreach (var element in elements)
-        {
-            var genParams = GetParamsFromXml(element, null);
-            if (genParams == null)
+            if (path.EndsWith(CandidateSuffixes[i], StringComparison.OrdinalIgnoreCase))
             {
-                continue;
+                return true;
             }
-
-            var generatedCode = DtoEntityGenerator.Generate(genParams, null);
-            if (string.IsNullOrEmpty(generatedCode))
-            {
-                continue;
-            }
-
-            // Generate filename based on namespace and name
-            var fileName = $"{genParams.Namespace}.{genParams.Name}.g.cs";
-
-            generated.Add((fileName, generatedCode!));
         }
 
-        return generated;
+        return false;
     }
 
-    private IEnumerable<(string fileName, string source)>? GenerateFromJson(string fileContent)
+    private static IEnumerable<(string fileName, string source)>? Generate(string filePath, string fileContent, string licenseHeader, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return GenerateFromJson(fileContent, filePath, licenseHeader, cancellationToken);
+    }
+
+    private static IEnumerable<(string fileName, string source)>? GenerateFromJson(string fileContent, string filePath, string licenseHeader, CancellationToken cancellationToken)
     {
         try
         {
-            using var document = System.Text.Json.JsonDocument.Parse(fileContent);
-            var root = document.RootElement;
+            using var jsonDoc = JsonDocument.Parse(fileContent);
+            var root = jsonDoc.RootElement;
 
-            var genParams = ParseGeneratorParamsFromJson(root);
+            var genParams = ParseGeneratorParamsFromJson(root, filePath, licenseHeader, cancellationToken, parentNamespace: null);
             if (genParams == null)
             {
                 return null;
             }
 
-            var generated = new List<(string fileName, string source)>();
-            GenerateCodeRecursive(genParams, generated);
+            List<(string fileName, string source)> generated = new();
+            GenerateCodeRecursive(genParams, generated, cancellationToken);
+
             return generated;
         }
-        catch
+        catch (Exception)
         {
             return null;
         }
     }
 
-    private static DtoEntityGenerator.GeneratorParams? ParseGeneratorParamsFromJson(System.Text.Json.JsonElement root)
+    private static DtoEntityGenerator.GeneratorParams? ParseGeneratorParamsFromJson(JsonElement root, string sourceFilePath, string licenseHeader, CancellationToken cancellationToken, string? parentNamespace)
     {
-        // Required fields
+        cancellationToken.ThrowIfCancellationRequested();
+
         if (!root.TryGetProperty("name", out var nameElement) ||
-            !root.TryGetProperty("namespace", out var namespaceElement))
+            (!root.TryGetProperty("namespace", out var namespaceElement) && string.IsNullOrEmpty(parentNamespace)))
         {
             return null;
         }
 
         var name = nameElement.GetString();
-        var ns = namespaceElement.GetString();
+        var ns = root.TryGetProperty("namespace", out var nsElement) ? nsElement.GetString() : parentNamespace;
+
         if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(ns))
         {
             return null;
         }
 
-        // Optional fields
-        string? parentName = root.TryGetProperty("parent", out var parentElement) ? parentElement.GetString() : null;
-        string? inherits = root.TryGetProperty("inherits", out var inheritsElement) ? inheritsElement.GetString() : null;
-        bool isAbstract = root.TryGetProperty("abstract", out var absElement) && absElement.ValueKind == System.Text.Json.JsonValueKind.True;
-        string? accessibility = root.TryGetProperty("accessibility", out var accElement) ? accElement.GetString() : null;
-        string? documentation = root.TryGetProperty("documentation", out var docElement) ? docElement.GetString() : null;
-        bool classOnly = root.TryGetProperty("classOnly", out var classOnlyElement) && classOnlyElement.ValueKind == System.Text.Json.JsonValueKind.True;
+        var documentation = root.TryGetProperty("documentation", out var docElement) ? docElement.GetString() : null;
+        var inherits = root.TryGetProperty("inherits", out var inheritsElement) ? inheritsElement.GetString() : null;
+        var accessibility = root.TryGetProperty("accessibility", out var accessibilityElement) ? accessibilityElement.GetString() : "public";
+        var isAbstract = root.TryGetProperty("abstract", out var abstractElement) && abstractElement.GetBoolean();
+        var classOnly = root.TryGetProperty("classOnly", out var classOnlyElement) && classOnlyElement.GetBoolean();
+        var isStrict = root.TryGetProperty("strict", out var strictElement) && strictElement.GetBoolean();
+        var useParentValidator = !root.TryGetProperty("useParentValidator", out var useParentValidatorElement) || useParentValidatorElement.GetBoolean();
+        var noCreateMethod = root.TryGetProperty("noCreateMethod", out var noCreateMethodElement) && noCreateMethodElement.GetBoolean();
+        var isRecordStruct = root.TryGetProperty("isRecordStruct", out var isRecordStructElement) && isRecordStructElement.GetBoolean();
 
-        // Properties
+        if (isAbstract && isStrict)
+        {
+            return null;
+        }
+
+        if (isRecordStruct)
+        {
+            if (isAbstract)
+            {
+                return null;
+            }
+            if (!string.IsNullOrEmpty(inherits))
+            {
+                // Records cannot inherit from classes
+                return null;
+            }
+        }
+
         var properties = new List<DtoEntityGenerator.PropertyDescriptor>();
-        if (root.TryGetProperty("properties", out var propsElement) && propsElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+        if (root.TryGetProperty("properties", out var propsElement) && propsElement.ValueKind == JsonValueKind.Array)
         {
             foreach (var prop in propsElement.EnumerateArray())
             {
-                var propName = prop.TryGetProperty("name", out var n) ? n.GetString() : null;
-                var propType = prop.TryGetProperty("type", out var t) ? t.GetString() : null;
+                cancellationToken.ThrowIfCancellationRequested();
+                if (!prop.TryGetProperty("name", out var propNameElement) || !prop.TryGetProperty("type", out var propTypeElement))
+                {
+                    continue;
+                }
+
+                var propName = propNameElement.GetString();
+                var propType = propTypeElement.GetString();
+
                 if (string.IsNullOrEmpty(propName) || string.IsNullOrEmpty(propType))
                 {
                     continue;
                 }
 
-                var isRequired = prop.TryGetProperty("required", out var req) && req.ValueKind == System.Text.Json.JsonValueKind.True;
-                var isNullable = prop.TryGetProperty("nullable", out var nul) && nul.ValueKind == System.Text.Json.JsonValueKind.True;
-                var noDefault = prop.TryGetProperty("noDefault", out var noDef) && noDef.ValueKind == System.Text.Json.JsonValueKind.True;
-                var isSettable = !prop.TryGetProperty("settable", out var set) || (set.ValueKind == System.Text.Json.JsonValueKind.True);
-                var max = prop.TryGetProperty("max", out var maxEl) ? maxEl.GetString() : null;
-                var min = prop.TryGetProperty("min", out var minEl) ? minEl.GetString() : null;
-                var regex = prop.TryGetProperty("regex", out var regexEl) ? regexEl.GetString() : null;
-                var jsonProperty = prop.TryGetProperty("jsonProperty", out var jsonPropEl) ? jsonPropEl.GetString() : null;
-                var expression = prop.TryGetProperty("expression", out var exprEl) ? exprEl.GetString() : null;
-                var propDocumentation = prop.TryGetProperty("documentation", out var docEl) ? docEl.GetString() : null;
+                var propDocumentation = prop.TryGetProperty("documentation", out var propDocElement) ? propDocElement.GetString() : null;
+                var isRequired = prop.TryGetProperty("required", out var requiredElement) ? requiredElement.GetBoolean() : true;
+                var isNullable = prop.TryGetProperty("nullable", out var nullableElement) && nullableElement.GetBoolean();
+                var max = prop.TryGetProperty("max", out var maxElement) ? maxElement.GetString() : null;
+                var min = prop.TryGetProperty("min", out var minElement) ? minElement.GetString() : null;
+                var regex = prop.TryGetProperty("regex", out var regexElement) ? regexElement.GetString() : null;
+                var jsonProperty = prop.TryGetProperty("jsonProperty", out var jsonPropertyElement) ? jsonPropertyElement.GetString() : null;
+                var noDefault = prop.TryGetProperty("noDefault", out var noDefaultElement) && noDefaultElement.GetBoolean();
+                var isSettable = prop.TryGetProperty("settable", out var settableElement) && settableElement.GetBoolean();
+                var expression = prop.TryGetProperty("expression", out var expressionElement) ? expressionElement.GetString() : null;
 
                 properties.Add(new DtoEntityGenerator.PropertyDescriptor(
-                    name: propName!,
-                    type: propType!,
-                    isRequired: isRequired,
-                    isNullable: isNullable,
-                    max: max,
-                    min: min,
-                    regex: regex,
-                    jsonProperty: jsonProperty,
-                    noDefault: noDefault,
-                    isSettable: isSettable,
-                    expression: expression,
-                    documentation: propDocumentation));
+                    propName, propType, isRequired, isNullable, max, min, regex, jsonProperty, noDefault, isSettable, expression, propDocumentation));
             }
         }
 
-        // Nested entities
-        List<DtoEntityGenerator.GeneratorParams>? nestedEntities = null;
-        if (root.TryGetProperty("nestedEntities", out var nestedElement) && nestedElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+        var nestedEntities = new List<DtoEntityGenerator.GeneratorParams>();
+        if (root.TryGetProperty("nestedEntities", out var nestedElement) && nestedElement.ValueKind == JsonValueKind.Array)
         {
-            nestedEntities = new List<DtoEntityGenerator.GeneratorParams>();
             foreach (var nested in nestedElement.EnumerateArray())
             {
-                var nestedParams = ParseGeneratorParamsFromJson(nested);
+                cancellationToken.ThrowIfCancellationRequested();
+                var nestedParams = ParseGeneratorParamsFromJson(nested, sourceFilePath, licenseHeader, cancellationToken, ns);
                 if (nestedParams != null)
                 {
-                    // Determine isAbstract for nested entity
-                    bool nestedIsAbstract = false;
-                    if (nested.TryGetProperty("abstract", out var nestedAbsElement))
-                    {
-                        nestedIsAbstract = nestedAbsElement.ValueKind == System.Text.Json.JsonValueKind.True;
-                    }
-
-                    // For nested entities, set parentName and classOnly
-                    nestedParams = new DtoEntityGenerator.GeneratorParams(
-                        name: nestedParams.Name,
-                        ns: ns!, // Use parent namespace
-                        parentName: name!, // Set parent name
-                        inherits: nestedParams.Inherits?.TrimStart(' ', ':'),
-                        isAbstract: nestedIsAbstract,
-                        accessibility: nestedParams.Accessibility,
-                        properties: nestedParams.Properties,
-                        nestedEntities: nestedParams.NestedEntities,
-                        documentation: nestedParams.Documentation,
-                        classOnly: true); // Force classOnly for nested entities
                     nestedEntities.Add(nestedParams);
                 }
             }
         }
 
-        return new DtoEntityGenerator.GeneratorParams(
-            name: name!,
-            ns: ns!,
-            parentName: parentName,
+        var genParams = new DtoEntityGenerator.GeneratorParams(
+            name: name,
+            ns: ns,
+            parentName: parentNamespace,
             inherits: inherits,
             isAbstract: isAbstract,
             accessibility: accessibility,
+            sourceFilePath: sourceFilePath,
             properties: properties,
-            nestedEntities: nestedEntities,
+            nestedEntities: nestedEntities.Count > 0 ? nestedEntities : null,
             documentation: documentation,
-            classOnly: classOnly);
+            classOnly: classOnly,
+            isStrict: isStrict,
+            useParentValidator: useParentValidator,
+            noCreateMethod: noCreateMethod,
+            isRecordStruct: isRecordStruct)
+        {
+            LicenseHeader = licenseHeader
+        };
+
+        return genParams;
     }
 
-    private static void GenerateCodeRecursive(DtoEntityGenerator.GeneratorParams genParams, List<(string fileName, string source)> generated)
+    private static void GenerateCodeRecursive(DtoEntityGenerator.GeneratorParams genParams, List<(string fileName, string source)> generated, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var generatedCode = DtoEntityGenerator.Generate(genParams, null);
         if (!string.IsNullOrEmpty(generatedCode))
         {
@@ -241,134 +262,9 @@ string.Equals(e.Name.LocalName, "Dto", System.StringComparison.Ordinal));
         {
             foreach (var nested in genParams.NestedEntities)
             {
-                GenerateCodeRecursive(nested, generated);
+                cancellationToken.ThrowIfCancellationRequested();
+                GenerateCodeRecursive(nested, generated, cancellationToken);
             }
         }
-    }
-
-    /// <summary>
-    /// Parse XML element to create GeneratorParams for DTO generation.
-    /// </summary>
-    public static DtoEntityGenerator.GeneratorParams? GetParamsFromXml(XElement xml, IBvLogger? logger)
-    {
-        var attributes = xml.GetAttributeDict();
-
-        // Required attributes
-        if (!attributes.TryGetValue("name", out var name) || string.IsNullOrEmpty(name))
-        {
-            logger?.LogError("DTO entity must have a 'name' attribute");
-            return null;
-        }
-
-        if (!attributes.TryGetValue("namespace", out var ns) || string.IsNullOrEmpty(ns))
-        {
-            logger?.LogError($"DTO entity '{name}' must have a 'namespace' attribute");
-            return null;
-        }
-
-        // Optional attributes
-        attributes.TryGetValue("parent", out var parentName);
-        attributes.TryGetValue("inherits", out var inherits);
-        var isAbstract = attributes.TryGetValue("abstract", out var abstractStr) && bool.TryParse(abstractStr, out var abs) && abs;
-        attributes.TryGetValue("accessibility", out var accessibility);
-        var classOnly = attributes.TryGetValue("classOnly", out var classOnlyStr) && bool.TryParse(classOnlyStr, out var co) && co;
-        attributes.TryGetValue("documentation", out var documentation);
-
-        // Parse properties
-        var properties = ParseProperties(xml.Elements("Property"), logger);
-
-        // Parse nested entities
-        var nestedEntities = ParseNestedEntities(xml.Elements("NestedEntity"), ns, name, logger);
-
-        return new DtoEntityGenerator.GeneratorParams(
-            name: name,
-            ns: ns,
-            parentName: parentName,
-            inherits: inherits,
-            isAbstract: isAbstract,
-            accessibility: accessibility,
-            properties: properties,
-            nestedEntities: nestedEntities,
-            documentation: documentation,
-            classOnly: classOnly);
-    }
-
-    private static List<DtoEntityGenerator.PropertyDescriptor> ParseProperties(IEnumerable<XElement> propertyElements, IBvLogger? logger)
-    {
-        var properties = new List<DtoEntityGenerator.PropertyDescriptor>();
-
-        foreach (var prop in propertyElements)
-        {
-            var attributes = prop.GetAttributeDict();
-
-            if (!attributes.TryGetValue("name", out var propName) || string.IsNullOrEmpty(propName))
-            {
-                logger?.LogError("Property must have a 'name' attribute");
-                continue;
-            }
-
-            if (!attributes.TryGetValue("type", out var propType) || string.IsNullOrEmpty(propType))
-            {
-                logger?.LogError($"Property '{propName}' must have a 'type' attribute");
-                continue;
-            }
-
-            var isRequired = attributes.TryGetValue("required", out var reqStr) && bool.TryParse(reqStr, out var req) && req;
-            var isNullable = attributes.TryGetValue("nullable", out var nullStr) && bool.TryParse(nullStr, out var nul) && nul;
-            var noDefault = attributes.TryGetValue("noDefault", out var noDefStr) && bool.TryParse(noDefStr, out var noDef) && noDef;
-            var isSettable = !attributes.ContainsKey("settable") || (attributes.TryGetValue("settable", out var setStr) && bool.TryParse(setStr, out var set) && set);
-
-            attributes.TryGetValue("max", out var max);
-            attributes.TryGetValue("min", out var min);
-            attributes.TryGetValue("regex", out var regex);
-            attributes.TryGetValue("jsonProperty", out var jsonProperty);
-            attributes.TryGetValue("expression", out var expression);
-            attributes.TryGetValue("documentation", out var propDocumentation);
-
-            properties.Add(new DtoEntityGenerator.PropertyDescriptor(
-                name: propName,
-                type: propType,
-                isRequired: isRequired,
-                isNullable: isNullable,
-                max: max,
-                min: min,
-                regex: regex,
-                jsonProperty: jsonProperty,
-                noDefault: noDefault,
-                isSettable: isSettable,
-                expression: expression,
-                documentation: propDocumentation));
-        }
-
-        return properties;
-    }
-
-    private static List<DtoEntityGenerator.GeneratorParams> ParseNestedEntities(IEnumerable<XElement> nestedElements, string parentNamespace, string parentName, IBvLogger? logger)
-    {
-        var nestedEntities = new List<DtoEntityGenerator.GeneratorParams>();
-
-        foreach (var nested in nestedElements)
-        {
-            var nestedParams = GetParamsFromXml(nested, logger);
-            if (nestedParams != null)
-            {
-                // For nested entities, we want to set the parent name and make them class-only
-                var updatedParams = new DtoEntityGenerator.GeneratorParams(
-                    name: nestedParams.Name,
-                    ns: parentNamespace, // Use parent namespace
-                    parentName: parentName, // Set parent name
-                    inherits: nestedParams.Inherits?.TrimStart(' ', ':'), // Remove leading colon if present
-                    isAbstract: !string.IsNullOrEmpty(nestedParams.Abstract),
-                    accessibility: nestedParams.Accessibility,
-                    properties: nestedParams.Properties,
-                    nestedEntities: nestedParams.NestedEntities,
-                    documentation: nestedParams.Documentation,
-                    classOnly: true); // Force class-only for nested entities
-
-                nestedEntities.Add(updatedParams);
-            }
-        }
-
-        return nestedEntities;
     }
 }

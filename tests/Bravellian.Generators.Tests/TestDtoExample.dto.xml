@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Entities>
-  <!-- Simple test DTO -->
-  <DtoEntity name="TestDto" namespace="Bravellian.Generators.Tests">
-    <Property name="Id" type="Guid" required="true" noDefault="true" />
-    <Property name="Name" type="string" required="true" max="50" />
-    <Property name="Email" type="string" required="true" regex="^[^@\s]+@[^@\s]+\.[^@\s]+$" />
-  </DtoEntity>
-</Entities>

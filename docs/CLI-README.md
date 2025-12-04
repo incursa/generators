@@ -7,15 +7,15 @@ This is a .NET command-line tool that replaces the Roslyn source generator funct
 To install the tool globally:
 
 ```bash
-dotnet tool install --global Bravellian.Generators.Cli
+dotnet tool install --global Bravellian.Generators
 ```
 
 Or to install it from a local build:
 
 ```bash
-cd Bravellian.Generators.Cli
+cd Bravellian.Generators
 dotnet pack
-dotnet tool install --global --add-source ./bin/Debug Bravellian.Generators.Cli
+dotnet tool install --global --add-source ./bin/Debug Bravellian.Generators
 ```
 
 ## Usage
@@ -183,10 +183,10 @@ dotnet build
 dotnet test
 
 # Package the CLI tool
-cd Bravellian.Generators.Cli
+cd Bravellian.Generators
 dotnet pack
 
 # Install locally for testing
-dotnet tool uninstall --global Bravellian.Generators.Cli
-dotnet tool install --global --add-source ./bin/Debug Bravellian.Generators.Cli
+dotnet tool uninstall --global Bravellian.Generators
+dotnet tool install --global --add-source ./bin/Debug Bravellian.Generators
 ```

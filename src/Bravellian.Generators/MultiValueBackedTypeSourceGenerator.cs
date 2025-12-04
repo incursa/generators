@@ -1,94 +1,111 @@
-﻿// Copyright (c) Bravellian
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 namespace Bravellian.Generators;
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Threading;
-using System.Xml.Linq;
+using Microsoft.CodeAnalysis;
 
-// 1. Inherit from the base class for single files
-// [Generator]
-public class MultiValueBackedTypeSourceGenerator
+[Generator(LanguageNames.CSharp)]
+public sealed class MultiValueBackedTypeSourceGenerator : IIncrementalGenerator
 {
-    // 2. Specify which files to watch
-    protected Regex FileExtensionRegex { get; } = new Regex(@"(?:.*\.types\.xml|.*\.sbt\.xml|_generate\.xml|.*\.multi\.json)$");
-
-    // 3. Implement the generation logic
-    protected IEnumerable<(string fileName, string source)>? Generate(string filePath, string fileContent, CancellationToken cancellationToken)
+    private static readonly string[] CandidateSuffixes = new[]
     {
-        var fileExtension = Path.GetExtension(filePath).ToLowerInvariant();
-        if (string.Equals(fileExtension, ".json", System.StringComparison.Ordinal))
+        ".multi.json",
+    };
+
+    private readonly record struct InputFile
+    {
+        public string Path { get; }
+        public string? Content { get; }
+
+        public InputFile(string path, string? content)
         {
-            return this.GenerateFromJson(fileContent);
+            Path = path;
+            Content = content;
         }
-        else
+    }
+
+    public void Initialize(IncrementalGeneratorInitializationContext context)
+    {
+        // Get license header from MSBuild property
+        var licenseHeaderProvider = context.AnalyzerConfigOptionsProvider
+            .Select(static (provider, _) =>
+            {
+                provider.GlobalOptions.TryGetValue("build_property.GeneratedCodeLicenseHeader", out var header);
+                return header ?? string.Empty;
+            });
+
+        var candidateFiles = context.AdditionalTextsProvider
+            .Where(static text => IsCandidateFile(text.Path))
+            .Select(static (text, cancellationToken) => new InputFile(text.Path, text.GetText(cancellationToken)?.ToString()))
+            .Where(static input => !string.IsNullOrWhiteSpace(input.Content));
+
+        // Combine files with license header
+        var filesWithLicense = candidateFiles.Combine(licenseHeaderProvider);
+
+        context.RegisterSourceOutput(filesWithLicense, static (productionContext, input) =>
         {
-            return this.GenerateFromXml(fileContent);
-        }
+            var (file, licenseHeader) = input;
+            try
+            {
+                var generated = Generate(file.Path, file.Content!, licenseHeader, productionContext.CancellationToken);
+                if (generated == null || !generated.Any())
+                {
+                    GeneratorDiagnostics.ReportSkipped(productionContext, $"No output generated for '{file.Path}'. Ensure required <MultiValueString> elements or JSON fields are present.");
+                    return;
+                }
+
+                var addedHintNames = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var (fileName, source) in generated)
+                {
+                    productionContext.CancellationToken.ThrowIfCancellationRequested();
+                    if (!addedHintNames.Add(fileName))
+                    {
+                        GeneratorDiagnostics.ReportDuplicateHintName(productionContext, fileName);
+                        continue;
+                    }
+                    productionContext.AddSource(fileName, source);
+                }
+            }
+            catch (Exception ex)
+            {
+                GeneratorDiagnostics.ReportError(productionContext, $"MultiValueBackedTypeSourceGenerator failed for '{file.Path}'", ex);
+            }
+        });
     }
 
     /// <summary>
-    /// Public wrapper for CLI usage.
+    /// Public wrapper for CLI usage
     /// </summary>
     public IEnumerable<(string fileName, string source)>? GenerateFromFiles(string filePath, string fileContent, CancellationToken cancellationToken = default)
     {
-        return this.Generate(filePath, fileContent, cancellationToken);
+        return Generate(filePath, fileContent, string.Empty, cancellationToken);
     }
 
-    private IEnumerable<(string fileName, string source)>? GenerateFromXml(string fileContent)
+    private static bool IsCandidateFile(string path)
     {
-        var xdoc = XDocument.Parse(fileContent);
-        if (xdoc.Root == null)
+        for (var i = 0; i < CandidateSuffixes.Length; i++)
         {
-            return null;
-        }
-
-        var elements = xdoc.Root.Elements("MultiValueString");
-        if (!elements.Any())
-        {
-            return null;
-        }
-
-        List<(string fileName, string source)> generated = new ();
-        foreach (var element in elements)
-        {
-            var genParams = MultiValueBackedTypeGenerator.GetParams(element, null);
-            if (genParams == null)
+            if (path.EndsWith(CandidateSuffixes[i], StringComparison.OrdinalIgnoreCase))
             {
-                continue;
+                return true;
             }
-
-            var generatedCode = MultiValueBackedTypeGenerator.Generate(genParams, null);
-            if (string.IsNullOrEmpty(generatedCode))
-            {
-                continue;
-            }
-
-            var fileName = $"{genParams.Value.Namespace}.{genParams.Value.Name}.g.cs";
-
-            generated.Add((fileName, generatedCode!));
         }
 
-        return generated;
+        return false;
     }
 
-    private IEnumerable<(string fileName, string source)>? GenerateFromJson(string fileContent)
+    private static IEnumerable<(string fileName, string source)>? Generate(string filePath, string fileContent, string licenseHeader, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        return GenerateFromJson(fileContent, filePath, licenseHeader, cancellationToken);
+    }
+
+    private static IEnumerable<(string fileName, string source)>? GenerateFromJson(string fileContent, string sourceFilePath, string licenseHeader, CancellationToken cancellationToken)
     {
         try
         {
@@ -98,14 +115,14 @@ public class MultiValueBackedTypeSourceGenerator
             if (!root.TryGetProperty("name", out var nameElement) ||
                 !root.TryGetProperty("namespace", out var namespaceElement))
             {
-                return null;
+                throw new InvalidDataException($"Required properties 'name' and 'namespace' are missing in '{sourceFilePath}'.");
             }
 
             var name = nameElement.GetString();
             var namespaceName = namespaceElement.GetString();
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(namespaceName))
             {
-                return null;
+                throw new InvalidDataException($"Properties 'name' and 'namespace' must be non-empty in '{sourceFilePath}'.");
             }
 
             string? separator = null;
@@ -126,7 +143,6 @@ public class MultiValueBackedTypeSourceGenerator
                 regex = regexElement.GetString();
             }
 
-            // Add bookend character support
             string? bookend = null;
             if (root.TryGetProperty("bookend", out var bookendElement))
             {
@@ -144,6 +160,8 @@ public class MultiValueBackedTypeSourceGenerator
             {
                 foreach (var part in partsElement.EnumerateArray())
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     var fieldName = part.TryGetProperty("name", out var n) ? n.GetString() : null;
                     var fieldType = part.TryGetProperty("type", out var t) ? t.GetString() : "string";
                     var serializedName = part.TryGetProperty("serializedName", out var sn) ? sn.GetString() : null;
@@ -161,7 +179,8 @@ public class MultiValueBackedTypeSourceGenerator
                             constantValue,
                             constantTypeValue,
                             isNullable,
-                            partNullIdentifier ?? nullIdentifier));
+                            partNullIdentifier ?? nullIdentifier
+                        ));
                     }
                 }
             }
@@ -174,7 +193,10 @@ public class MultiValueBackedTypeSourceGenerator
                 format ?? string.Empty,
                 regex ?? string.Empty,
                 bookend ?? string.Empty,
-                fields);
+                fields,
+                sourceFilePath,
+                licenseHeader
+            );
 
             var generatedCode = MultiValueBackedTypeGenerator.Generate(genParams, null);
             if (string.IsNullOrEmpty(generatedCode))
@@ -183,9 +205,22 @@ public class MultiValueBackedTypeSourceGenerator
             }
 
             var fileName = $"{namespaceName!}.{name!}.g.cs";
-            return new[] { (fileName, generatedCode!) };
+            var results = new List<(string fileName, string source)> { (fileName, generatedCode!) };
+
+            // Generate ValueConverter if path is configured
+            if (ValueConverterConfig.IsEnabled)
+            {
+                var converterCode = MultiValueBackedTypeGenerator.GenerateValueConverter(genParams, null);
+                if (!string.IsNullOrEmpty(converterCode))
+                {
+                    var converterFileName = $"{namespaceName!}.{name!}ValueConverter.g.cs";
+                    results.Add((converterFileName, converterCode!));
+                }
+            }
+
+            return results;
         }
-        catch
+        catch (Exception)
         {
             return null;
         }

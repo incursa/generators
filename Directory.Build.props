@@ -3,17 +3,15 @@
 		<!-- Keep your path and basic project info -->
 		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
 		<RepoRootPath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\'))</RepoRootPath>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
 
 		<Company>Bravellian</Company>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-		<IncludeSymbols>true</IncludeSymbols>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<!-- <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder> -->
 		<!-- Let SDK handle defaults unless needed -->
-		<LangVersion>13.0</LangVersion>
+		<LangVersion>14.0</LangVersion>
 		<!-- Keep specific lang version if needed -->
 		<PublishRelease>true</PublishRelease>
 

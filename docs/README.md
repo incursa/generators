@@ -44,19 +44,19 @@ This project contains source generators and CLI tools for generating C# code fro
 
 ```bash
 # Generate from a single file
-dotnet run --project Bravellian.Generators.Cli -- --input "definitions.json" --output "Generated"
+dotnet run --project Bravellian.Generators -- --input "definitions.json" --output "Generated"
 
 # Generate from multiple files
-dotnet run --project Bravellian.Generators.Cli -- --input "file1.json;file2.xml" --output "Generated"
+dotnet run --project Bravellian.Generators -- --input "file1.json;file2.xml" --output "Generated"
 
 # Generate from a directory
-dotnet run --project Bravellian.Generators.Cli -- --input "DefinitionsFolder" --output "Generated"
+dotnet run --project Bravellian.Generators -- --input "DefinitionsFolder" --output "Generated"
 
 # Dry run to see what would be generated
-dotnet run --project Bravellian.Generators.Cli -- --input "definitions.json" --output "Generated" --dry-run
+dotnet run --project Bravellian.Generators -- --input "definitions.json" --output "Generated" --dry-run
 
 # Verbose output
-dotnet run --project Bravellian.Generators.Cli -- --input "definitions.json" --output "Generated" --verbose
+dotnet run --project Bravellian.Generators -- --input "definitions.json" --output "Generated" --verbose
 ```
 
 ## JSON Schema Support
@@ -77,7 +77,7 @@ Example definition files are available for each generator type:
 dotnet build
 
 # Build just the CLI tool
-dotnet build Bravellian.Generators.Cli
+dotnet build Bravellian.Generators
 
 # Run tests
 dotnet test

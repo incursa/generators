@@ -5,4 +5,4 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
-PWG001 | Bravellian.Generators | Error | Diagnostics
+BG001 | Bravellian.Generators | Error | Diagnostics
