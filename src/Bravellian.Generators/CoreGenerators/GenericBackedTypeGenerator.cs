@@ -1,12 +1,11 @@
 // Licensed under the Apache License, Version 2.0.
 // See LICENSE file in the project root for full license information.
 
-namespace Bravellian.Generators;
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Xml.Linq;
+
+namespace Bravellian.Generators;
 
 public static class GenericBackedTypeGenerator
 {
@@ -64,7 +63,7 @@ public readonly partial record struct {{relatedClass.Name}}
 
     public {{relatedClass.InnerTypeName}} Value { get; init; }
 
-    public static {{relatedClass.Name}} Parse(string s, IFormatProvider provider)
+    public static {{relatedClass.Name}} Parse(string s, IFormatProvider? provider)
     {
         var parsed = {{relatedClass.InnerTypeName}}.Parse(s, provider);
         return new {{relatedClass.Name}}(parsed);
@@ -72,7 +71,7 @@ public readonly partial record struct {{relatedClass.Name}}
 
     public static {{relatedClass.Name}} Parse(string value) => Parse(value, null);
 
-    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider provider, out {{relatedClass.Name}} result)
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out {{relatedClass.Name}} result)
     {
         if ({{relatedClass.InnerTypeName}}.TryParse(s, provider, out {{relatedClass.InnerTypeName}} id))
         {
@@ -220,13 +219,13 @@ public readonly partial record struct {{relatedClass.Name}}
 
         public GeneratorParams(string name, string ns, string innerTypeName, bool isPublic, string? sourceFilePath, string? licenseHeader = null)
         {
-            this.Name = name;
-            this.Namespace = ns;
-            this.IsPublic = isPublic;
-            this.FullyQualifiedName = string.Join(".", ns, name);
-            this.InnerTypeName = innerTypeName;
-            this.SourceFilePath = sourceFilePath;
-            this.LicenseHeader = licenseHeader;
+            Name = name;
+            Namespace = ns;
+            IsPublic = isPublic;
+            FullyQualifiedName = string.Join(".", ns, name);
+            InnerTypeName = innerTypeName;
+            SourceFilePath = sourceFilePath;
+            LicenseHeader = licenseHeader;
         }
     }
 }

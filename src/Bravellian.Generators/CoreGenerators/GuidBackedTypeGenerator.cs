@@ -1,12 +1,11 @@
 // Licensed under the Apache License, Version 2.0.
 // See LICENSE file in the project root for full license information.
 
-namespace Bravellian.Generators;
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Xml.Linq;
+
+namespace Bravellian.Generators;
 
 public static class GuidBackedTypeGenerator
 {
@@ -89,13 +88,13 @@ public readonly partial record struct {{relatedClass.Name}}
 
     public static {{relatedClass.Name}}? From(Guid? value) => value.HasValue ? new(value.Value) : null;
 
-    public static {{relatedClass.Name}} Parse(ReadOnlySpan<char> s, IFormatProvider provider)
+    public static {{relatedClass.Name}} Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
     {
         var id = Guid.Parse(s, provider);
         return new {{relatedClass.Name}}(id);
     }
 
-    public static {{relatedClass.Name}} Parse([StringSyntax(StringSyntaxAttribute.GuidFormat)] string s, IFormatProvider provider)
+    public static {{relatedClass.Name}} Parse([StringSyntax(StringSyntaxAttribute.GuidFormat)] string s, IFormatProvider? provider)
     {
         var id = Guid.Parse(s, provider);
         return new {{relatedClass.Name}}(id);
@@ -103,7 +102,7 @@ public readonly partial record struct {{relatedClass.Name}}
 
     public static {{relatedClass.Name}} Parse([StringSyntax(StringSyntaxAttribute.GuidFormat)] string value) => new(Guid.Parse(value));
 
-    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider provider, out {{relatedClass.Name}} result)
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out {{relatedClass.Name}} result)
     {
         if (Guid.TryParse(s, provider, out Guid id))
         {
@@ -115,7 +114,7 @@ public readonly partial record struct {{relatedClass.Name}}
         return false;
     }
 
-    public static bool TryParse([StringSyntax(StringSyntaxAttribute.GuidFormat)] [NotNullWhen(true)] string? s, IFormatProvider provider, out {{relatedClass.Name}} result)
+    public static bool TryParse([StringSyntax(StringSyntaxAttribute.GuidFormat)] [NotNullWhen(true)] string? s, IFormatProvider? provider, out {{relatedClass.Name}} result)
     {
         if (Guid.TryParse(s, provider, out Guid id))
         {
@@ -275,13 +274,13 @@ public readonly partial record struct {{relatedClass.Name}}
 
         public GeneratorParams(string name, string ns, bool isPublic, bool useDefaultFormat, string? sourceFilePath, string? licenseHeader = null)
         {
-            this.Name = name;
-            this.Namespace = ns;
-            this.IsPublic = isPublic;
-            this.FullyQualifiedName = string.Join(".", ns, name);
-            this.UseDefaultFormat = useDefaultFormat;
-            this.SourceFilePath = sourceFilePath;
-            this.LicenseHeader = licenseHeader;
+            Name = name;
+            Namespace = ns;
+            IsPublic = isPublic;
+            FullyQualifiedName = string.Join(".", ns, name);
+            UseDefaultFormat = useDefaultFormat;
+            SourceFilePath = sourceFilePath;
+            LicenseHeader = licenseHeader;
         }
     }
 }
