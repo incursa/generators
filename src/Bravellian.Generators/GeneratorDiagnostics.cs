@@ -54,6 +54,15 @@ internal static class GeneratorDiagnostics
         isEnabledByDefault: true,
         helpLinkUri: HelpLinkUri);
 
+    private static readonly DiagnosticDescriptor ValidationWarningDescriptor = new(
+        id: "BG006",
+        title: "Validation warning",
+        messageFormat: "Validation warning for '{0}': {1}",
+        category: Category,
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true,
+        helpLinkUri: HelpLinkUri);
+
     public static void ReportError(SourceProductionContext context, string message, Exception? exception = null, string? filePath = null)
     {
         var messageBuilder = new StringBuilder();
@@ -107,6 +116,15 @@ internal static class GeneratorDiagnostics
             : $"{errorMessage} (File: {filePath})";
 
         context.ReportDiagnostic(Diagnostic.Create(ValidationErrorDescriptor, Location.None, itemName, fullMessage));
+    }
+
+    public static void ReportValidationWarning(SourceProductionContext context, string itemName, string warningMessage, string? filePath = null)
+    {
+        var fullMessage = string.IsNullOrEmpty(filePath)
+            ? $"{warningMessage}"
+            : $"{warningMessage} (File: {filePath})";
+
+        context.ReportDiagnostic(Diagnostic.Create(ValidationWarningDescriptor, Location.None, itemName, fullMessage));
     }
 
     public static void ReportMissingRequiredProperty(SourceProductionContext context, string propertyName, string filePath)
