@@ -101,6 +101,11 @@
             "type": "string",
             "description": "Custom JSON property name for serialization"
           },
+          "defaultValue": {
+            "type": "string",
+            "description": "Default value for the property (e.g., '\"default\"', '0', 'true', 'new List<string>()')",
+            "examples": ["\"default value\"", "0", "true", "DateTime.UtcNow", "new List<string>()"]
+          },
           "expression": {
             "type": "string",
             "description": "C# expression for computed properties",

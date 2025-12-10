@@ -52,7 +52,7 @@ public sealed class DtoEntitySourceGenerator : IIncrementalGenerator
             var (file, licenseHeader) = input;
             try
             {
-                var generated = Generate(file.Path, file.Content!, licenseHeader, productionContext.CancellationToken);
+                var generated = Generate(file.Path, file.Content!, licenseHeader, productionContext.CancellationToken, productionContext);
                 if (generated == null || !generated.Any())
                 {
                     GeneratorDiagnostics.ReportSkipped(productionContext, $"No output generated for '{file.Path}'. Ensure required DTO elements or JSON fields are present.");
@@ -83,7 +83,7 @@ public sealed class DtoEntitySourceGenerator : IIncrementalGenerator
     /// </summary>
     public IEnumerable<(string fileName, string source)>? GenerateFromFiles(string filePath, string fileContent, CancellationToken cancellationToken = default)
     {
-        return Generate(filePath, fileContent, string.Empty, cancellationToken);
+        return Generate(filePath, fileContent, string.Empty, cancellationToken, null);
     }
 
     private static bool IsCandidateFile(string path)
@@ -99,20 +99,20 @@ public sealed class DtoEntitySourceGenerator : IIncrementalGenerator
         return false;
     }
 
-    private static IEnumerable<(string fileName, string source)>? Generate(string filePath, string fileContent, string licenseHeader, CancellationToken cancellationToken)
+    private static IEnumerable<(string fileName, string source)>? Generate(string filePath, string fileContent, string licenseHeader, CancellationToken cancellationToken, SourceProductionContext? productionContext)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        return GenerateFromJson(fileContent, filePath, licenseHeader, cancellationToken);
+        return GenerateFromJson(fileContent, filePath, licenseHeader, cancellationToken, productionContext);
     }
 
-    private static IEnumerable<(string fileName, string source)>? GenerateFromJson(string fileContent, string filePath, string licenseHeader, CancellationToken cancellationToken)
+    private static IEnumerable<(string fileName, string source)>? GenerateFromJson(string fileContent, string filePath, string licenseHeader, CancellationToken cancellationToken, SourceProductionContext? productionContext)
     {
         try
         {
             using var jsonDoc = JsonDocument.Parse(fileContent);
             var root = jsonDoc.RootElement;
 
-            var genParams = ParseGeneratorParamsFromJson(root, filePath, licenseHeader, cancellationToken, parentNamespace: null);
+            var genParams = ParseGeneratorParamsFromJson(root, filePath, licenseHeader, cancellationToken, parentNamespace: null, productionContext);
             if (genParams == null)
             {
                 return null;
@@ -129,7 +129,7 @@ public sealed class DtoEntitySourceGenerator : IIncrementalGenerator
         }
     }
 
-    private static DtoEntityGenerator.GeneratorParams? ParseGeneratorParamsFromJson(JsonElement root, string sourceFilePath, string licenseHeader, CancellationToken cancellationToken, string? parentNamespace)
+    private static DtoEntityGenerator.GeneratorParams? ParseGeneratorParamsFromJson(JsonElement root, string sourceFilePath, string licenseHeader, CancellationToken cancellationToken, string? parentNamespace, SourceProductionContext? productionContext)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -204,9 +204,21 @@ public sealed class DtoEntitySourceGenerator : IIncrementalGenerator
                 var noDefault = prop.TryGetProperty("noDefault", out var noDefaultElement) && noDefaultElement.GetBoolean();
                 var isSettable = prop.TryGetProperty("settable", out var settableElement) && settableElement.GetBoolean();
                 var expression = prop.TryGetProperty("expression", out var expressionElement) ? expressionElement.GetString() : null;
+                var defaultValue = prop.TryGetProperty("defaultValue", out var defaultValueElement) ? defaultValueElement.GetString() : null;
+
+                // Validate property configuration (skip validation for expression properties)
+                if (string.IsNullOrEmpty(expression))
+                {
+                    var hasDefault = !string.IsNullOrEmpty(defaultValue) && !noDefault;
+                    var validationError = ValidatePropertyConfiguration(propName, isRequired, isNullable, hasDefault, isSettable, isStrict);
+                    if (validationError != null && productionContext.HasValue)
+                    {
+                        GeneratorDiagnostics.ReportValidationError(productionContext.Value, propName, validationError, sourceFilePath);
+                    }
+                }
 
                 properties.Add(new DtoEntityGenerator.PropertyDescriptor(
-                    propName, propType, isRequired, isNullable, max, min, regex, jsonProperty, noDefault, isSettable, expression, propDocumentation));
+                    propName, propType, isRequired, isNullable, max, min, regex, jsonProperty, noDefault, isSettable, expression, propDocumentation, defaultValue));
             }
         }
 
@@ -216,7 +228,7 @@ public sealed class DtoEntitySourceGenerator : IIncrementalGenerator
             foreach (var nested in nestedElement.EnumerateArray())
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var nestedParams = ParseGeneratorParamsFromJson(nested, sourceFilePath, licenseHeader, cancellationToken, ns);
+                var nestedParams = ParseGeneratorParamsFromJson(nested, sourceFilePath, licenseHeader, cancellationToken, ns, productionContext);
                 if (nestedParams != null)
                 {
                     nestedEntities.Add(nestedParams);
@@ -266,5 +278,53 @@ public sealed class DtoEntitySourceGenerator : IIncrementalGenerator
                 GenerateCodeRecursive(nested, generated, cancellationToken);
             }
         }
+    }
+
+    /// <summary>
+    /// Validates property configuration based on the truth table for required/nullable/defaultValue combinations.
+    /// Returns an error message if the configuration is invalid, or null if valid.
+    /// </summary>
+    private static string? ValidatePropertyConfiguration(string propertyName, bool isRequired, bool isNullable, bool hasDefault, bool isSettable, bool isStrict)
+    {
+        // For strict DTOs, settable must be false
+        if (isStrict && isSettable)
+        {
+            return $"Strict DTOs cannot have settable properties. Property '{propertyName}' has settable=true in a strict DTO.";
+        }
+
+        // Case #1 (Hard Invalid): required=false, nullable=false, no defaultValue
+        // This creates a non-nullable type that's not required and has no default, which can stay null at runtime
+        if (!isRequired && !isNullable && !hasDefault)
+        {
+            return $"Invalid configuration for property '{propertyName}': Non-nullable, non-required properties must have a default value. " +
+                   $"Either set required=true, nullable=true, or provide a defaultValue.";
+        }
+
+        // Case #8 (Hard Invalid): required=true, nullable=true, defaultValue present
+        // This combination has confusing semantics: "required + nullable + default"
+        if (isRequired && isNullable && hasDefault)
+        {
+            return $"Invalid configuration for property '{propertyName}': Properties cannot be both required and nullable with a default value. " +
+                   $"This combination has unclear semantics. Remove one of: required, nullable, or defaultValue.";
+        }
+
+        // Case #6 (Discouraged): required=true, nullable=false, defaultValue present
+        // Default makes it effectively "non-nullable with default", but required suggests "must be provided"
+        if (isRequired && !isNullable && hasDefault)
+        {
+            return $"Discouraged configuration for property '{propertyName}': Required non-nullable properties should not have a default value. " +
+                   $"If the property is required, the caller should provide it. Either remove 'required' or remove 'defaultValue'.";
+        }
+
+        // Case #7 (Discouraged): required=true, nullable=true, no defaultValue
+        // Type says nullable but validation says non-nullable - logically inconsistent
+        if (isRequired && isNullable && !hasDefault)
+        {
+            return $"Inconsistent configuration for property '{propertyName}': Required properties should not be nullable. " +
+                   $"The type allows null but validation requires non-null. Either remove 'required' or remove 'nullable'.";
+        }
+
+        // All other cases are valid
+        return null;
     }
 }
