@@ -60,14 +60,6 @@ jobs:
         Write-Host "Calculated Version: $version"
         echo "semVer=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
-    - name: Update NuGet source with credentials
-      run: |
-        dotnet nuget update source Bravellian `
-        --username AzureDevOps `
-        --password "${{ secrets.BRAVELLIAN_FEED_PAT }}" `
-        --store-password-in-clear-text `
-        --configfile nuget.config
-
     - name: Restore dependencies
       run: dotnet restore Bravellian.Generators.sln
 
