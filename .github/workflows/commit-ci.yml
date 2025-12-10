@@ -75,32 +75,32 @@ jobs:
     # - name: Run Tests
     #   run: dotnet test Bravellian.Generators.sln --no-build --configuration Release
   
-    - name: Pack NuGet packages
-      run: dotnet pack Bravellian.Generators.sln --configuration Release --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
+  #   - name: Pack NuGet packages
+  #     run: dotnet pack Bravellian.Generators.sln --configuration Release --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
 
-    - name: Upload package artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: nupkgs
-        path: ./nupkgs/*.nupkg
+  #   - name: Upload package artifact
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       name: nupkgs
+  #       path: ./nupkgs/*.nupkg
 
-  publish-github-packages:
-    needs: build
-    runs-on: ubuntu-latest
-    # Pre-release = contains hyphen (e.g., 1.2.3-pre.4)
-    if: ${{ contains(github.ref_name, '-') }}
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: nupkgs
-          path: out
-      - name: Configure GitHub Packages source
-        run: |
-          dotnet nuget remove source github || true
-          dotnet nuget add source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
-            --name "github" \
-            --username "${{ github.repository_owner }}" \
-            --password "${{ secrets.GITHUB_TOKEN }}" \
-            --store-password-in-clear-text
-      - name: Push to GitHub Packages
-        run: dotnet nuget push "out/*.nupkg" --source "github" --skip-duplicate
+  # publish-github-packages:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   # Pre-release = contains hyphen (e.g., 1.2.3-pre.4)
+  #   if: ${{ contains(github.ref_name, '-') }}
+  #   steps:
+  #     - uses: actions/download-artifact@v4
+  #       with:
+  #         name: nupkgs
+  #         path: out
+  #     - name: Configure GitHub Packages source
+  #       run: |
+  #         dotnet nuget remove source github || true
+  #         dotnet nuget add source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
+  #           --name "github" \
+  #           --username "${{ github.repository_owner }}" \
+  #           --password "${{ secrets.GITHUB_TOKEN }}" \
+  #           --store-password-in-clear-text
+  #     - name: Push to GitHub Packages
+  #       run: dotnet nuget push "out/*.nupkg" --source "github" --skip-duplicate

@@ -74,6 +74,3 @@ jobs:
   
     - name: Pack NuGet packages
       run: dotnet pack Bravellian.Generators.sln --configuration Release --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
-
-    - name: Publish
-      run: dotnet nuget push **\*.nupkg --source Bravellian --api-key az --skip-duplicate

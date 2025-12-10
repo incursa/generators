@@ -192,7 +192,7 @@ public readonly partial record struct {{relatedClass.Name}}
         {
 {{matchCases}}
             default:
-                throw new ArgumentOutOfRangeException(this);
+                throw new NotSupportedException("Internal value is not valid.");
         }
     }
 
@@ -210,7 +210,7 @@ public readonly partial record struct {{relatedClass.Name}}
         {
 {{matchTCases}}
             default:
-                throw new ArgumentOutOfRangeException(this);
+                throw new NotSupportedException("Internal value is not valid.");
         }
     }
 
