@@ -374,7 +374,7 @@ public static class MultiValueBackedTypeGenerator
                 }
             }
         }
-        catch
+        catch (Exception ex) when (ex is ArgumentException or FormatException)
         {
             // Fall through to return false
         }

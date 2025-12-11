@@ -150,7 +150,7 @@ public readonly partial record struct {{relatedClass.Name}}
             result = new {{relatedClass.Name}}(value);
             return true;
         }
-        catch
+        catch (Exception ex) when (ex is ArgumentException or FormatException)
         {
             result = default;
             return false;
@@ -170,7 +170,7 @@ public readonly partial record struct {{relatedClass.Name}}
             result = new {{relatedClass.Name}}(value);
             return true;
         }
-        catch
+        catch (Exception ex) when (ex is ArgumentException or FormatException)
         {
             result = default;
             return false;
@@ -400,7 +400,7 @@ public readonly partial record struct {{relatedClass.Name}}
                 result = new {{relatedClass.Name}}(value);
                 return true;
             }
-            catch
+            catch (Exception ex) when (ex is ArgumentException or FormatException)
             {
                 result = default;
                 return false;
@@ -611,7 +611,7 @@ public readonly partial record struct {{relatedClass.Name}}
                 result = new {{relatedClass.Name}}(value);
                 return true;
             }
-            catch
+            catch (Exception ex) when (ex is ArgumentException or FormatException)
             {
                 result = default;
                 return false;
