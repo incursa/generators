@@ -294,7 +294,7 @@ public readonly partial record struct {{relatedClass.Name}}
         sb.Clear();
 
         // Generate display names array
-        sb.AppendLine("        new string[]");
+        sb.AppendLine("new string[]");
         sb.AppendLine("        {");
         for (int i = 0; i < enumCount; i++)
         {
@@ -460,7 +460,7 @@ public readonly partial record struct {{relatedClass.Name}}
         for (int i = 0; i < enumCount; i++)
         {
             var p = relatedClass.EnumValues![i];
-            sb.Append("            ").Append(i).AppendLine(":");
+            sb.Append("            case ").Append(i).AppendLine(":");
             sb.Append("                case").Append(p.Name).AppendLine("();");
             sb.AppendLine("                return;");
         }
@@ -471,7 +471,7 @@ public readonly partial record struct {{relatedClass.Name}}
         for (int i = 0; i < enumCount; i++)
         {
             var p = relatedClass.EnumValues![i];
-            sb.Append("            ").Append(i).AppendLine(":");
+            sb.Append("            case ").Append(i).AppendLine(":");
             sb.Append("                return case").Append(p.Name).AppendLine("();");
         }
         var matchTCases = sb.ToString();
@@ -481,7 +481,7 @@ public readonly partial record struct {{relatedClass.Name}}
         for (int i = 0; i < enumCount; i++)
         {
             var p = relatedClass.EnumValues![i];
-            sb.Append("            ").Append(i).AppendLine(":");
+            sb.Append("            case ").Append(i).AppendLine(":");
             sb.Append("                case").Append(p.Name).AppendLine("();");
             sb.AppendLine("                return true;");
         }
@@ -492,7 +492,7 @@ public readonly partial record struct {{relatedClass.Name}}
         for (int i = 0; i < enumCount; i++)
         {
             var p = relatedClass.EnumValues![i];
-            sb.Append("            ").Append(i).AppendLine(":");
+            sb.Append("            case ").Append(i).AppendLine(":");
             sb.Append("                result = case").Append(p.Name).AppendLine("();");
             sb.AppendLine("                return true;");
         }
