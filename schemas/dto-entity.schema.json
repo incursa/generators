@@ -1,0 +1,168 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DTO Entity Definition",
+  "description": "Schema for defining a DTO entity for source generation.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "description": "The name of the DTO entity.",
+      "type": "string"
+    },
+    "namespace": {
+      "description": "The namespace for the generated DTO entity.",
+      "type": "string"
+    },
+    "documentation": {
+      "description": "Optional documentation for the entity.",
+      "type": "string"
+    },
+    "inherits": {
+      "description": "The base type that this entity inherits from.",
+      "type": "string"
+    },
+    "accessibility": {
+      "description": "The accessibility of the generated type (e.g., 'public', 'internal').",
+      "type": "string",
+      "default": "public"
+    },
+    "abstract": {
+      "description": "Specifies if the generated type is abstract.",
+      "type": "boolean",
+      "default": false
+    },
+    "classOnly": {
+      "description": "If true, only the class content is generated, without namespace and usings.",
+      "type": "boolean",
+      "default": false
+    },
+    "strict": {
+      "description": "Enables strict generation mode.",
+      "type": "boolean",
+      "default": false
+    },
+    "useParentValidator": {
+      "description": "Specifies if the parent's validator should be used.",
+      "type": "boolean",
+      "default": true
+    },
+    "noCreateMethod": {
+      "description": "If true, a 'Create' method will not be generated.",
+      "type": "boolean",
+      "default": false
+    },
+    "isRecordStruct": {
+      "description": "If true, a record struct will be generated instead of a record class.",
+      "type": "boolean",
+      "default": false
+    },
+    "properties": {
+      "description": "A list of properties for the DTO entity.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/propertyDescriptor"
+      }
+    },
+    "nestedEntities": {
+      "description": "A list of nested DTO entities.",
+      "type": "array",
+      "items": {
+        "$ref": "#"
+      }
+    }
+  },
+  "required": [
+    "name",
+    "namespace"
+  ],
+  "definitions": {
+    "propertyDescriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "documentation": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "nullable": {
+          "type": "boolean"
+        },
+        "isList": {
+          "type": "boolean"
+        },
+        "isVirtual": {
+          "type": "boolean"
+        },
+        "isInitOnly": {
+          "type": "boolean"
+        },
+        "defaultValue": {
+          "type": "string"
+        },
+        "isIEquatable": {
+          "type": "boolean"
+        },
+        "isKey": {
+          "type": "boolean"
+        },
+        "isSecret": {
+          "type": "boolean"
+        },
+        "isIdentifier": {
+          "type": "boolean"
+        },
+        "isConcatenated": {
+          "type": "boolean"
+        },
+        "isHashed": {
+          "type": "boolean"
+        },
+        "isSensitive": {
+          "type": "boolean"
+        },
+        "isExcluded": {
+          "type": "boolean"
+        },
+        "isReadOnly": {
+          "type": "boolean"
+        },
+        "nonWhitespace": {
+          "type": "boolean"
+        },
+        "max": {
+          "type": "string"
+        },
+        "min": {
+          "type": "string"
+        },
+        "regex": {
+          "type": "string"
+        },
+        "jsonProperty": {
+          "type": "string"
+        },
+        "noDefault": {
+          "type": "boolean"
+        },
+        "settable": {
+          "type": "boolean"
+        },
+        "expression": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "type"
+      ]
+    }
+  }
+}

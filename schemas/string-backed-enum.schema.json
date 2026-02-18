@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://bravellian.com/schemas/string-backed-enum.schema.json",
+  "title": "String Backed Enum",
+  "description": "Schema for Bravellian string-backed enum types (.enum.json, .string_enum.json)",
+  "type": "object",
+  "required": ["name", "namespace", "values"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the enum type",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+    },
+    "namespace": {
+      "type": "string",
+      "description": "The .NET namespace for the generated enum",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_.]*$"
+    },
+    "values": {
+      "type": "object",
+      "description": "The enum values and their configurations",
+      "patternProperties": {
+        "^[A-Za-z_][A-Za-z0-9_]*$": {
+          "type": "object",
+          "required": ["value"],
+          "properties": {
+            "value": {
+              "type": "string",
+              "description": "The string value for this enum member"
+            },
+            "display": {
+              "type": "string",
+              "description": "The display name for this enum member (defaults to the property name)"
+            },
+            "documentation": {
+              "type": "string",
+              "description": "XML documentation comment for this enum member"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 1
+    },
+    "properties": {
+      "type": "array",
+      "description": "Additional properties to add to the enum type",
+      "items": {
+        "type": "object",
+        "required": ["name", "type"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The property name",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+          },
+          "type": {
+            "type": "string",
+            "description": "The .NET type for this property",
+            "examples": ["string", "int", "bool", "DateTime", "decimal"]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "name": "AccountingSystemEnum",
+      "namespace": "Bravellian.Enums",
+      "properties": [
+        {
+          "name": "SystemId",
+          "type": "int"
+        },
+        {
+          "name": "ApiEndpoint",
+          "type": "string"
+        },
+        {
+          "name": "IsCloudBased",
+          "type": "bool"
+        }
+      ],
+      "values": {
+        "None": {
+          "value": "none",
+          "documentation": "No accounting system selected"
+        },
+        "ViewpointVista": {
+          "value": "viewpoint_vista",
+          "display": "Viewpoint Vista",
+          "documentation": "Viewpoint Vista construction management system"
+        },
+        "Quickbooks": {
+          "value": "quickbooks",
+          "display": "Quickbooks",
+          "documentation": "QuickBooks accounting software"
+        }
+      }
+    }
+  ]
+}
