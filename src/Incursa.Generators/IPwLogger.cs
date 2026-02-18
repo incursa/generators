@@ -1,6 +1,6 @@
 using System;
 
-namespace Bravellian.Generators;
+namespace Incursa.Generators;
 
 public interface IBgLogger
 {

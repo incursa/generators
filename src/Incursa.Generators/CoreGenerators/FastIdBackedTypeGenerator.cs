@@ -1,18 +1,19 @@
 // Licensed under the Apache License, Version 2.0.
 // See LICENSE file in the project root for full license information.
 
+namespace Incursa.Generators;
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Linq;
 
-namespace Bravellian.Generators;
-
-public static class GenericBackedTypeGenerator
+public static class FastIdBackedTypeGenerator
 {
     public static GeneratorParams? GetParams(XElement xml, IBgLogger? logger, string sourceFilePath)
     {
         IReadOnlyDictionary<string, string> attributes = xml.GetAttributeDict();
-        return new(attributes.TryGetValue("name"), attributes.TryGetValue("namespace"), attributes.TryGetValue("type"), true, sourceFilePath);
+        return new(attributes.TryGetValue("name"), attributes.TryGetValue("namespace"), true, sourceFilePath);
     }
 
     public static string? Generate(GeneratorParams? structToGenerate, IBgLogger? logger)
@@ -27,7 +28,21 @@ public static class GenericBackedTypeGenerator
         }
     }
 
-    private static string GenerateClass(in GeneratorParams relatedClass)
+    public static string? GenerateValueConverter(GeneratorParams? structToGenerate, IBgLogger? logger)
+    {
+        if (structToGenerate.HasValue)
+        {
+            return ValueConverterGenerator.GenerateFastIdBackedConverter(
+                structToGenerate.Value.Name,
+                structToGenerate.Value.Namespace);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private static string GenerateClass(GeneratorParams relatedClass)
     {
         var licenseHeader = relatedClass.LicenseHeader ?? string.Empty;
 
@@ -54,26 +69,68 @@ public readonly partial record struct {{relatedClass.Name}}
           IEquatable<{{relatedClass.Name}}>,
           IParsable<{{relatedClass.Name}}>
 {
-    public static readonly {{relatedClass.Name}} Default = new(default);
+    public static readonly {{relatedClass.Name}} Empty = new(Incursa.FastId.Empty);
 
-    public {{relatedClass.Name}}({{relatedClass.InnerTypeName}} value)
+    public {{relatedClass.Name}}(Incursa.FastId value)
     {
-        this.Value = value;
+        this.FastId = value;
     }
 
-    public {{relatedClass.InnerTypeName}} Value { get; init; }
-
-    public static {{relatedClass.Name}} Parse(string s, IFormatProvider? provider)
+    public {{relatedClass.Name}}(long value)
     {
-        var parsed = {{relatedClass.InnerTypeName}}.Parse(s, provider);
-        return new {{relatedClass.Name}}(parsed);
+        this.FastId = new Incursa.FastId(value);
     }
 
-    public static {{relatedClass.Name}} Parse(string value) => Parse(value, null);
+    public Incursa.FastId FastId { get; init; }
 
-    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out {{relatedClass.Name}} result)
+    public long Value => this.FastId.Value;
+
+    public static {{relatedClass.Name}} GenerateNew() => new(Incursa.FastId.New());
+
+    public static {{relatedClass.Name}} From(Incursa.FastId value) => new(value);
+
+    public static {{relatedClass.Name}} From(long value) => new(value);
+
+    public static {{relatedClass.Name}}? From(Incursa.FastId? value) => value.HasValue ? new(value.Value) : null;
+
+    public static {{relatedClass.Name}}? From(long? value) => value.HasValue ? new(value.Value) : null;
+
+    public static {{relatedClass.Name}} Parse(string s, IFormatProvider? provider) => Parse(s.AsSpan(), provider);
+
+    public static {{relatedClass.Name}} Parse(string value) => Parse(value.AsSpan());
+
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out {{relatedClass.Name}} result) =>
+        TryParse(s.AsSpan(), provider, out result);
+
+    public static {{relatedClass.Name}}? TryParse(string? value) => TryParse(value.AsSpan());
+
+    public static bool TryParse(string? value, out {{relatedClass.Name}} id) =>
+        TryParse(value.AsSpan(), out id);
+
+    public static {{relatedClass.Name}} Parse(ReadOnlySpan<char> s) => Parse(s, null);
+
+    public static {{relatedClass.Name}} Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
     {
-        if ({{relatedClass.InnerTypeName}}.TryParse(s, provider, out {{relatedClass.InnerTypeName}} id))
+        var id = Incursa.FastId.Parse(s, provider);
+        return new {{relatedClass.Name}}(id);
+    }
+
+    public static {{relatedClass.Name}}? TryParse(ReadOnlySpan<char> s)
+    {
+        if (TryParse(s, null, out {{relatedClass.Name}} id))
+        {
+            return id;
+        }
+
+        return null;
+    }
+
+    public static bool TryParse(ReadOnlySpan<char> s, [MaybeNullWhen(false)] out {{relatedClass.Name}} result) =>
+        TryParse(s, null, out result);
+
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out {{relatedClass.Name}} result)
+    {
+        if (Incursa.FastId.TryParse(s, provider, out Incursa.FastId id))
         {
             result = new {{relatedClass.Name}}(id);
             return true;
@@ -83,31 +140,19 @@ public readonly partial record struct {{relatedClass.Name}}
         return false;
     }
 
-    public static {{relatedClass.Name}}? TryParse(string? value)
-    {
-        if (TryParse(value, null, out {{relatedClass.Name}} result))
-        {
-            return result;
-        }
-
-        return null;
-    }
-
-    public static bool TryParse(string? value, out {{relatedClass.Name}} id) => TryParse(value, null, out id);
-
     public int CompareTo({{relatedClass.Name}} other)
     {
-        return this.Value.CompareTo(other.Value);
+        return this.FastId.CompareTo(other.FastId);
     }
 
     public int CompareTo(object? obj)
     {
         if (obj is {{relatedClass.Name}} id)
         {
-            return this.Value.CompareTo(id.Value);
+            return this.FastId.CompareTo(id.FastId);
         }
 
-        return this.Value.CompareTo(obj);
+        return this.FastId.CompareTo(obj);
     }
 
     public static bool operator <({{relatedClass.Name}} left, {{relatedClass.Name}} right) => left.CompareTo(right) < 0;
@@ -120,15 +165,15 @@ public readonly partial record struct {{relatedClass.Name}}
 
     public bool Equals({{relatedClass.Name}} other)
     {
-        return this.Value.Equals(other.Value);
+        return this.FastId.Equals(other.FastId);
     }
 
     public override int GetHashCode()
     {
-        return this.Value.GetHashCode();
+        return this.FastId.GetHashCode();
     }
 
-    public override string ToString() => this.Value.ToString();
+    public override string ToString() => this.FastId.ToString();
 
     public class {{relatedClass.Name}}JsonConverter : JsonConverter<{{relatedClass.Name}}>
     {
@@ -136,7 +181,7 @@ public readonly partial record struct {{relatedClass.Name}}
         {
             var s = reader.GetString();
 
-            if (!string.IsNullOrEmpty(s) && {{relatedClass.InnerTypeName}}.TryParse(s, out {{relatedClass.InnerTypeName}} id))
+            if (!string.IsNullOrEmpty(s) && Incursa.FastId.TryParse(s, out Incursa.FastId id))
             {
                 return new {{relatedClass.Name}}(id);
             }
@@ -160,14 +205,14 @@ public readonly partial record struct {{relatedClass.Name}}
                 Read(ref reader, typeToConvert, options);
     }
 
-    // TypeConverter for {{relatedClass.Name}} to and from string and {{relatedClass.InnerTypeName}}
+    // TypeConverter for {{relatedClass.Name}} to and from string and Incursa.FastId
     public class {{relatedClass.Name}}TypeConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType) =>
-            sourceType == typeof(string) || sourceType == typeof({{relatedClass.InnerTypeName}}) || base.CanConvertFrom(context, sourceType);
+            sourceType == typeof(string) || sourceType == typeof(long) || sourceType == typeof(Incursa.FastId) || base.CanConvertFrom(context, sourceType);
 
         public override bool CanConvertTo(ITypeDescriptorContext? context, [NotNullWhen(true)] Type? destinationType) =>
-            destinationType == typeof(string) || destinationType == typeof({{relatedClass.InnerTypeName}}) || base.CanConvertTo(context, destinationType);
+            destinationType == typeof(string) || destinationType == typeof(long) || destinationType == typeof(Incursa.FastId) || base.CanConvertTo(context, destinationType);
 
         public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
         {
@@ -176,7 +221,12 @@ public readonly partial record struct {{relatedClass.Name}}
                 return TryParse(s) ?? default;
             }
 
-            if (value is {{relatedClass.InnerTypeName}} g)
+            if (value is long l)
+            {
+                return new {{relatedClass.Name}}(l);
+            }
+
+            if (value is Incursa.FastId g)
             {
                 return new {{relatedClass.Name}}(g);
             }
@@ -193,9 +243,14 @@ public readonly partial record struct {{relatedClass.Name}}
                     return type.ToString();
                 }
 
-                if (destinationType == typeof({{relatedClass.InnerTypeName}}))
+                if (destinationType == typeof(long))
                 {
                     return type.Value;
+                }
+
+                if (destinationType == typeof(Incursa.FastId))
+                {
+                    return type.FastId;
                 }
             }
 
@@ -212,20 +267,18 @@ public readonly partial record struct {{relatedClass.Name}}
         public readonly string Name;
         public readonly string FullyQualifiedName;
         public readonly string Namespace;
-        public readonly string InnerTypeName;
         public readonly bool IsPublic;
         public readonly string? SourceFilePath;
         public readonly string? LicenseHeader;
 
-        public GeneratorParams(string name, string ns, string innerTypeName, bool isPublic, string? sourceFilePath, string? licenseHeader = null)
+        public GeneratorParams(string name, string ns, bool isPublic, string? sourceFilePath, string? licenseHeader = null)
         {
-            Name = name;
-            Namespace = ns;
-            IsPublic = isPublic;
-            FullyQualifiedName = string.Join(".", ns, name);
-            InnerTypeName = innerTypeName;
-            SourceFilePath = sourceFilePath;
-            LicenseHeader = licenseHeader;
+            this.Name = name;
+            this.Namespace = ns;
+            this.IsPublic = isPublic;
+            this.FullyQualifiedName = string.Join(".", ns, name);
+            this.SourceFilePath = sourceFilePath;
+            this.LicenseHeader = licenseHeader;
         }
     }
 }

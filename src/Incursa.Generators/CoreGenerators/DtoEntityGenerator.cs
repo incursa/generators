@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Bravellian.Generators;
+namespace Incursa.Generators;
 
 public static class DtoEntityGenerator
 {

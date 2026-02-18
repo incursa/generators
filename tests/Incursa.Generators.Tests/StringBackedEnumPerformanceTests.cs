@@ -1,4 +1,4 @@
-namespace Bravellian.Generators.Tests;
+namespace Incursa.Generators.Tests;
 
 using System.Diagnostics;
 using System.Reflection;
@@ -67,7 +67,8 @@ public class StringBackedEnumPerformanceTests(ITestOutputHelper output)
 
         var fileContent = File.ReadAllText(filePath);
 
-        var times = new List<long>();
+        var cpuTimes = new List<long>();
+        var wallTimes = new List<long>();
         const int runs = 5;
 
         output.WriteLine($"Running {runs} iterations...");
@@ -86,15 +87,16 @@ public class StringBackedEnumPerformanceTests(ITestOutputHelper output)
             var elapsedCpuMs = (cpuEnd - cpuStart).TotalMilliseconds;
             var elapsedWallMs = wall.ElapsedMilliseconds;
 
-            times.Add((long)elapsedCpuMs);
+            cpuTimes.Add((long)elapsedCpuMs);
+            wallTimes.Add(elapsedWallMs);
             result.GeneratedCount.ShouldBeGreaterThan(0);
 
             output.WriteLine($"  Run {i + 1}: {elapsedCpuMs:F1}ms (CPU), {elapsedWallMs}ms (wall)");
         }
 
-        var average = times.Average();
-        var min = times.Min();
-        var max = times.Max();
+        var average = wallTimes.Average();
+        var min = wallTimes.Min();
+        var max = wallTimes.Max();
 
         output.WriteLine($"\nStatistics:");
         output.WriteLine($"  Min: {min}ms");
@@ -104,7 +106,7 @@ public class StringBackedEnumPerformanceTests(ITestOutputHelper output)
 
         // Consistency check - first run may have JIT overhead,
         // so check consistency excluding the first run
-        var subsequentRuns = times.Skip(1).ToList();
+        var subsequentRuns = wallTimes.Skip(1).ToList();
         var subsequentMin = subsequentRuns.Min();
         var subsequentMax = subsequentRuns.Max();
         

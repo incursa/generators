@@ -1,4 +1,4 @@
-# Bravellian Code Generators
+# Incursa Code Generators
 
 This directory contains Roslyn source generators that automatically create strongly-typed wrappers for common value types.
 
@@ -22,7 +22,7 @@ You can customize the license header for generated code by setting the `Generate
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     
     <!-- Custom license header for generated code -->
     <GeneratedCodeLicenseHeader>

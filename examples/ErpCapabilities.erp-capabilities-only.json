@@ -1,6 +1,6 @@
 {
-  "generatedCapabilitiesNamespace": "Bravellian.Repositories.Erps",
-  "generatedInterfacesNamespace": "Bravellian.Repositories.Erps",
+  "generatedCapabilitiesNamespace": "Incursa.Repositories.Erps",
+  "generatedInterfacesNamespace": "Incursa.Repositories.Erps",
   "capabilities": [
     {
       "name": "Vendor.CanRead",

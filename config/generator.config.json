@@ -8,7 +8,7 @@
         "columnNameRegex": ".*Amount$"
       },
       "apply": {
-        "csharpType": "Bravellian.Money"
+        "csharpType": "Incursa.Money"
       }
     },
     {
@@ -19,7 +19,7 @@
         "columnNameRegex": ".*Percentage$"
       },
       "apply": {
-        "csharpType": "Bravellian.Percentage"
+        "csharpType": "Incursa.Percentage"
       }
     },
     {
@@ -30,7 +30,7 @@
         "columnNameRegex": ".*Context$"
       },
       "apply": {
-        "csharpType": "Bravellian.JsonContext"
+        "csharpType": "Incursa.JsonContext"
       }
     },
     {
@@ -41,7 +41,7 @@
         "columnNameRegex": ".*Predicate$"
       },
       "apply": {
-        "csharpType": "Bravellian.BasicPredicate"
+        "csharpType": "Incursa.BasicPredicate"
       }
     },
     {
@@ -52,7 +52,7 @@
         "columnNameRegex": "^ErpInvoiceId$"
       },
       "apply": {
-        "csharpType": "Bravellian.InvoiceIdentifier"
+        "csharpType": "Incursa.InvoiceIdentifier"
       }
     },
     {
@@ -63,7 +63,7 @@
         "columnNameRegex": "^ErpInvoiceLineItemId$"
       },
       "apply": {
-        "csharpType": "Bravellian.InvoiceLineItemIdentifier"
+        "csharpType": "Incursa.InvoiceLineItemIdentifier"
       }
     },
     {
@@ -74,7 +74,7 @@
         "columnNameRegex": "^RuleJson$"
       },
       "apply": {
-        "csharpType": "Bravellian.JsonContext"
+        "csharpType": "Incursa.JsonContext"
       }
     },
     {
@@ -85,7 +85,7 @@
         "columnNameRegex": "^JobErpId$"
       },
       "apply": {
-        "csharpType": "Bravellian.JobErpIdentifier"
+        "csharpType": "Incursa.JobErpIdentifier"
       }
     },
     {
@@ -96,7 +96,7 @@
         "columnNameRegex": "^VendorErpId$"
       },
       "apply": {
-        "csharpType": "Bravellian.VendorErpIdentifier"
+        "csharpType": "Incursa.VendorErpIdentifier"
       }
     },
     {
@@ -107,7 +107,7 @@
         "columnNameRegex": "^TaxCodeErpId$"
       },
       "apply": {
-        "csharpType": "Bravellian.TaxCodeErpIdentifier"
+        "csharpType": "Incursa.TaxCodeErpIdentifier"
       }
     },
     {
@@ -118,7 +118,7 @@
         "columnNameRegex": "^ApInvoiceErpId$"
       },
       "apply": {
-        "csharpType": "Bravellian.ApInvoiceErpIdentifier"
+        "csharpType": "Incursa.ApInvoiceErpIdentifier"
       }
     },
     {
@@ -129,7 +129,7 @@
         "columnNameRegex": "^ApPaymentErpId$"
       },
       "apply": {
-        "csharpType": "Bravellian.ApPaymentErpIdentifier"
+        "csharpType": "Incursa.ApPaymentErpIdentifier"
       }
     },
     {
@@ -140,7 +140,7 @@
         "columnNameRegex": "^ApPaymentLineItemErpId$"
       },
       "apply": {
-        "csharpType": "Bravellian.ApPaymentLineItemErpIdentifier"
+        "csharpType": "Incursa.ApPaymentLineItemErpIdentifier"
       }
     },
     {
@@ -151,7 +151,7 @@
         "columnNameRegex": "^JournalPaymentErpId$"
       },
       "apply": {
-        "csharpType": "Bravellian.ApPaymentErpIdentifier"
+        "csharpType": "Incursa.ApPaymentErpIdentifier"
       }
     },
     {
@@ -162,7 +162,7 @@
         "columnNameRegex": "^CostTypeErpId$"
       },
       "apply": {
-        "csharpType": "Bravellian.CostTypeErpIdentifier"
+        "csharpType": "Incursa.CostTypeErpIdentifier"
       }
     },
     {
@@ -173,7 +173,7 @@
         "columnNameRegex": "^CostCodeErpId$"
       },
       "apply": {
-        "csharpType": "Bravellian.CostCodeErpIdentifier"
+        "csharpType": "Incursa.CostCodeErpIdentifier"
       }
     },
     {
@@ -184,7 +184,7 @@
         "columnNameRegex": "^ApInvoiceLineItemErpId$"
       },
       "apply": {
-        "csharpType": "Bravellian.ApInvoiceLineItemErpIdentifier"
+        "csharpType": "Incursa.ApInvoiceLineItemErpIdentifier"
       }
     }
   ],
@@ -201,13 +201,13 @@
       "description": "SigningRequest table specific mappings",
       "columnOverrides": {
         "ProviderRequestId": {
-          "csharpType": "Bravellian.ProviderRequestIdentifier"
+          "csharpType": "Incursa.ProviderRequestIdentifier"
         },
         "Code": {
-          "csharpType": "Bravellian.ShortCode"
+          "csharpType": "Incursa.ShortCode"
         },
         "Workflow": {
-          "csharpType": "Bravellian.SigningWorkflow"
+          "csharpType": "Incursa.SigningWorkflow"
         }
       }
     },
@@ -215,7 +215,7 @@
       "description": "Job table specific mappings",
       "columnOverrides": {
         "ErpId": {
-          "csharpType": "Bravellian.JobErpIdentifier"
+          "csharpType": "Incursa.JobErpIdentifier"
         }
       }
     },
@@ -223,7 +223,7 @@
       "description": "Vendor table specific mappings",
       "columnOverrides": {
         "ErpId": {
-          "csharpType": "Bravellian.VendorErpIdentifier"
+          "csharpType": "Incursa.VendorErpIdentifier"
         }
       }
     },
@@ -231,7 +231,7 @@
       "description": "TaxCode table specific mappings",
       "columnOverrides": {
         "ErpId": {
-          "csharpType": "Bravellian.TaxCodeErpIdentifier"
+          "csharpType": "Incursa.TaxCodeErpIdentifier"
         }
       }
     }

@@ -5,15 +5,14 @@
 using System.Collections.Generic;
 using System.Xml.Linq;
 
-namespace Bravellian.Generators;
+namespace Incursa.Generators;
 
-public static class GuidBackedTypeGenerator
+public static class GenericBackedTypeGenerator
 {
     public static GeneratorParams? GetParams(XElement xml, IBgLogger? logger, string sourceFilePath)
     {
         IReadOnlyDictionary<string, string> attributes = xml.GetAttributeDict();
-        var useDefaultFormat = attributes.TryGetValue("default-format", out var defaultFormatString) && bool.TryParse(defaultFormatString, out var defaultFormat) && defaultFormat;
-        return new(attributes.TryGetValue("name"), attributes.TryGetValue("namespace"), true, useDefaultFormat, sourceFilePath);
+        return new(attributes.TryGetValue("name"), attributes.TryGetValue("namespace"), attributes.TryGetValue("type"), true, sourceFilePath);
     }
 
     public static string? Generate(GeneratorParams? structToGenerate, IBgLogger? logger)
@@ -28,21 +27,7 @@ public static class GuidBackedTypeGenerator
         }
     }
 
-    public static string? GenerateValueConverter(GeneratorParams? structToGenerate, IBgLogger? logger)
-    {
-        if (structToGenerate.HasValue)
-        {
-            return ValueConverterGenerator.GenerateGuidBackedConverter(
-                structToGenerate.Value.Name,
-                structToGenerate.Value.Namespace);
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    private static string GenerateClass(GeneratorParams relatedClass)
+    private static string GenerateClass(in GeneratorParams relatedClass)
     {
         var licenseHeader = relatedClass.LicenseHeader ?? string.Empty;
 
@@ -67,44 +52,28 @@ public readonly partial record struct {{relatedClass.Name}}
         : IComparable,
           IComparable<{{relatedClass.Name}}>,
           IEquatable<{{relatedClass.Name}}>,
-          ISpanParsable<{{relatedClass.Name}}>,
           IParsable<{{relatedClass.Name}}>
 {
-    public const string ExactValidationRegexString = $"^{FullValidationRegexString}$";
-    public const string FullValidationRegexString = "(?#GUID match)(?![({]?[0]{8}[-]?(?>[0]{4}[-]?){3}[0]{12}[})]?)[({]?[a-fA-F0-9]{8}[-]?(?>[a-fA-F0-9]{4}[-]?){3}[a-fA-F0-9]{12}[})]?";
+    public static readonly {{relatedClass.Name}} Default = new(default);
 
-    public static readonly {{relatedClass.Name}} Empty = new(Guid.Empty);
-
-    public {{relatedClass.Name}}(Guid value)
+    public {{relatedClass.Name}}({{relatedClass.InnerTypeName}} value)
     {
         this.Value = value;
     }
 
-    public Guid Value { get; init; }
+    public {{relatedClass.InnerTypeName}} Value { get; init; }
 
-    public static {{relatedClass.Name}} GenerateNew() => new(Guid.NewGuid());
-
-    public static {{relatedClass.Name}} From(Guid value) => new(value);
-
-    public static {{relatedClass.Name}}? From(Guid? value) => value.HasValue ? new(value.Value) : null;
-
-    public static {{relatedClass.Name}} Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
+    public static {{relatedClass.Name}} Parse(string s, IFormatProvider? provider)
     {
-        var id = Guid.Parse(s, provider);
-        return new {{relatedClass.Name}}(id);
+        var parsed = {{relatedClass.InnerTypeName}}.Parse(s, provider);
+        return new {{relatedClass.Name}}(parsed);
     }
 
-    public static {{relatedClass.Name}} Parse([StringSyntax(StringSyntaxAttribute.GuidFormat)] string s, IFormatProvider? provider)
-    {
-        var id = Guid.Parse(s, provider);
-        return new {{relatedClass.Name}}(id);
-    }
+    public static {{relatedClass.Name}} Parse(string value) => Parse(value, null);
 
-    public static {{relatedClass.Name}} Parse([StringSyntax(StringSyntaxAttribute.GuidFormat)] string value) => new(Guid.Parse(value));
-
-    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out {{relatedClass.Name}} result)
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out {{relatedClass.Name}} result)
     {
-        if (Guid.TryParse(s, provider, out Guid id))
+        if ({{relatedClass.InnerTypeName}}.TryParse(s, provider, out {{relatedClass.InnerTypeName}} id))
         {
             result = new {{relatedClass.Name}}(id);
             return true;
@@ -114,39 +83,17 @@ public readonly partial record struct {{relatedClass.Name}}
         return false;
     }
 
-    public static bool TryParse([StringSyntax(StringSyntaxAttribute.GuidFormat)] [NotNullWhen(true)] string? s, IFormatProvider? provider, out {{relatedClass.Name}} result)
+    public static {{relatedClass.Name}}? TryParse(string? value)
     {
-        if (Guid.TryParse(s, provider, out Guid id))
+        if (TryParse(value, null, out {{relatedClass.Name}} result))
         {
-            result = new {{relatedClass.Name}}(id);
-            return true;
-        }
-
-        result = default;
-        return false;
-    }
-
-    public static {{relatedClass.Name}}? TryParse([StringSyntax(StringSyntaxAttribute.GuidFormat)] string? value)
-    {
-        if (Guid.TryParse(value, out Guid result))
-        {
-            return new {{relatedClass.Name}}(result);
+            return result;
         }
 
         return null;
     }
 
-    public static bool TryParse([StringSyntax(StringSyntaxAttribute.GuidFormat)] string? value, out {{relatedClass.Name}} id)
-    {
-        if (Guid.TryParse(value, out Guid result))
-        {
-            id = new {{relatedClass.Name}}(result);
-            return true;
-        }
-
-        id = default;
-        return false;
-    }
+    public static bool TryParse(string? value, out {{relatedClass.Name}} id) => TryParse(value, null, out id);
 
     public int CompareTo({{relatedClass.Name}} other)
     {
@@ -181,9 +128,7 @@ public readonly partial record struct {{relatedClass.Name}}
         return this.Value.GetHashCode();
     }
 
-    public override string ToString() => this.Value.ToString({{(relatedClass.UseDefaultFormat ? string.Empty : "\"N\"")}});
-
-    public string ToString(string format) => this.Value.ToString(format);
+    public override string ToString() => this.Value.ToString();
 
     public class {{relatedClass.Name}}JsonConverter : JsonConverter<{{relatedClass.Name}}>
     {
@@ -191,7 +136,7 @@ public readonly partial record struct {{relatedClass.Name}}
         {
             var s = reader.GetString();
 
-            if (!string.IsNullOrEmpty(s) && Guid.TryParse(s, out Guid id))
+            if (!string.IsNullOrEmpty(s) && {{relatedClass.InnerTypeName}}.TryParse(s, out {{relatedClass.InnerTypeName}} id))
             {
                 return new {{relatedClass.Name}}(id);
             }
@@ -215,14 +160,14 @@ public readonly partial record struct {{relatedClass.Name}}
                 Read(ref reader, typeToConvert, options);
     }
 
-    // TypeConverter for {{relatedClass.Name}} to and from string and Guid
+    // TypeConverter for {{relatedClass.Name}} to and from string and {{relatedClass.InnerTypeName}}
     public class {{relatedClass.Name}}TypeConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType) =>
-            sourceType == typeof(string) || sourceType == typeof(Guid) || base.CanConvertFrom(context, sourceType);
+            sourceType == typeof(string) || sourceType == typeof({{relatedClass.InnerTypeName}}) || base.CanConvertFrom(context, sourceType);
 
         public override bool CanConvertTo(ITypeDescriptorContext? context, [NotNullWhen(true)] Type? destinationType) =>
-            destinationType == typeof(string) || destinationType == typeof(Guid) || base.CanConvertTo(context, destinationType);
+            destinationType == typeof(string) || destinationType == typeof({{relatedClass.InnerTypeName}}) || base.CanConvertTo(context, destinationType);
 
         public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
         {
@@ -231,7 +176,7 @@ public readonly partial record struct {{relatedClass.Name}}
                 return TryParse(s) ?? default;
             }
 
-            if (value is Guid g)
+            if (value is {{relatedClass.InnerTypeName}} g)
             {
                 return new {{relatedClass.Name}}(g);
             }
@@ -248,7 +193,7 @@ public readonly partial record struct {{relatedClass.Name}}
                     return type.ToString();
                 }
 
-                if (destinationType == typeof(Guid))
+                if (destinationType == typeof({{relatedClass.InnerTypeName}}))
                 {
                     return type.Value;
                 }
@@ -267,18 +212,18 @@ public readonly partial record struct {{relatedClass.Name}}
         public readonly string Name;
         public readonly string FullyQualifiedName;
         public readonly string Namespace;
+        public readonly string InnerTypeName;
         public readonly bool IsPublic;
-        public readonly bool UseDefaultFormat;
         public readonly string? SourceFilePath;
         public readonly string? LicenseHeader;
 
-        public GeneratorParams(string name, string ns, bool isPublic, bool useDefaultFormat, string? sourceFilePath, string? licenseHeader = null)
+        public GeneratorParams(string name, string ns, string innerTypeName, bool isPublic, string? sourceFilePath, string? licenseHeader = null)
         {
             Name = name;
             Namespace = ns;
             IsPublic = isPublic;
             FullyQualifiedName = string.Join(".", ns, name);
-            UseDefaultFormat = useDefaultFormat;
+            InnerTypeName = innerTypeName;
             SourceFilePath = sourceFilePath;
             LicenseHeader = licenseHeader;
         }

@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://bravellian.com/schemas/string-backed-enum.schema.json",
+  "$id": "https://incursa.com/schemas/string-backed-enum.schema.json",
   "title": "String Backed Enum",
-  "description": "Schema for Bravellian string-backed enum types (.enum.json, .string_enum.json)",
+  "description": "Schema for Incursa string-backed enum types (.enum.json, .string_enum.json)",
   "type": "object",
   "required": ["name", "namespace", "values"],
   "properties": {
@@ -69,7 +69,7 @@
   "examples": [
     {
       "name": "AccountingSystemEnum",
-      "namespace": "Bravellian.Enums",
+      "namespace": "Incursa.Enums",
       "properties": [
         {
           "name": "SystemId",

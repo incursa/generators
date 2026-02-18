@@ -1,3 +1,4 @@
+namespace Incursa.Generators;
 
 using System;
 using System.Collections.Generic;
@@ -7,14 +8,12 @@ using System.Text.Json;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 
-namespace Bravellian.Generators;
-
 [Generator(LanguageNames.CSharp)]
-public sealed class FastIdBackedTypeSourceGenerator : IIncrementalGenerator
+public sealed class GuidBackedTypeSourceGenerator : IIncrementalGenerator
 {
     private static readonly string[] CandidateSuffixes = new[]
     {
-        ".fastid.json",
+        ".guid.json",
     };
 
     private readonly record struct InputFile
@@ -55,7 +54,7 @@ public sealed class FastIdBackedTypeSourceGenerator : IIncrementalGenerator
                 var generated = Generate(file.Path, file.Content!, licenseHeader, productionContext.CancellationToken);
                 if (generated == null || !generated.Any())
                 {
-                    GeneratorDiagnostics.ReportSkipped(productionContext, $"No output generated for '{file.Path}'. Ensure required <FastIdBacked> elements or JSON fields are present.");
+                    GeneratorDiagnostics.ReportSkipped(productionContext, $"No output generated for '{file.Path}'. Ensure required <GuidBacked> elements or JSON fields are present.");
                     return;
                 }
 
@@ -73,7 +72,7 @@ public sealed class FastIdBackedTypeSourceGenerator : IIncrementalGenerator
             }
             catch (Exception ex)
             {
-                GeneratorDiagnostics.ReportError(productionContext, $"FastIdBackedTypeSourceGenerator failed for '{file.Path}'", ex);
+                GeneratorDiagnostics.ReportError(productionContext, $"GuidBackedTypeSourceGenerator failed for '{file.Path}'", ex);
             }
         });
     }
@@ -126,15 +125,31 @@ public sealed class FastIdBackedTypeSourceGenerator : IIncrementalGenerator
                 throw new InvalidDataException($"Properties 'name' and 'namespace' must be non-empty in '{sourceFilePath}'.");
             }
 
-            var genParams = new FastIdBackedTypeGenerator.GeneratorParams(
+            bool useDefaultFormat = false;
+            if (root.TryGetProperty("defaultFormat", out var defaultFormatElement))
+            {
+                useDefaultFormat = defaultFormatElement.ValueKind == JsonValueKind.True;
+                if (defaultFormatElement.ValueKind == JsonValueKind.False)
+                {
+                    useDefaultFormat = false;
+                }
+
+                if (defaultFormatElement.ValueKind == JsonValueKind.String && bool.TryParse(defaultFormatElement.GetString(), out var parsed))
+                {
+                    useDefaultFormat = parsed;
+                }
+            }
+
+            var genParams = new GuidBackedTypeGenerator.GeneratorParams(
                 name!,
                 namespaceName!,
                 true,
+                useDefaultFormat,
                 sourceFilePath,
                 licenseHeader
             );
 
-            var generatedCode = FastIdBackedTypeGenerator.Generate(genParams, null);
+            var generatedCode = GuidBackedTypeGenerator.Generate(genParams, null);
             if (string.IsNullOrEmpty(generatedCode))
             {
                 return null;
@@ -146,7 +161,7 @@ public sealed class FastIdBackedTypeSourceGenerator : IIncrementalGenerator
             // Generate ValueConverter if path is configured
             if (ValueConverterConfig.IsEnabled)
             {
-                var converterCode = FastIdBackedTypeGenerator.GenerateValueConverter(genParams, null);
+                var converterCode = GuidBackedTypeGenerator.GenerateValueConverter(genParams, null);
                 if (!string.IsNullOrEmpty(converterCode))
                 {
                     var converterFileName = $"{namespaceName!}.{name!}ValueConverter.g.cs";
@@ -158,8 +173,7 @@ public sealed class FastIdBackedTypeSourceGenerator : IIncrementalGenerator
         }
         catch (Exception ex)
         {
-            // Decide how to handle exceptions, e.g., log them
-            return null;
+            throw new InvalidDataException($"Failed to process JSON for '{sourceFilePath}'.", ex);
         }
     }
 }

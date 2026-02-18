@@ -6,7 +6,7 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
 
-		<Company>Bravellian</Company>
+		<Company>Incursa</Company>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<!-- <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder> -->
@@ -87,7 +87,7 @@
 	</PropertyGroup>
 
 	<!-- Keep global Using directives -->
-	<ItemGroup Condition="'$(MSBuildProjectExtension)' != '.dcproj' AND '$(MSBuildProjectExtension)' != '.sqlproj' AND $(MSBuildProjectName.StartsWith('Bravellian.Generators')) == false AND $(MSBuildProjectName.StartsWith('Bravellian.Database')) == false">
+	<ItemGroup Condition="'$(MSBuildProjectExtension)' != '.dcproj' AND '$(MSBuildProjectExtension)' != '.sqlproj' AND $(MSBuildProjectName.StartsWith('Incursa.Generators')) == false AND $(MSBuildProjectName.StartsWith('Incursa.Database')) == false">
 		<Using Include="System" />
 		<Using Include="System.Collections.Generic" />
 		<Using Include="System.Diagnostics" />
@@ -103,7 +103,7 @@
 	</ItemGroup>
 
 	<!-- Keep core project references and build tooling -->
-	<ItemGroup Condition="'$(MSBuildProjectExtension)' != '.dcproj' AND '$(MSBuildProjectExtension)' != '.sqlproj' AND $(MSBuildProjectName.StartsWith('Bravellian.Database')) == false">
+	<ItemGroup Condition="'$(MSBuildProjectExtension)' != '.dcproj' AND '$(MSBuildProjectExtension)' != '.sqlproj' AND $(MSBuildProjectName.StartsWith('Incursa.Database')) == false">
 		<RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true" />
 
 		<!-- Keep InternalsVisibleTo -->

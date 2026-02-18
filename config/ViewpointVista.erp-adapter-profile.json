@@ -1,12 +1,12 @@
 {
   "capabilitiesReference": {
-    "generatedCapabilitiesNamespace": "Bravellian.Repositories.Erps",
-    "generatedInterfacesNamespace": "Bravellian.Repositories.Erps",
+    "generatedCapabilitiesNamespace": "Incursa.Repositories.Erps",
+    "generatedInterfacesNamespace": "Incursa.Repositories.Erps",
     "capabilitiesFile": "ErpCapabilities.erp-capabilities-only.json"
   },
   "adapterProfile": {
     "name": "ViewpointVista",
-    "targetNamespace": "Bravellian.Repositories.Erps.ViewpointVista",
+    "targetNamespace": "Incursa.Repositories.Erps.ViewpointVista",
     "targetClassName": "ViewpointVistaAdapter",
     "supportedCapabilities": [
       "Vendor.CanRead",

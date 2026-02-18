@@ -1,6 +1,6 @@
 {
-  "generatedCapabilitiesNamespace": "Bravellian.Repositories.Erps",
-  "generatedInterfacesNamespace": "Bravellian.Repositories.Erps",
+  "generatedCapabilitiesNamespace": "Incursa.Repositories.Erps",
+  "generatedInterfacesNamespace": "Incursa.Repositories.Erps",
   "capabilities": [
     {
       "name": "Vendor.CanRead",
@@ -31,7 +31,7 @@
   "adapterProfiles": [
     {
       "name": "ViewpointVista",
-      "targetNamespace": "Bravellian.Repositories.Erps.Viewpoint.Vista",
+      "targetNamespace": "Incursa.Repositories.Erps.Viewpoint.Vista",
       "targetClassName": "VistaErpAdapter",
       "supportedCapabilities": [
         "Vendor.CanRead",
@@ -42,7 +42,7 @@
     },
     {
       "name": "ViewpointSpectrum",
-      "targetNamespace": "Bravellian.Repositories.Erps.Viewpoint.Spectrum", 
+      "targetNamespace": "Incursa.Repositories.Erps.Viewpoint.Spectrum", 
       "targetClassName": "SpectrumErpAdapter",
       "supportedCapabilities": [
         "Vendor.CanRead",

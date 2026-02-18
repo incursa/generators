@@ -1,4 +1,4 @@
-namespace Bravellian.Generators;
+namespace Incursa.Generators;
 
 using System;
 using System.Collections.Generic;

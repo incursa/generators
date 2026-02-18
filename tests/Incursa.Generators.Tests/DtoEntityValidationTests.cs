@@ -1,4 +1,4 @@
-namespace Bravellian.Generators.Tests;
+namespace Incursa.Generators.Tests;
 
 using System.Collections.Immutable;
 using System.Text;

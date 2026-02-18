@@ -1,9 +1,9 @@
-// CONFIDENTIAL - Copyright (c) Bravellian LLC. All rights reserved.
+// CONFIDENTIAL - Copyright (c) Incursa LLC. All rights reserved.
 // See NOTICE.md for full restrictions and usage terms.
 
 #nullable enable
 
-namespace Bravellian.Generators;
+namespace Incursa.Generators;
 
 /// <summary>
 /// Global configuration for Entity Framework Core ValueConverter generation.

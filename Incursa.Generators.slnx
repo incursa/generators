@@ -1,0 +1,18 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/_src/">
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+    <File Path="stylecop.filelayout.xml" />
+    <File Path="stylecop.json" />
+  </Folder>
+  <Project Path="src/Incursa.Generators/Incursa.Generators.csproj" />
+  <Project Path="tests/Incursa.Generators.Tests/Incursa.Generators.Tests.csproj" />
+</Solution>

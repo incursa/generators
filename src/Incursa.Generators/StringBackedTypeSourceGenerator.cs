@@ -1,4 +1,4 @@
-namespace Bravellian.Generators;
+namespace Incursa.Generators;
 
 using System;
 using System.Collections.Generic;
@@ -9,11 +9,11 @@ using System.Threading;
 using Microsoft.CodeAnalysis;
 
 [Generator(LanguageNames.CSharp)]
-public sealed class MultiValueBackedTypeSourceGenerator : IIncrementalGenerator
+public sealed class StringBackedTypeSourceGenerator : IIncrementalGenerator
 {
     private static readonly string[] CandidateSuffixes = new[]
     {
-        ".multi.json",
+        ".string.json",
     };
 
     private readonly record struct InputFile
@@ -54,7 +54,9 @@ public sealed class MultiValueBackedTypeSourceGenerator : IIncrementalGenerator
                 var generated = Generate(file.Path, file.Content!, licenseHeader, productionContext.CancellationToken);
                 if (generated == null || !generated.Any())
                 {
-                    GeneratorDiagnostics.ReportSkipped(productionContext, $"No output generated for '{file.Path}'. Ensure required <MultiValueString> elements or JSON fields are present.");
+                    GeneratorDiagnostics.ReportSkipped(productionContext, 
+                        "No output generated. Ensure required 'name' and 'namespace' properties are present and valid.", 
+                        file.Path);
                     return;
                 }
 
@@ -72,7 +74,10 @@ public sealed class MultiValueBackedTypeSourceGenerator : IIncrementalGenerator
             }
             catch (Exception ex)
             {
-                GeneratorDiagnostics.ReportError(productionContext, $"MultiValueBackedTypeSourceGenerator failed for '{file.Path}'", ex);
+                GeneratorDiagnostics.ReportError(productionContext, 
+                    "StringBackedTypeSourceGenerator failed to generate code.", 
+                    ex, 
+                    file.Path);
             }
         });
     }
@@ -105,36 +110,34 @@ public sealed class MultiValueBackedTypeSourceGenerator : IIncrementalGenerator
         return GenerateFromJson(fileContent, filePath, licenseHeader, cancellationToken);
     }
 
-    private static IEnumerable<(string fileName, string source)>? GenerateFromJson(string fileContent, string sourceFilePath, string licenseHeader, CancellationToken cancellationToken)
+    private static IEnumerable<(string fileName, string source)>? GenerateFromJson(string fileContent, string? filePath, string licenseHeader, CancellationToken cancellationToken)
     {
         try
         {
             using var document = JsonDocument.Parse(fileContent);
             var root = document.RootElement;
 
-            if (!root.TryGetProperty("name", out var nameElement) ||
-                !root.TryGetProperty("namespace", out var namespaceElement))
+            if (!root.TryGetProperty("name", out var nameElement))
             {
-                throw new InvalidDataException($"Required properties 'name' and 'namespace' are missing in '{sourceFilePath}'.");
+                throw new InvalidDataException($"Required property 'name' is missing. Each type definition must have a 'name' property.");
+            }
+
+            if (!root.TryGetProperty("namespace", out var namespaceElement))
+            {
+                throw new InvalidDataException($"Required property 'namespace' is missing. Each type definition must have a 'namespace' property.");
             }
 
             var name = nameElement.GetString();
             var namespaceName = namespaceElement.GetString();
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(namespaceName))
+            
+            if (string.IsNullOrWhiteSpace(name))
             {
-                throw new InvalidDataException($"Properties 'name' and 'namespace' must be non-empty in '{sourceFilePath}'.");
+                throw new InvalidDataException($"Property 'name' must be a non-empty string. Current value: '{name ?? "null"}'");
             }
-
-            string? separator = null;
-            if (root.TryGetProperty("separator", out var separatorElement))
+            
+            if (string.IsNullOrWhiteSpace(namespaceName))
             {
-                separator = separatorElement.GetString();
-            }
-
-            string? format = null;
-            if (root.TryGetProperty("format", out var formatElement))
-            {
-                format = formatElement.GetString();
+                throw new InvalidDataException($"Property 'namespace' must be a non-empty string. Current value: '{namespaceName ?? "null"}'");
             }
 
             string? regex = null;
@@ -143,86 +146,85 @@ public sealed class MultiValueBackedTypeSourceGenerator : IIncrementalGenerator
                 regex = regexElement.GetString();
             }
 
-            string? bookend = null;
-            if (root.TryGetProperty("bookend", out var bookendElement))
+            string? regexConst = null;
+            if (root.TryGetProperty("regexConst", out var regexConstElement))
             {
-                bookend = bookendElement.GetString();
+                regexConst = regexConstElement.GetString();
             }
 
-            string? nullIdentifier = null;
-            if (root.TryGetProperty("nullIdentifier", out var nullIdentifierElement))
+            var additionalProperties = new List<(string Type, string Name)>();
+            if (root.TryGetProperty("properties", out var propertiesElement) && propertiesElement.ValueKind == JsonValueKind.Array)
             {
-                nullIdentifier = nullIdentifierElement.GetString();
-            }
-
-            var fields = new List<MultiValueBackedTypeGenerator.FieldInfo>();
-            if (root.TryGetProperty("parts", out var partsElement) && partsElement.ValueKind == JsonValueKind.Array)
-            {
-                foreach (var part in partsElement.EnumerateArray())
+                foreach (var prop in propertiesElement.EnumerateArray())
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    var fieldName = part.TryGetProperty("name", out var n) ? n.GetString() : null;
-                    var fieldType = part.TryGetProperty("type", out var t) ? t.GetString() : "string";
-                    var serializedName = part.TryGetProperty("serializedName", out var sn) ? sn.GetString() : null;
-                    var constantValue = part.TryGetProperty("constantValue", out var cv) ? cv.GetString() : null;
-                    var constantTypeValue = part.TryGetProperty("constantTypeValue", out var ctv) ? ctv.GetString() : null;
-                    var isNullable = part.TryGetProperty("isNullable", out var inull) && inull.GetBoolean();
-                    var partNullIdentifier = part.TryGetProperty("nullIdentifier", out var pni) ? pni.GetString() : null;
-
-                    if (!string.IsNullOrEmpty(fieldName))
+                    var propName = prop.TryGetProperty("name", out var n) ? n.GetString() : null;
+                    var propType = prop.TryGetProperty("type", out var t) ? t.GetString() : null;
+                    
+                    // Both must be present and non-empty, or both must be absent/empty
+                    var hasName = !string.IsNullOrWhiteSpace(propName);
+                    var hasType = !string.IsNullOrWhiteSpace(propType);
+                    
+                    if (hasName && hasType)
                     {
-                        fields.Add(new MultiValueBackedTypeGenerator.FieldInfo(
-                            fieldName!,
-                            fieldType!,
-                            serializedName,
-                            constantValue,
-                            constantTypeValue,
-                            isNullable,
-                            partNullIdentifier ?? nullIdentifier
-                        ));
+                        additionalProperties.Add((propType!, propName!));
                     }
+                    else if (hasName != hasType)
+                    {
+                        // Exactly one is set - this is an error
+                        throw new InvalidDataException($"Property definition incomplete. Both 'name' and 'type' must be specified for additional properties. Got name: '{propName ?? "null"}', type: '{propType ?? "null"}'");
+                    }
+                    // else: both are empty/null, which is valid - just skip this entry
                 }
             }
 
-            var genParams = new MultiValueBackedTypeGenerator.GeneratorParams(
+            var genParams = new StringBackedTypeGenerator.GeneratorParams(
                 name!,
                 namespaceName!,
                 true,
-                separator ?? "|",
-                format ?? string.Empty,
-                regex ?? string.Empty,
-                bookend ?? string.Empty,
-                fields,
-                sourceFilePath,
+                regex,
+                regexConst,
+                additionalProperties,
+                filePath,
                 licenseHeader
             );
 
-            var generatedCode = MultiValueBackedTypeGenerator.Generate(genParams, null);
+            var generatedCode = StringBackedTypeGenerator.Generate(genParams, null);
             if (string.IsNullOrEmpty(generatedCode))
             {
+                // This shouldn't happen with valid parameters, but handle gracefully
                 return null;
             }
 
-            var fileName = $"{namespaceName!}.{name!}.g.cs";
+            var fileName = $"{namespaceName!}.{name!}.{Path.GetFileName(filePath)}.g.cs";
             var results = new List<(string fileName, string source)> { (fileName, generatedCode!) };
 
             // Generate ValueConverter if path is configured
             if (ValueConverterConfig.IsEnabled)
             {
-                var converterCode = MultiValueBackedTypeGenerator.GenerateValueConverter(genParams, null);
+                var converterCode = StringBackedTypeGenerator.GenerateValueConverter(genParams, null);
                 if (!string.IsNullOrEmpty(converterCode))
                 {
-                    var converterFileName = $"{namespaceName!}.{name!}ValueConverter.g.cs";
+                    var converterFileName = $"{namespaceName!}.{name!}ValueConverter.{Path.GetFileName(filePath)}.g.cs";
                     results.Add((converterFileName, converterCode!));
                 }
             }
 
             return results;
         }
-        catch (Exception)
+        catch (JsonException jsonEx)
         {
-            return null;
+            throw new InvalidDataException($"Failed to parse JSON. Ensure the file is valid JSON. Details: {jsonEx.Message}", jsonEx);
+        }
+        catch (InvalidDataException)
+        {
+            // Re-throw validation errors as-is
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Unexpected error during code generation. Details: {ex.Message}", ex);
         }
     }
 }
