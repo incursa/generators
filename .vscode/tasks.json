@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Bravellian.Generators.sln",
+                "${workspaceFolder}/Incursa.Generators.slnx",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -23,7 +23,7 @@
             "type": "process",
             "args": [
                 "test",
-                "${workspaceFolder}/tests/Bravellian.Generators.Tests/Bravellian.Generators.Tests.csproj"
+                "${workspaceFolder}/tests/Incursa.Generators.Tests/Incursa.Generators.Tests.csproj"
             ],
             "group": {
                 "kind": "test",
@@ -64,9 +64,9 @@
             "args": [
                 "nuget",
                 "push",
-                "${workspaceFolder}/src/Bravellian.Generators/bin/Release/Bravellian.Generators.${input:versionNumber}.nupkg",
+                "${workspaceFolder}/src/Incursa.Generators/bin/Release/Bravellian.Generators.${input:versionNumber}.nupkg",
                 "--source",
-                "Bravellian",
+                "Incursa",
                 "--api-key",
                 "az"
             ],

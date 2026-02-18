@@ -1,19 +1,19 @@
 // Licensed under the Apache License, Version 2.0.
 // See LICENSE file in the project root for full license information.
 
-namespace Bravellian.Generators;
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Xml.Linq;
 
-public static class FastIdBackedTypeGenerator
+namespace Incursa.Generators;
+
+public static class GuidBackedTypeGenerator
 {
     public static GeneratorParams? GetParams(XElement xml, IBgLogger? logger, string sourceFilePath)
     {
         IReadOnlyDictionary<string, string> attributes = xml.GetAttributeDict();
-        return new(attributes.TryGetValue("name"), attributes.TryGetValue("namespace"), true, sourceFilePath);
+        var useDefaultFormat = attributes.TryGetValue("default-format", out var defaultFormatString) && bool.TryParse(defaultFormatString, out var defaultFormat) && defaultFormat;
+        return new(attributes.TryGetValue("name"), attributes.TryGetValue("namespace"), true, useDefaultFormat, sourceFilePath);
     }
 
     public static string? Generate(GeneratorParams? structToGenerate, IBgLogger? logger)
@@ -32,7 +32,7 @@ public static class FastIdBackedTypeGenerator
     {
         if (structToGenerate.HasValue)
         {
-            return ValueConverterGenerator.GenerateFastIdBackedConverter(
+            return ValueConverterGenerator.GenerateGuidBackedConverter(
                 structToGenerate.Value.Name,
                 structToGenerate.Value.Namespace);
         }
@@ -67,70 +67,44 @@ public readonly partial record struct {{relatedClass.Name}}
         : IComparable,
           IComparable<{{relatedClass.Name}}>,
           IEquatable<{{relatedClass.Name}}>,
+          ISpanParsable<{{relatedClass.Name}}>,
           IParsable<{{relatedClass.Name}}>
 {
-    public static readonly {{relatedClass.Name}} Empty = new(Bravellian.FastId.Empty);
+    public const string ExactValidationRegexString = $"^{FullValidationRegexString}$";
+    public const string FullValidationRegexString = "(?#GUID match)(?![({]?[0]{8}[-]?(?>[0]{4}[-]?){3}[0]{12}[})]?)[({]?[a-fA-F0-9]{8}[-]?(?>[a-fA-F0-9]{4}[-]?){3}[a-fA-F0-9]{12}[})]?";
 
-    public {{relatedClass.Name}}(Bravellian.FastId value)
+    public static readonly {{relatedClass.Name}} Empty = new(Guid.Empty);
+
+    public {{relatedClass.Name}}(Guid value)
     {
-        this.FastId = value;
+        this.Value = value;
     }
 
-    public {{relatedClass.Name}}(long value)
-    {
-        this.FastId = new Bravellian.FastId(value);
-    }
+    public Guid Value { get; init; }
 
-    public Bravellian.FastId FastId { get; init; }
+    public static {{relatedClass.Name}} GenerateNew() => new(Guid.NewGuid());
 
-    public long Value => this.FastId.Value;
+    public static {{relatedClass.Name}} From(Guid value) => new(value);
 
-    public static {{relatedClass.Name}} GenerateNew() => new(Bravellian.FastId.New());
-
-    public static {{relatedClass.Name}} From(Bravellian.FastId value) => new(value);
-
-    public static {{relatedClass.Name}} From(long value) => new(value);
-
-    public static {{relatedClass.Name}}? From(Bravellian.FastId? value) => value.HasValue ? new(value.Value) : null;
-
-    public static {{relatedClass.Name}}? From(long? value) => value.HasValue ? new(value.Value) : null;
-
-    public static {{relatedClass.Name}} Parse(string s, IFormatProvider? provider) => Parse(s.AsSpan(), provider);
-
-    public static {{relatedClass.Name}} Parse(string value) => Parse(value.AsSpan());
-
-    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out {{relatedClass.Name}} result) =>
-        TryParse(s.AsSpan(), provider, out result);
-
-    public static {{relatedClass.Name}}? TryParse(string? value) => TryParse(value.AsSpan());
-
-    public static bool TryParse(string? value, out {{relatedClass.Name}} id) =>
-        TryParse(value.AsSpan(), out id);
-
-    public static {{relatedClass.Name}} Parse(ReadOnlySpan<char> s) => Parse(s, null);
+    public static {{relatedClass.Name}}? From(Guid? value) => value.HasValue ? new(value.Value) : null;
 
     public static {{relatedClass.Name}} Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
     {
-        var id = Bravellian.FastId.Parse(s, provider);
+        var id = Guid.Parse(s, provider);
         return new {{relatedClass.Name}}(id);
     }
 
-    public static {{relatedClass.Name}}? TryParse(ReadOnlySpan<char> s)
+    public static {{relatedClass.Name}} Parse([StringSyntax(StringSyntaxAttribute.GuidFormat)] string s, IFormatProvider? provider)
     {
-        if (TryParse(s, null, out {{relatedClass.Name}} id))
-        {
-            return id;
-        }
-
-        return null;
+        var id = Guid.Parse(s, provider);
+        return new {{relatedClass.Name}}(id);
     }
 
-    public static bool TryParse(ReadOnlySpan<char> s, [MaybeNullWhen(false)] out {{relatedClass.Name}} result) =>
-        TryParse(s, null, out result);
+    public static {{relatedClass.Name}} Parse([StringSyntax(StringSyntaxAttribute.GuidFormat)] string value) => new(Guid.Parse(value));
 
-    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out {{relatedClass.Name}} result)
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out {{relatedClass.Name}} result)
     {
-        if (Bravellian.FastId.TryParse(s, provider, out Bravellian.FastId id))
+        if (Guid.TryParse(s, provider, out Guid id))
         {
             result = new {{relatedClass.Name}}(id);
             return true;
@@ -140,19 +114,53 @@ public readonly partial record struct {{relatedClass.Name}}
         return false;
     }
 
+    public static bool TryParse([StringSyntax(StringSyntaxAttribute.GuidFormat)] [NotNullWhen(true)] string? s, IFormatProvider? provider, out {{relatedClass.Name}} result)
+    {
+        if (Guid.TryParse(s, provider, out Guid id))
+        {
+            result = new {{relatedClass.Name}}(id);
+            return true;
+        }
+
+        result = default;
+        return false;
+    }
+
+    public static {{relatedClass.Name}}? TryParse([StringSyntax(StringSyntaxAttribute.GuidFormat)] string? value)
+    {
+        if (Guid.TryParse(value, out Guid result))
+        {
+            return new {{relatedClass.Name}}(result);
+        }
+
+        return null;
+    }
+
+    public static bool TryParse([StringSyntax(StringSyntaxAttribute.GuidFormat)] string? value, out {{relatedClass.Name}} id)
+    {
+        if (Guid.TryParse(value, out Guid result))
+        {
+            id = new {{relatedClass.Name}}(result);
+            return true;
+        }
+
+        id = default;
+        return false;
+    }
+
     public int CompareTo({{relatedClass.Name}} other)
     {
-        return this.FastId.CompareTo(other.FastId);
+        return this.Value.CompareTo(other.Value);
     }
 
     public int CompareTo(object? obj)
     {
         if (obj is {{relatedClass.Name}} id)
         {
-            return this.FastId.CompareTo(id.FastId);
+            return this.Value.CompareTo(id.Value);
         }
 
-        return this.FastId.CompareTo(obj);
+        return this.Value.CompareTo(obj);
     }
 
     public static bool operator <({{relatedClass.Name}} left, {{relatedClass.Name}} right) => left.CompareTo(right) < 0;
@@ -165,15 +173,17 @@ public readonly partial record struct {{relatedClass.Name}}
 
     public bool Equals({{relatedClass.Name}} other)
     {
-        return this.FastId.Equals(other.FastId);
+        return this.Value.Equals(other.Value);
     }
 
     public override int GetHashCode()
     {
-        return this.FastId.GetHashCode();
+        return this.Value.GetHashCode();
     }
 
-    public override string ToString() => this.FastId.ToString();
+    public override string ToString() => this.Value.ToString({{(relatedClass.UseDefaultFormat ? string.Empty : "\"N\"")}});
+
+    public string ToString(string format) => this.Value.ToString(format);
 
     public class {{relatedClass.Name}}JsonConverter : JsonConverter<{{relatedClass.Name}}>
     {
@@ -181,7 +191,7 @@ public readonly partial record struct {{relatedClass.Name}}
         {
             var s = reader.GetString();
 
-            if (!string.IsNullOrEmpty(s) && Bravellian.FastId.TryParse(s, out Bravellian.FastId id))
+            if (!string.IsNullOrEmpty(s) && Guid.TryParse(s, out Guid id))
             {
                 return new {{relatedClass.Name}}(id);
             }
@@ -205,14 +215,14 @@ public readonly partial record struct {{relatedClass.Name}}
                 Read(ref reader, typeToConvert, options);
     }
 
-    // TypeConverter for {{relatedClass.Name}} to and from string and Bravellian.FastId
+    // TypeConverter for {{relatedClass.Name}} to and from string and Guid
     public class {{relatedClass.Name}}TypeConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType) =>
-            sourceType == typeof(string) || sourceType == typeof(long) || sourceType == typeof(Bravellian.FastId) || base.CanConvertFrom(context, sourceType);
+            sourceType == typeof(string) || sourceType == typeof(Guid) || base.CanConvertFrom(context, sourceType);
 
         public override bool CanConvertTo(ITypeDescriptorContext? context, [NotNullWhen(true)] Type? destinationType) =>
-            destinationType == typeof(string) || destinationType == typeof(long) || destinationType == typeof(Bravellian.FastId) || base.CanConvertTo(context, destinationType);
+            destinationType == typeof(string) || destinationType == typeof(Guid) || base.CanConvertTo(context, destinationType);
 
         public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
         {
@@ -221,12 +231,7 @@ public readonly partial record struct {{relatedClass.Name}}
                 return TryParse(s) ?? default;
             }
 
-            if (value is long l)
-            {
-                return new {{relatedClass.Name}}(l);
-            }
-
-            if (value is Bravellian.FastId g)
+            if (value is Guid g)
             {
                 return new {{relatedClass.Name}}(g);
             }
@@ -243,14 +248,9 @@ public readonly partial record struct {{relatedClass.Name}}
                     return type.ToString();
                 }
 
-                if (destinationType == typeof(long))
+                if (destinationType == typeof(Guid))
                 {
                     return type.Value;
-                }
-
-                if (destinationType == typeof(Bravellian.FastId))
-                {
-                    return type.FastId;
                 }
             }
 
@@ -268,17 +268,19 @@ public readonly partial record struct {{relatedClass.Name}}
         public readonly string FullyQualifiedName;
         public readonly string Namespace;
         public readonly bool IsPublic;
+        public readonly bool UseDefaultFormat;
         public readonly string? SourceFilePath;
         public readonly string? LicenseHeader;
 
-        public GeneratorParams(string name, string ns, bool isPublic, string? sourceFilePath, string? licenseHeader = null)
+        public GeneratorParams(string name, string ns, bool isPublic, bool useDefaultFormat, string? sourceFilePath, string? licenseHeader = null)
         {
-            this.Name = name;
-            this.Namespace = ns;
-            this.IsPublic = isPublic;
-            this.FullyQualifiedName = string.Join(".", ns, name);
-            this.SourceFilePath = sourceFilePath;
-            this.LicenseHeader = licenseHeader;
+            Name = name;
+            Namespace = ns;
+            IsPublic = isPublic;
+            FullyQualifiedName = string.Join(".", ns, name);
+            UseDefaultFormat = useDefaultFormat;
+            SourceFilePath = sourceFilePath;
+            LicenseHeader = licenseHeader;
         }
     }
 }

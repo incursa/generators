@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://bravellian.com/schemas/multi-value-backed-type.schema.json",
+  "$id": "https://incursa.com/schemas/multi-value-backed-type.schema.json",
   "title": "Multi-Value Backed Type",
-  "description": "Schema for Bravellian multi-value backed types (.multi.json)",
+  "description": "Schema for Incursa multi-value backed types (.multi.json)",
   "type": "object",
   "required": ["name", "namespace", "values"],
   "properties": {
@@ -71,7 +71,7 @@
   "examples": [
     {
       "name": "ContactMethod",
-      "namespace": "Bravellian.ValueTypes",
+      "namespace": "Incursa.ValueTypes",
       "values": [
         {
           "name": "Email",

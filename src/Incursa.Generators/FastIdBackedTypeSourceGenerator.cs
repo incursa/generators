@@ -1,15 +1,21 @@
-namespace Bravellian.Generators;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 
+namespace Incursa.Generators;
+
 [Generator(LanguageNames.CSharp)]
-public sealed class GenericBackedTypeSourceGenerator : IIncrementalGenerator
+public sealed class FastIdBackedTypeSourceGenerator : IIncrementalGenerator
 {
-    private static readonly string[] CandidateSuffixes = System.Array.Empty<string>();
+    private static readonly string[] CandidateSuffixes = new[]
+    {
+        ".fastid.json",
+    };
 
     private readonly record struct InputFile
     {
@@ -49,7 +55,7 @@ public sealed class GenericBackedTypeSourceGenerator : IIncrementalGenerator
                 var generated = Generate(file.Path, file.Content!, licenseHeader, productionContext.CancellationToken);
                 if (generated == null || !generated.Any())
                 {
-                    GeneratorDiagnostics.ReportSkipped(productionContext, $"No output generated for '{file.Path}'. Ensure required <GenericBacked> elements are present.");
+                    GeneratorDiagnostics.ReportSkipped(productionContext, $"No output generated for '{file.Path}'. Ensure required <FastIdBacked> elements or JSON fields are present.");
                     return;
                 }
 
@@ -67,7 +73,7 @@ public sealed class GenericBackedTypeSourceGenerator : IIncrementalGenerator
             }
             catch (Exception ex)
             {
-                GeneratorDiagnostics.ReportError(productionContext, $"GenericBackedTypeSourceGenerator failed for '{file.Path}'", ex);
+                GeneratorDiagnostics.ReportError(productionContext, $"FastIdBackedTypeSourceGenerator failed for '{file.Path}'", ex);
             }
         });
     }
@@ -96,6 +102,64 @@ public sealed class GenericBackedTypeSourceGenerator : IIncrementalGenerator
     private static IEnumerable<(string fileName, string source)>? Generate(string filePath, string fileContent, string licenseHeader, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        return null;
+
+        return GenerateFromJson(fileContent, filePath, licenseHeader, cancellationToken);
+    }
+
+    private static IEnumerable<(string fileName, string source)>? GenerateFromJson(string fileContent, string sourceFilePath, string licenseHeader, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var document = JsonDocument.Parse(fileContent);
+            var root = document.RootElement;
+
+            if (!root.TryGetProperty("name", out var nameElement) ||
+                !root.TryGetProperty("namespace", out var namespaceElement))
+            {
+                throw new InvalidDataException($"Required properties 'name' and 'namespace' are missing in '{sourceFilePath}'.");
+            }
+
+            var name = nameElement.GetString();
+            var namespaceName = namespaceElement.GetString();
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(namespaceName))
+            {
+                throw new InvalidDataException($"Properties 'name' and 'namespace' must be non-empty in '{sourceFilePath}'.");
+            }
+
+            var genParams = new FastIdBackedTypeGenerator.GeneratorParams(
+                name!,
+                namespaceName!,
+                true,
+                sourceFilePath,
+                licenseHeader
+            );
+
+            var generatedCode = FastIdBackedTypeGenerator.Generate(genParams, null);
+            if (string.IsNullOrEmpty(generatedCode))
+            {
+                return null;
+            }
+
+            var fileName = $"{namespaceName!}.{name!}.g.cs";
+            var results = new List<(string fileName, string source)> { (fileName, generatedCode!) };
+
+            // Generate ValueConverter if path is configured
+            if (ValueConverterConfig.IsEnabled)
+            {
+                var converterCode = FastIdBackedTypeGenerator.GenerateValueConverter(genParams, null);
+                if (!string.IsNullOrEmpty(converterCode))
+                {
+                    var converterFileName = $"{namespaceName!}.{name!}ValueConverter.g.cs";
+                    results.Add((converterFileName, converterCode!));
+                }
+            }
+
+            return results;
+        }
+        catch (Exception ex)
+        {
+            // Decide how to handle exceptions, e.g., log them
+            return null;
+        }
     }
 }

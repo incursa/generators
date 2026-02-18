@@ -6,34 +6,34 @@
     <!-- Pattern-based mappings -->
     <TypeMappingRule ColumnNamePattern=".*Amount" 
                      CSharpTypePattern="decimal" 
-                     TargetType="Bravellian.Core.Money" 
+                     TargetType="Incursa.Core.Money" 
                      IsRegexPattern="true" />
     
     <TypeMappingRule ColumnNamePattern=".*Percentage" 
                      CSharpTypePattern="decimal" 
-                     TargetType="Bravellian.Core.Percentage" 
+                     TargetType="Incursa.Core.Percentage" 
                      IsRegexPattern="true" />
     
     <TypeMappingRule ColumnNamePattern=".*Context$" 
-                     TargetType="Bravellian.Core.JsonContext" 
+                     TargetType="Incursa.Core.JsonContext" 
                      IsRegexPattern="true" />
     
     <TypeMappingRule ColumnNamePattern=".*Predicate$" 
-                     TargetType="Bravellian.Core.BasicPredicate" 
+                     TargetType="Incursa.Core.BasicPredicate" 
                      IsRegexPattern="true" />
 
     <!-- Table and column specific mappings -->
     <TypeMappingRule ColumnNamePattern="ErpInvoiceId" 
                      CSharpTypePattern="long" 
-                     TargetType="Bravellian.Core.InvoiceIdentifier" />
+                     TargetType="Incursa.Core.InvoiceIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="ErpInvoiceLineItemId" 
                      CSharpTypePattern="long" 
-                     TargetType="Bravellian.Core.InvoiceLineItemIdentifier" />
+                     TargetType="Incursa.Core.InvoiceLineItemIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="RuleJson" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.Core.JsonContext" />
+                     TargetType="Incursa.Core.JsonContext" />
 
     <!-- Exceptions -->
     <TypeMappingRule TableNamePattern="QueueItem" 
@@ -44,320 +44,320 @@
     <!-- String-backed identifier mappings -->
     <TypeMappingRule ColumnNamePattern="JobErpId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.JobErpIdentifier" />
+                     TargetType="Incursa.JobErpIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="VendorErpId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.VendorErpIdentifier" />
+                     TargetType="Incursa.VendorErpIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="TaxCodeErpId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.TaxCodeErpIdentifier" />
+                     TargetType="Incursa.TaxCodeErpIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="ApInvoiceErpId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.ApInvoiceErpIdentifier" />
+                     TargetType="Incursa.ApInvoiceErpIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="ApPaymentErpId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.ApPaymentErpIdentifier" />
+                     TargetType="Incursa.ApPaymentErpIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="ApPaymentLineItemErpId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.ApPaymentLineItemErpIdentifier" />
+                     TargetType="Incursa.ApPaymentLineItemErpIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="JournalPaymentErpId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.ApPaymentErpIdentifier" />
+                     TargetType="Incursa.ApPaymentErpIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="CostTypeErpId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.CostTypeErpIdentifier" />
+                     TargetType="Incursa.CostTypeErpIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="CostCodeErpId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.CostCodeErpIdentifier" />
+                     TargetType="Incursa.CostCodeErpIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="ApInvoiceLineItemErpId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.ApInvoiceLineItemErpIdentifier" />
+                     TargetType="Incursa.ApInvoiceLineItemErpIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="SubcontractErpId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.SubcontractErpIdentifier" />
+                     TargetType="Incursa.SubcontractErpIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="SubcontractLineItemErpId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.SubcontractLineItemErpIdentifier" />
+                     TargetType="Incursa.SubcontractLineItemErpIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="PurchaseOrderErpId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.PurchaseOrderErpIdentifier" />
+                     TargetType="Incursa.PurchaseOrderErpIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="PurchaseOrderLineItemErpId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.PurchaseOrderLineItemErpIdentifier" />
+                     TargetType="Incursa.PurchaseOrderLineItemErpIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="JournalPaymentLineItemErpId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.ApPaymentLineItemErpIdentifier" />
+                     TargetType="Incursa.ApPaymentLineItemErpIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="UserObjectId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.Core.UserObjectId" />
+                     TargetType="Incursa.Core.UserObjectId" />
     
     <TypeMappingRule ColumnNamePattern="OrganizationSubscriptionId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.Core.OrganizationSubscriptionIdentifier" />
+                     TargetType="Incursa.Core.OrganizationSubscriptionIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="ErpRecordSource" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.Core.ErpRecordSource" />
+                     TargetType="Incursa.Core.ErpRecordSource" />
     
     <TypeMappingRule ColumnNamePattern="ErpSystem" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.Core.ErpSystem" />
+                     TargetType="Incursa.Core.ErpSystem" />
     
     <TypeMappingRule ColumnNamePattern="SignatureRequestExternalId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.Core.SignatureRequestExternalIdentifier" />
+                     TargetType="Incursa.Core.SignatureRequestExternalIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="SupplierErpId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.Core.SupplierErpId" />
+                     TargetType="Incursa.Core.SupplierErpId" />
     
     <TypeMappingRule ColumnNamePattern="StripeCustomerId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.Core.StripeCustomerIdentifier" />
+                     TargetType="Incursa.Core.StripeCustomerIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="RowFingerprint" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.DataFingerprint" />
+                     TargetType="Incursa.DataFingerprint" />
     
     <TypeMappingRule ColumnNamePattern="ProviderRequestId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.ProviderRequestIdentifier" />
+                     TargetType="Incursa.ProviderRequestIdentifier" />
 
     <!-- Table-specific ErpId mappings -->
     <TypeMappingRule TableNamePattern="Job" 
                      ColumnNamePattern="ErpId" 
-                     TargetType="Bravellian.JobErpIdentifier" />
+                     TargetType="Incursa.JobErpIdentifier" />
     
     <TypeMappingRule TableNamePattern="Vendor" 
                      ColumnNamePattern="ErpId" 
-                     TargetType="Bravellian.VendorErpIdentifier" />
+                     TargetType="Incursa.VendorErpIdentifier" />
     
     <TypeMappingRule TableNamePattern="TaxCode" 
                      ColumnNamePattern="ErpId" 
-                     TargetType="Bravellian.TaxCodeErpIdentifier" />
+                     TargetType="Incursa.TaxCodeErpIdentifier" />
     
     <TypeMappingRule TableNamePattern="ApInvoice" 
                      ColumnNamePattern="ErpId" 
-                     TargetType="Bravellian.ApInvoiceErpIdentifier" />
+                     TargetType="Incursa.ApInvoiceErpIdentifier" />
     
     <TypeMappingRule TableNamePattern="ApInvoiceLineItem" 
                      ColumnNamePattern="ErpId" 
-                     TargetType="Bravellian.ApInvoiceLineItemErpIdentifier" />
+                     TargetType="Incursa.ApInvoiceLineItemErpIdentifier" />
     
     <TypeMappingRule TableNamePattern="ApPayment" 
                      ColumnNamePattern="ErpId" 
-                     TargetType="Bravellian.ApPaymentErpIdentifier" />
+                     TargetType="Incursa.ApPaymentErpIdentifier" />
     
     <TypeMappingRule TableNamePattern="ApPaymentLineItem" 
                      ColumnNamePattern="ErpId" 
-                     TargetType="Bravellian.ApPaymentLineItemErpIdentifier" />
+                     TargetType="Incursa.ApPaymentLineItemErpIdentifier" />
     
     <TypeMappingRule TableNamePattern="CostType" 
                      ColumnNamePattern="ErpId" 
-                     TargetType="Bravellian.CostTypeErpIdentifier" />
+                     TargetType="Incursa.CostTypeErpIdentifier" />
     
     <TypeMappingRule TableNamePattern="CostCode" 
                      ColumnNamePattern="ErpId" 
-                     TargetType="Bravellian.CostCodeErpIdentifier" />
+                     TargetType="Incursa.CostCodeErpIdentifier" />
     
     <TypeMappingRule TableNamePattern="Subcontract" 
                      ColumnNamePattern="ErpId" 
-                     TargetType="Bravellian.SubcontractErpIdentifier" />
+                     TargetType="Incursa.SubcontractErpIdentifier" />
     
     <TypeMappingRule TableNamePattern="SubcontractChangeOrder" 
                      ColumnNamePattern="ErpId" 
-                     TargetType="Bravellian.SubcontractChangeOrderErpIdentifier" />
+                     TargetType="Incursa.SubcontractChangeOrderErpIdentifier" />
     
     <TypeMappingRule TableNamePattern="SubcontractLineItem" 
                      ColumnNamePattern="ErpId" 
-                     TargetType="Bravellian.SubcontractLineItemErpIdentifier" />
+                     TargetType="Incursa.SubcontractLineItemErpIdentifier" />
     
     <TypeMappingRule TableNamePattern="PurchaseOrder" 
                      ColumnNamePattern="ErpId" 
-                     TargetType="Bravellian.PurchaseOrderErpIdentifier" />
+                     TargetType="Incursa.PurchaseOrderErpIdentifier" />
     
     <TypeMappingRule TableNamePattern="PurchaseOrderLineItem" 
                      ColumnNamePattern="ErpId" 
-                     TargetType="Bravellian.PurchaseOrderLineItemErpIdentifier" />
+                     TargetType="Incursa.PurchaseOrderLineItemErpIdentifier" />
     
     <TypeMappingRule TableNamePattern="PurchaseOrderChangeOrder" 
                      ColumnNamePattern="ErpId" 
-                     TargetType="Bravellian.PurchaseOrderChangeOrderErpIdentifier" />
+                     TargetType="Incursa.PurchaseOrderChangeOrderErpIdentifier" />
 
     <!-- GuidBacked identifier mappings -->
     <TypeMappingRule ColumnNamePattern="AzureMarketplaceSubscriptionId" 
                      CSharpTypePattern="long" 
-                     TargetType="Bravellian.Core.AzureMarketplaceSubscriptionIdentifier" />
+                     TargetType="Incursa.Core.AzureMarketplaceSubscriptionIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="BillingFrequencyId" 
                      CSharpTypePattern="long" 
-                     TargetType="Bravellian.Core.BillingFrequencyIdentifier" />
+                     TargetType="Incursa.Core.BillingFrequencyIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="AccountingSystemId" 
                      CSharpTypePattern="long" 
-                     TargetType="Bravellian.Core.AccountingSystemIdentifier" />
+                     TargetType="Incursa.Core.AccountingSystemIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="AddressUsaRawId" 
                      CSharpTypePattern="long" 
-                     TargetType="Bravellian.Core.AddressUsaRawIdentifier" />
+                     TargetType="Incursa.Core.AddressUsaRawIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="AddressUsaStandardizedId" 
                      CSharpTypePattern="long" 
-                     TargetType="Bravellian.Core.AddressUsaStandardizedIdentifier" />
+                     TargetType="Incursa.Core.AddressUsaStandardizedIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="ErpCompanyId" 
                      CSharpTypePattern="long" 
-                     TargetType="Bravellian.ErpCompanyIdentifier" />
+                     TargetType="Incursa.ErpCompanyIdentifier" />
 
     <!-- Enum mappings -->
     <TypeMappingRule ColumnNamePattern="VendorRole" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.Core.VendorUserRole" />
+                     TargetType="Incursa.Core.VendorUserRole" />
     
     <TypeMappingRule ColumnNamePattern="PaymentWaiverGroupType" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.Core.PaymentWaiverGroupType" />
+                     TargetType="Incursa.Core.PaymentWaiverGroupType" />
     
     <TypeMappingRule ColumnNamePattern="BillingFrequencyType" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.Core.BillingFrequencyType" />
+                     TargetType="Incursa.Core.BillingFrequencyType" />
     
     <TypeMappingRule ColumnNamePattern="EventType" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.Core.PwEventType" />
+                     TargetType="Incursa.Core.PwEventType" />
 
     <!-- Table-specific enum mappings -->
     <TypeMappingRule TableNamePattern="VendorUser" 
                      ColumnNamePattern="Role" 
-                     TargetType="Bravellian.Core.VendorUserRole" />
+                     TargetType="Incursa.Core.VendorUserRole" />
     
     <TypeMappingRule TableNamePattern="PaymentWaiverGroup" 
                      ColumnNamePattern="Type" 
-                     TargetType="Bravellian.Core.PaymentWaiverGroupType" />
+                     TargetType="Incursa.Core.PaymentWaiverGroupType" />
     
     <TypeMappingRule TableNamePattern="BillingFrequencie" 
                      ColumnNamePattern="Type" 
-                     TargetType="Bravellian.Core.BillingFrequencyType" />
+                     TargetType="Incursa.Core.BillingFrequencyType" />
     
     <TypeMappingRule TableNamePattern="Event" 
                      ColumnNamePattern="Type" 
-                     TargetType="Bravellian.Core.PwEventType" />
+                     TargetType="Incursa.Core.PwEventType" />
 
     <!-- Email mapping -->
     <TypeMappingRule ColumnNamePattern="Email" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.EmailAddress" />
+                     TargetType="Incursa.EmailAddress" />
 
     <!-- Money-related mappings with regex patterns -->
     <TypeMappingRule ColumnNamePattern="TotalContractAmount|TotalChangeAmount|TotalInvoiceAmount|TotalInvoicedRetentionAmount|OriginalAmount|Retention|UnitCost|Balance|DebitTotal|CreditTotal" 
                      CSharpTypePattern="decimal" 
-                     TargetType="Bravellian.Core.Money" 
+                     TargetType="Incursa.Core.Money" 
                      IsRegexPattern="true" />
 
     <!-- Percentage mappings with regex patterns -->
     <TypeMappingRule ColumnNamePattern="RetentionPercentage|DefaultRetentionPercentage" 
                      CSharpTypePattern="decimal" 
-                     TargetType="Bravellian.Core.Percentage" 
+                     TargetType="Incursa.Core.Percentage" 
                      IsRegexPattern="true" />
 
     <!-- Common identifier patterns -->
     <TypeMappingRule ColumnNamePattern="JobId" 
                      CSharpTypePattern="long" 
-                     TargetType="Bravellian.Core.JobIdentifier" />
+                     TargetType="Incursa.Core.JobIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="VendorId" 
                      CSharpTypePattern="long" 
-                     TargetType="Bravellian.Core.VendorIdentifier" />
+                     TargetType="Incursa.Core.VendorIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="CommitmentId" 
                      CSharpTypePattern="long" 
-                     TargetType="Bravellian.Core.CommitmentIdentifier" />
+                     TargetType="Incursa.Core.CommitmentIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="PurchaseOrderId" 
                      CSharpTypePattern="long" 
-                     TargetType="Bravellian.Core.PurchaseOrderIdentifier" />
+                     TargetType="Incursa.Core.PurchaseOrderIdentifier" />
 
-    <!-- BravellianTenantId special handling -->
-    <TypeMappingRule ColumnNamePattern="BravellianTenantId" 
-                     TargetType="Bravellian.Core.BravellianTenantIdentifier" />
+    <!-- IncursaTenantId special handling -->
+    <TypeMappingRule ColumnNamePattern="IncursaTenantId" 
+                     TargetType="Incursa.Core.IncursaTenantIdentifier" />
     
     <TypeMappingRule ColumnNamePattern="TenantId" 
                      CSharpTypePattern="long" 
-                     TargetType="Bravellian.Core.BravellianTenantIdentifier" />
+                     TargetType="Incursa.Core.IncursaTenantIdentifier" />
 
     <!-- Context and JSON mappings -->
     <TypeMappingRule ColumnNamePattern="DocumentContext" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.Core.JsonContext" />
+                     TargetType="Incursa.Core.JsonContext" />
     
     <TypeMappingRule ColumnNamePattern="Context" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.Core.JsonContext" />
+                     TargetType="Incursa.Core.JsonContext" />
     
     <TypeMappingRule ColumnNamePattern="Metadata" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.Core.JsonContext" />
+                     TargetType="Incursa.Core.JsonContext" />
 
     <!-- Status mappings -->
     <TypeMappingRule TableNamePattern="PurchaseOrder" 
                      ColumnNamePattern="Status" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.ErpPurchaseOrderStatus" />
+                     TargetType="Incursa.ErpPurchaseOrderStatus" />
     
     <TypeMappingRule TableNamePattern="Commitment" 
                      ColumnNamePattern="Status" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.ErpCommitmentStatus" />
+                     TargetType="Incursa.ErpCommitmentStatus" />
     
     <TypeMappingRule TableNamePattern="Job" 
                      ColumnNamePattern="Status" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.ErpJobStatus" />
+                     TargetType="Incursa.ErpJobStatus" />
 
     <!-- Schema-specific mappings -->
     <TypeMappingRule SchemaNamePattern="erp" 
                      ColumnNamePattern="RecordSource" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.RecordSource" />
+                     TargetType="Incursa.RecordSource" />
     
     <TypeMappingRule ColumnNamePattern="RecordSource" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.RecordSource" />
+                     TargetType="Incursa.RecordSource" />
 
     <!-- Special cases with table and column specificity -->
     <TypeMappingRule TableNamePattern="SigningRequest" 
                      ColumnNamePattern="ProviderRequestId" 
-                     TargetType="Bravellian.ProviderRequestIdentifier" />
+                     TargetType="Incursa.ProviderRequestIdentifier" />
     
     <TypeMappingRule TableNamePattern="SigningRequest" 
                      ColumnNamePattern="Code" 
-                     TargetType="Bravellian.Core.Common.ShortCode" />
+                     TargetType="Incursa.Core.Common.ShortCode" />
     
     <TypeMappingRule TableNamePattern="SigningRequest" 
                      ColumnNamePattern="Workflow" 
-                     TargetType="Bravellian.SigningWorkflow" />
+                     TargetType="Incursa.SigningWorkflow" />
 
     <!-- Additional common patterns that can be inferred from your mapping -->
     
     <!-- UserId patterns -->
     <TypeMappingRule ColumnNamePattern="UserId" 
                      CSharpTypePattern="string" 
-                     TargetType="Bravellian.Core.UserObjectId" />
+                     TargetType="Incursa.Core.UserObjectId" />
     
     <!-- Timestamp pattern -->
     <TypeMappingRule ColumnNamePattern="Timestamp" 

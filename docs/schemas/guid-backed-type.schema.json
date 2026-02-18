@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://bravellian.com/schemas/guid-backed-type.schema.json",
+  "$id": "https://incursa.com/schemas/guid-backed-type.schema.json",
   "title": "GUID Backed Type",
-  "description": "Schema for Bravellian GUID-backed value types (.guid.json)",
+  "description": "Schema for Incursa GUID-backed value types (.guid.json)",
   "type": "object",
   "required": ["name", "namespace"],
   "properties": {
@@ -42,11 +42,11 @@
   "examples": [
     {
       "name": "CustomerId",
-      "namespace": "Bravellian.Identifiers"
+      "namespace": "Incursa.Identifiers"
     },
     {
       "name": "ProductId",
-      "namespace": "Bravellian.Identifiers",
+      "namespace": "Incursa.Identifiers",
       "properties": [
         {
           "name": "Category",

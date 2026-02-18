@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://bravellian.com/schemas/dto-entity.schema.json",
+  "$id": "https://incursa.com/schemas/dto-entity.schema.json",
   "title": "DTO/Entity Type",
-  "description": "Schema for Bravellian DTO and Entity types (.dto.json, .entity.json)",
+  "description": "Schema for Incursa DTO and Entity types (.dto.json, .entity.json)",
   "type": "object",
   "required": ["name", "namespace"],
   "properties": {
@@ -124,7 +124,7 @@
   "examples": [
     {
       "name": "PersonDto",
-      "namespace": "Bravellian.Models.Dtos",
+      "namespace": "Incursa.Models.Dtos",
       "documentation": "Represents a person data transfer object",
       "properties": [
         {

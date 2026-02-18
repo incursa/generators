@@ -1,4 +1,4 @@
-namespace Bravellian.Generators;
+namespace Incursa.Generators;
 
 using System;
 using System.Text;
@@ -6,8 +6,8 @@ using Microsoft.CodeAnalysis;
 
 internal static class GeneratorDiagnostics
 {
-    private const string Category = "BravellianGenerators";
-    private const string HelpLinkUri = "https://github.com/bravellian/platform/blob/main/docs/generators.md";
+    private const string Category = "IncursaGenerators";
+    private const string HelpLinkUri = "https://github.com/incursa/platform/blob/main/docs/generators.md";
 
     private static readonly DiagnosticDescriptor ErrorDescriptor = new(
         id: "BG001",

@@ -1,4 +1,4 @@
-namespace Bravellian.Generators;
+namespace Incursa.Generators;
 
 using System;
 using System.Collections.Generic;
@@ -9,11 +9,11 @@ using System.Threading;
 using Microsoft.CodeAnalysis;
 
 [Generator(LanguageNames.CSharp)]
-public sealed class GuidBackedTypeSourceGenerator : IIncrementalGenerator
+public sealed class NumberBackedEnumTypeSourceGenerator : IIncrementalGenerator
 {
     private static readonly string[] CandidateSuffixes = new[]
     {
-        ".guid.json",
+        ".number_enum.json",
     };
 
     private readonly record struct InputFile
@@ -54,7 +54,7 @@ public sealed class GuidBackedTypeSourceGenerator : IIncrementalGenerator
                 var generated = Generate(file.Path, file.Content!, licenseHeader, productionContext.CancellationToken);
                 if (generated == null || !generated.Any())
                 {
-                    GeneratorDiagnostics.ReportSkipped(productionContext, $"No output generated for '{file.Path}'. Ensure required <GuidBacked> elements or JSON fields are present.");
+                    GeneratorDiagnostics.ReportSkipped(productionContext, $"No output generated for '{file.Path}'. Ensure required <NumberEnum> elements or JSON fields are present.");
                     return;
                 }
 
@@ -72,7 +72,7 @@ public sealed class GuidBackedTypeSourceGenerator : IIncrementalGenerator
             }
             catch (Exception ex)
             {
-                GeneratorDiagnostics.ReportError(productionContext, $"GuidBackedTypeSourceGenerator failed for '{file.Path}'", ex);
+                GeneratorDiagnostics.ReportError(productionContext, $"NumberBackedEnumTypeSourceGenerator failed for '{file.Path}'", ex);
             }
         });
     }
@@ -113,9 +113,10 @@ public sealed class GuidBackedTypeSourceGenerator : IIncrementalGenerator
             var root = document.RootElement;
 
             if (!root.TryGetProperty("name", out var nameElement) ||
-                !root.TryGetProperty("namespace", out var namespaceElement))
+                !root.TryGetProperty("namespace", out var namespaceElement) ||
+                !root.TryGetProperty("values", out var valuesElement))
             {
-                throw new InvalidDataException($"Required properties 'name' and 'namespace' are missing in '{sourceFilePath}'.");
+                throw new InvalidDataException($"Required properties 'name', 'namespace', or 'values' are missing in '{sourceFilePath}'.");
             }
 
             var name = nameElement.GetString();
@@ -125,31 +126,60 @@ public sealed class GuidBackedTypeSourceGenerator : IIncrementalGenerator
                 throw new InvalidDataException($"Properties 'name' and 'namespace' must be non-empty in '{sourceFilePath}'.");
             }
 
-            bool useDefaultFormat = false;
-            if (root.TryGetProperty("defaultFormat", out var defaultFormatElement))
+            var numberType = root.TryGetProperty("type", out var typeElement) ? typeElement.GetString() : "int";
+
+            var enumValues = new List<(string Value, string Name, string? DisplayName)>();
+            foreach (var valueProperty in valuesElement.EnumerateObject())
             {
-                useDefaultFormat = defaultFormatElement.ValueKind == JsonValueKind.True;
-                if (defaultFormatElement.ValueKind == JsonValueKind.False)
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var valueName = valueProperty.Name;
+                var valueObj = valueProperty.Value;
+                if (!valueObj.TryGetProperty("value", out var valueElement))
                 {
-                    useDefaultFormat = false;
+                    continue;
                 }
 
-                if (defaultFormatElement.ValueKind == JsonValueKind.String && bool.TryParse(defaultFormatElement.GetString(), out var parsed))
+                var value = valueElement.GetRawText();
+                var displayName = valueObj.TryGetProperty("display", out var displayElement)
+                    ? displayElement.GetString()
+                    : valueName;
+                enumValues.Add((value, valueName, displayName));
+            }
+
+            if (!enumValues.Any())
+            {
+                throw new InvalidDataException($"No enum values were found under 'values' in '{sourceFilePath}'.");
+            }
+
+            var additionalProperties = new List<(string Type, string Name)>();
+            if (root.TryGetProperty("properties", out var propertiesElement) && propertiesElement.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var prop in propertiesElement.EnumerateArray())
                 {
-                    useDefaultFormat = parsed;
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    var propName = prop.TryGetProperty("name", out var n) ? n.GetString() : null;
+                    var propType = prop.TryGetProperty("type", out var t) ? t.GetString() : null;
+                    if (!string.IsNullOrEmpty(propName) && !string.IsNullOrEmpty(propType))
+                    {
+                        additionalProperties.Add((propType!, propName!));
+                    }
                 }
             }
 
-            var genParams = new GuidBackedTypeGenerator.GeneratorParams(
+            var genParams = new NumberBackedEnumTypeGenerator.GeneratorParams(
                 name!,
                 namespaceName!,
                 true,
-                useDefaultFormat,
+                numberType ?? "int",
+                enumValues,
+                additionalProperties,
                 sourceFilePath,
                 licenseHeader
             );
 
-            var generatedCode = GuidBackedTypeGenerator.Generate(genParams, null);
+            var generatedCode = NumberBackedEnumTypeGenerator.Generate(genParams, null);
             if (string.IsNullOrEmpty(generatedCode))
             {
                 return null;
@@ -161,7 +191,7 @@ public sealed class GuidBackedTypeSourceGenerator : IIncrementalGenerator
             // Generate ValueConverter if path is configured
             if (ValueConverterConfig.IsEnabled)
             {
-                var converterCode = GuidBackedTypeGenerator.GenerateValueConverter(genParams, null);
+                var converterCode = NumberBackedEnumTypeGenerator.GenerateValueConverter(genParams, null);
                 if (!string.IsNullOrEmpty(converterCode))
                 {
                     var converterFileName = $"{namespaceName!}.{name!}ValueConverter.g.cs";
@@ -171,9 +201,9 @@ public sealed class GuidBackedTypeSourceGenerator : IIncrementalGenerator
 
             return results;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            throw new InvalidDataException($"Failed to process JSON for '{sourceFilePath}'.", ex);
+            return null;
         }
     }
 }

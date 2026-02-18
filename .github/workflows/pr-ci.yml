@@ -61,16 +61,16 @@ jobs:
         echo "semVer=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
     - name: Restore dependencies
-      run: dotnet restore Bravellian.Generators.sln
+      run: dotnet restore Incursa.Generators.slnx
 
     - name: Restore tools
       run: dotnet tool restore
           
     - name: Build solution
-      run: dotnet build Bravellian.Generators.sln --no-restore --configuration Release -p:Version=${{ steps.git_version.outputs.semVer }}
+      run: dotnet build Incursa.Generators.slnx --no-restore --configuration Release -p:Version=${{ steps.git_version.outputs.semVer }}
 
-    # - name: Run Tests
-    #   run: dotnet test Bravellian.Generators.sln --no-build --configuration Release
+    - name: Run Tests
+      run: dotnet test Incursa.Generators.slnx --no-build --configuration Release
   
     - name: Pack NuGet packages
-      run: dotnet pack Bravellian.Generators.sln --configuration Release --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
+      run: dotnet pack Incursa.Generators.slnx --configuration Release --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}

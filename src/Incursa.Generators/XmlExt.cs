@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace Bravellian.Generators;
+namespace Incursa.Generators;
 
 internal static class XmlExt
 {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ErpCapabilityDefinitions 
-    GeneratedCapabilitiesNamespace="Bravellian.TestGeneration.Erps" 
-    GeneratedInterfacesNamespace="Bravellian.TestGeneration.Erps.Interfaces">
+    GeneratedCapabilitiesNamespace="Incursa.TestGeneration.Erps" 
+    GeneratedInterfacesNamespace="Incursa.TestGeneration.Erps.Interfaces">
 
     <Capabilities>
         <Capability Name="Vendor.CanRead" Interface="IVendorListReader" Description="Ability to list all vendors for the tenant." />
@@ -10,7 +10,7 @@
     </Capabilities>
 
     <AdapterProfiles>
-        <AdapterProfile Name="TestAdapter" TargetNamespace="Bravellian.TestGeneration.TestAdapters" TargetClassName="TestErpAdapter">
+        <AdapterProfile Name="TestAdapter" TargetNamespace="Incursa.TestGeneration.TestAdapters" TargetClassName="TestErpAdapter">
             <SupportsCapability Name="Vendor.CanRead" />
             <SupportsCapability Name="Invoice.CanCreate" />
         </AdapterProfile>

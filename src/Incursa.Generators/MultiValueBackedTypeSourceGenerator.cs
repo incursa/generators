@@ -1,4 +1,4 @@
-namespace Bravellian.Generators;
+namespace Incursa.Generators;
 
 using System;
 using System.Collections.Generic;
@@ -9,11 +9,11 @@ using System.Threading;
 using Microsoft.CodeAnalysis;
 
 [Generator(LanguageNames.CSharp)]
-public sealed class NumberBackedEnumTypeSourceGenerator : IIncrementalGenerator
+public sealed class MultiValueBackedTypeSourceGenerator : IIncrementalGenerator
 {
     private static readonly string[] CandidateSuffixes = new[]
     {
-        ".number_enum.json",
+        ".multi.json",
     };
 
     private readonly record struct InputFile
@@ -54,7 +54,7 @@ public sealed class NumberBackedEnumTypeSourceGenerator : IIncrementalGenerator
                 var generated = Generate(file.Path, file.Content!, licenseHeader, productionContext.CancellationToken);
                 if (generated == null || !generated.Any())
                 {
-                    GeneratorDiagnostics.ReportSkipped(productionContext, $"No output generated for '{file.Path}'. Ensure required <NumberEnum> elements or JSON fields are present.");
+                    GeneratorDiagnostics.ReportSkipped(productionContext, $"No output generated for '{file.Path}'. Ensure required <MultiValueString> elements or JSON fields are present.");
                     return;
                 }
 
@@ -72,7 +72,7 @@ public sealed class NumberBackedEnumTypeSourceGenerator : IIncrementalGenerator
             }
             catch (Exception ex)
             {
-                GeneratorDiagnostics.ReportError(productionContext, $"NumberBackedEnumTypeSourceGenerator failed for '{file.Path}'", ex);
+                GeneratorDiagnostics.ReportError(productionContext, $"MultiValueBackedTypeSourceGenerator failed for '{file.Path}'", ex);
             }
         });
     }
@@ -113,10 +113,9 @@ public sealed class NumberBackedEnumTypeSourceGenerator : IIncrementalGenerator
             var root = document.RootElement;
 
             if (!root.TryGetProperty("name", out var nameElement) ||
-                !root.TryGetProperty("namespace", out var namespaceElement) ||
-                !root.TryGetProperty("values", out var valuesElement))
+                !root.TryGetProperty("namespace", out var namespaceElement))
             {
-                throw new InvalidDataException($"Required properties 'name', 'namespace', or 'values' are missing in '{sourceFilePath}'.");
+                throw new InvalidDataException($"Required properties 'name' and 'namespace' are missing in '{sourceFilePath}'.");
             }
 
             var name = nameElement.GetString();
@@ -126,60 +125,80 @@ public sealed class NumberBackedEnumTypeSourceGenerator : IIncrementalGenerator
                 throw new InvalidDataException($"Properties 'name' and 'namespace' must be non-empty in '{sourceFilePath}'.");
             }
 
-            var numberType = root.TryGetProperty("type", out var typeElement) ? typeElement.GetString() : "int";
-
-            var enumValues = new List<(string Value, string Name, string? DisplayName)>();
-            foreach (var valueProperty in valuesElement.EnumerateObject())
+            string? separator = null;
+            if (root.TryGetProperty("separator", out var separatorElement))
             {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                var valueName = valueProperty.Name;
-                var valueObj = valueProperty.Value;
-                if (!valueObj.TryGetProperty("value", out var valueElement))
-                {
-                    continue;
-                }
-
-                var value = valueElement.GetRawText();
-                var displayName = valueObj.TryGetProperty("display", out var displayElement)
-                    ? displayElement.GetString()
-                    : valueName;
-                enumValues.Add((value, valueName, displayName));
+                separator = separatorElement.GetString();
             }
 
-            if (!enumValues.Any())
+            string? format = null;
+            if (root.TryGetProperty("format", out var formatElement))
             {
-                throw new InvalidDataException($"No enum values were found under 'values' in '{sourceFilePath}'.");
+                format = formatElement.GetString();
             }
 
-            var additionalProperties = new List<(string Type, string Name)>();
-            if (root.TryGetProperty("properties", out var propertiesElement) && propertiesElement.ValueKind == JsonValueKind.Array)
+            string? regex = null;
+            if (root.TryGetProperty("regex", out var regexElement))
             {
-                foreach (var prop in propertiesElement.EnumerateArray())
+                regex = regexElement.GetString();
+            }
+
+            string? bookend = null;
+            if (root.TryGetProperty("bookend", out var bookendElement))
+            {
+                bookend = bookendElement.GetString();
+            }
+
+            string? nullIdentifier = null;
+            if (root.TryGetProperty("nullIdentifier", out var nullIdentifierElement))
+            {
+                nullIdentifier = nullIdentifierElement.GetString();
+            }
+
+            var fields = new List<MultiValueBackedTypeGenerator.FieldInfo>();
+            if (root.TryGetProperty("parts", out var partsElement) && partsElement.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var part in partsElement.EnumerateArray())
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    var propName = prop.TryGetProperty("name", out var n) ? n.GetString() : null;
-                    var propType = prop.TryGetProperty("type", out var t) ? t.GetString() : null;
-                    if (!string.IsNullOrEmpty(propName) && !string.IsNullOrEmpty(propType))
+                    var fieldName = part.TryGetProperty("name", out var n) ? n.GetString() : null;
+                    var fieldType = part.TryGetProperty("type", out var t) ? t.GetString() : "string";
+                    var serializedName = part.TryGetProperty("serializedName", out var sn) ? sn.GetString() : null;
+                    var constantValue = part.TryGetProperty("constantValue", out var cv) ? cv.GetString() : null;
+                    var constantTypeValue = part.TryGetProperty("constantTypeValue", out var ctv) ? ctv.GetString() : null;
+                    var isNullable = part.TryGetProperty("isNullable", out var inull) && inull.GetBoolean();
+                    var partNullIdentifier = part.TryGetProperty("nullIdentifier", out var pni) ? pni.GetString() : null;
+
+                    if (!string.IsNullOrEmpty(fieldName))
                     {
-                        additionalProperties.Add((propType!, propName!));
+                        fields.Add(new MultiValueBackedTypeGenerator.FieldInfo(
+                            fieldName!,
+                            fieldType!,
+                            serializedName,
+                            constantValue,
+                            constantTypeValue,
+                            isNullable,
+                            partNullIdentifier ?? nullIdentifier
+                        ));
                     }
                 }
             }
 
-            var genParams = new NumberBackedEnumTypeGenerator.GeneratorParams(
+            var genParams = new MultiValueBackedTypeGenerator.GeneratorParams(
                 name!,
                 namespaceName!,
                 true,
-                numberType ?? "int",
-                enumValues,
-                additionalProperties,
+                separator ?? "|",
+                format ?? string.Empty,
+                regex ?? string.Empty,
+                bookend ?? string.Empty,
+                fields,
                 sourceFilePath,
                 licenseHeader
             );
 
-            var generatedCode = NumberBackedEnumTypeGenerator.Generate(genParams, null);
+            var generatedCode = MultiValueBackedTypeGenerator.Generate(genParams, null);
             if (string.IsNullOrEmpty(generatedCode))
             {
                 return null;
@@ -191,7 +210,7 @@ public sealed class NumberBackedEnumTypeSourceGenerator : IIncrementalGenerator
             // Generate ValueConverter if path is configured
             if (ValueConverterConfig.IsEnabled)
             {
-                var converterCode = NumberBackedEnumTypeGenerator.GenerateValueConverter(genParams, null);
+                var converterCode = MultiValueBackedTypeGenerator.GenerateValueConverter(genParams, null);
                 if (!string.IsNullOrEmpty(converterCode))
                 {
                     var converterFileName = $"{namespaceName!}.{name!}ValueConverter.g.cs";
