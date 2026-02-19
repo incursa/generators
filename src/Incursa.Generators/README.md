@@ -1,84 +1,32 @@
-# Incursa Code Generators
+# Incursa.Generators
 
-This directory contains Roslyn source generators that automatically create strongly-typed wrappers for common value types.
+`Incursa.Generators` is a Roslyn source generator package for creating strongly typed domain models from JSON and XML definition files.
 
-## Supported Generators
+It is designed for teams that want consistency, type safety, and low-boilerplate patterns for identifiers, enums, and DTO-style models.
 
-- **StringBackedType** - String-backed value types with optional validation
-- **GuidBackedType** - GUID-backed value types  
-- **FastIdBackedType** - Fast ID types
-- **NumberBackedEnum** - Number-based enumeration types
-- **StringBackedEnum** - String-based enumeration types
-- **MultiValueBackedType** - Multi-value types
-- **GenericBackedType** - Generic value types
-- **DtoEntity** - DTO and entity types
+## What It Generates
 
-## Configuration
+- String-backed value types
+- GUID-backed and FastId-backed identifiers
+- Number-backed and string-backed enums
+- Multi-value and generic-backed types
+- DTO and entity models
 
-### License Headers
-
-You can customize the license header for generated code by setting the `GeneratedCodeLicenseHeader` MSBuild property in your project file:
+## Installation
 
 ```xml
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    
-    <!-- Custom license header for generated code -->
-    <GeneratedCodeLicenseHeader>
-// Copyright (c) Your Company Name
-// Licensed under MIT License
-    </GeneratedCodeLicenseHeader>
-  </PropertyGroup>
-</Project>
+<ItemGroup>
+  <PackageReference Include="Incursa.Generators" Version="x.x.x" PrivateAssets="all" />
+</ItemGroup>
 ```
 
-If not specified, the generators will not include a license header.
+## Quick Start
 
-### Generated Code Characteristics
+1. Add definition files (for example `*.string.json`, `*.enum.json`, `*.dto.json`, `*.dto.xml`) to your project.
+2. Build your project.
+3. Use the generated `.g.cs` files as normal domain types.
 
-All generated types are:
-- **Partial** - Allowing you to extend them in separate files
-- **Strongly-typed** - Providing compile-time safety
-- **JSON-serializable** - With built-in JsonConverter
-- **Type-convertible** - With built-in TypeConverter
-
-Generated types implement standard .NET interfaces:
-- `IComparable` and `IComparable<T>`
-- `IEquatable<T>`
-- `IParsable<T>` (where applicable)
-- `ISpanParsable<T>` (for GUID types)
-
-### Extending Generated Types
-
-Since all types are generated as `partial`, you can easily extend them:
-
-```csharp
-// Generated (automatic)
-public readonly partial record struct CustomerId
-{
-    public Guid Value { get; init; }
-    // ... generated members
-}
-
-// Your extension (manual - in a separate file)
-public readonly partial record struct CustomerId
-{
-    public static CustomerId FromLegacyId(int legacyId)
-    {
-        // Custom conversion logic
-        return new CustomerId(ConvertToGuid(legacyId));
-    }
-    
-    public bool IsSystemId() => Value == Guid.Empty;
-}
-```
-
-## Example Usage
-
-### String-Backed Type
-
-Create a file named `EmailAddress.string.json`:
+Example string-backed type definition:
 
 ```json
 {
@@ -88,101 +36,37 @@ Create a file named `EmailAddress.string.json`:
 }
 ```
 
-This generates a validated email address type:
+## Configuration
 
-```csharp
-var email = EmailAddress.Parse("user@example.com");
-Console.WriteLine(email.Value); // "user@example.com"
-
-// Validation is automatic
-try 
-{
-    var invalid = EmailAddress.Parse("not-an-email");
-}
-catch (ArgumentOutOfRangeException)
-{
-    // Invalid email format
-}
-```
-
-### GUID-Backed Type
-
-Create a file named `UserId.guid.json`:
-
-```json
-{
-  "name": "UserId",
-  "namespace": "MyApp.Domain"
-}
-```
-
-This generates a strongly-typed user ID:
-
-```csharp
-var userId = UserId.GenerateNew();
-var empty = UserId.Empty;
-var fromGuid = UserId.From(Guid.NewGuid());
-```
-
-### Number-Backed Enum
-
-Create a file named `OrderStatus.enum.json`:
-
-```json
-{
-  "name": "OrderStatus",
-  "namespace": "MyApp.Domain",
-  "numberType": "int",
-  "values": [
-    { "name": "Pending", "value": "0", "displayName": "Pending" },
-    { "name": "Processing", "value": "1", "displayName": "Processing" },
-    { "name": "Completed", "value": "2", "displayName": "Completed" }
-  ]
-}
-```
-
-## Error Messages
-
-The generators provide detailed error messages with context:
-
-- **BG001**: General generator error with exception details
-- **BG002**: File skipped with reason
-- **BG003**: Duplicate generated file name detected
-- **BG004**: Validation error with item name and context
-- **BG005**: Missing required property with property name
-
-Each error includes the file path and helpful context to identify and fix the issue.
-
-## Best Practices
-
-1. **License Headers**: Set the license header at the project level in your .csproj file
-2. **Partial Classes**: Use partial classes to extend generated types without modifying generated code
-3. **Naming**: Follow C# naming conventions for type names in your JSON files
-4. **Organization**: Keep generator JSON files co-located with related code
-
-## Troubleshooting
-
-### Generator not running
-
-Ensure your project file includes the generator package:
+Optional custom header for generated code:
 
 ```xml
-<ItemGroup>
-  <PackageReference Include="Incursa.Generators" Version="x.x.x" />
-</ItemGroup>
+<PropertyGroup>
+  <GeneratedCodeLicenseHeader>// Copyright (c) Your Company</GeneratedCodeLicenseHeader>
+</PropertyGroup>
 ```
 
-### Missing generated files
+## Generated Type Characteristics
 
-Check that your JSON files match the expected naming pattern (e.g., `*.string.json`, `*.guid.json`)
+- Strongly typed and partial
+- Built-in conversion and parsing patterns (where applicable)
+- Validation-aware for supported definitions
+- Clear diagnostics for invalid inputs
 
-### Compilation errors in generated code
+## Diagnostics
 
-If you see compilation errors in generated files:
-1. Clean and rebuild the solution
-2. Check that all required dependencies are installed
-3. Verify your JSON configuration files are valid
+The package emits diagnostics (`BG00x`) for malformed definitions, duplicate outputs, and generation errors to help identify issues early during build.
+
+## Compatibility
+
+- Generator package target: `netstandard2.0`
+- Consumer projects: modern SDK-style C# projects (including .NET 8+ and .NET 10)
+
+## Documentation and Samples
+
+- Repository docs and schema references: <https://github.com/incursa/generators/tree/main/docs>
+- Sample inputs: <https://github.com/incursa/generators/tree/main/examples>
 
 ## Support
 
-For issues or questions, please file an issue on the GitHub repository.
+- Open an issue: <https://github.com/incursa/generators/issues>

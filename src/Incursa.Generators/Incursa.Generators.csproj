@@ -24,12 +24,14 @@
         <Version>1.0.0</Version>
         <Authors>Incursa</Authors>
         <Owners>Incursa</Owners>
-        <Description>Source generators for C# types and classes.</Description>
-        <PackageProjectUrl>https://github.com/incursa/platform</PackageProjectUrl>
+        <Description>Roslyn source generators for strongly typed identifiers, enums, DTOs, and value objects from JSON or XML definitions.</Description>
+        <PackageTags>source-generator;roslyn;code-generation;dto;value-objects;strongly-typed</PackageTags>
+        <PackageProjectUrl>https://github.com/incursa/generators</PackageProjectUrl>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-        <RepositoryUrl>https://github.com/incursa/platform</RepositoryUrl>
+        <RepositoryUrl>https://github.com/incursa/generators</RepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageIcon>nuget_logo.png</PackageIcon>
-        <PackageReleaseNotes>For support, contact oss@incursa.com</PackageReleaseNotes>
+        <PackageReleaseNotes>Includes Incursa naming updates, .slnx migration support, and .NET 10 compatible test/build flow.</PackageReleaseNotes>
         <NuspecProperties>id=$(PackageId);version=$(Version);authors=$(Authors)</NuspecProperties>
         <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     </PropertyGroup>
@@ -57,6 +59,7 @@
         </None>
 		<None Include="Incursa.Generators.props" Pack="true" PackagePath="build\" />
 		<None Include="Incursa.Generators.props" Pack="true" PackagePath="buildTransitive\" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 
     <ItemGroup>
