@@ -83,11 +83,17 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     # Stable = no hyphen in version (e.g., 1.2.3)
-    if: ${{ !contains(github.ref_name, '-') && secrets.NUGET_API_KEY != '' }}
+    if: ${{ !contains(github.ref_name, '-') }}
+    env:
+      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: nupkgs
           path: out
+      - name: Skip publish when key is missing
+        if: ${{ env.NUGET_API_KEY == '' }}
+        run: echo "NUGET_API_KEY is not set; skipping NuGet publish."
       - name: Push to nuget.org
-        run: dotnet nuget push "out/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+        if: ${{ env.NUGET_API_KEY != '' }}
+        run: dotnet nuget push "out/*.nupkg" --api-key "${{ env.NUGET_API_KEY }}" --source "https://api.nuget.org/v3/index.json" --skip-duplicate
