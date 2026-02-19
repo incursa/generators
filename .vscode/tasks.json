@@ -64,7 +64,7 @@
             "args": [
                 "nuget",
                 "push",
-                "${workspaceFolder}/src/Incursa.Generators/bin/Release/Bravellian.Generators.${input:versionNumber}.nupkg",
+                "${workspaceFolder}/src/Incursa.Generators/bin/Release/Incursa.Generators.${input:versionNumber}.nupkg",
                 "--source",
                 "Incursa",
                 "--api-key",
