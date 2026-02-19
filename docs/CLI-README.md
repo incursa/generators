@@ -4,12 +4,10 @@ This is a .NET command-line tool that replaces the Roslyn source generator funct
 
 ## Installation
 
-`Bravellian.Generators` remains the published NuGet package ID for compatibility.
-
 To install the tool globally:
 
 ```bash
-dotnet tool install --global Bravellian.Generators
+dotnet tool install --global Incursa.Generators
 ```
 
 Or to install it from a local build:
@@ -17,7 +15,7 @@ Or to install it from a local build:
 ```bash
 cd Incursa.Generators
 dotnet pack
-dotnet tool install --global --add-source ./bin/Debug Bravellian.Generators
+dotnet tool install --global --add-source ./bin/Debug Incursa.Generators
 ```
 
 ## Usage
@@ -189,6 +187,6 @@ cd Incursa.Generators
 dotnet pack
 
 # Install locally for testing
-dotnet tool uninstall --global Bravellian.Generators
-dotnet tool install --global --add-source ./bin/Debug Bravellian.Generators
+dotnet tool uninstall --global Incursa.Generators
+dotnet tool install --global --add-source ./bin/Debug Incursa.Generators
 ```
