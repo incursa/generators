@@ -94,4 +94,34 @@ public sealed class WriteModeCleanupTests
         File.Exists(Path.Combine(workspace.RootPath, "generated", "page-models", "Customer", "CustomerListPageModelBase.g.cs")).ShouldBeFalse();
         File.Exists(Path.Combine(workspace.RootPath, "generated", "registrations", "PageFeatureRegistrationExtensions.g.cs")).ShouldBeTrue();
     }
+
+    [Fact]
+    public async Task Cli_generate_write_filter_with_no_matches_does_not_rewrite_registration_helper()
+    {
+        using var workspace = new TestWorkspace();
+        workspace.CopyDirectory(TestWorkspace.GetTestDataPath("HappyPath", "Source"));
+
+        var configPath = Path.Combine(workspace.RootPath, "app-definitions.json");
+        await ToolCommandRunner.RunAsync(
+            ["generate", "--config", configPath, "--write"],
+            TextWriter.Null,
+            TextWriter.Null,
+            TestContext.Current.CancellationToken);
+
+        var registrationHelperPath = Path.Combine(workspace.RootPath, "generated", "registrations", "PageFeatureRegistrationExtensions.g.cs");
+        var beforeContent = File.ReadAllText(registrationHelperPath);
+
+        var stdout = new StringWriter();
+        var stderr = new StringWriter();
+        var exitCode = await ToolCommandRunner.RunAsync(
+            ["generate", "--config", configPath, "--filter", "MissingFeature", "--write", "--verbosity", "detailed"],
+            stdout,
+            stderr,
+            TestContext.Current.CancellationToken);
+
+        exitCode.ShouldBe(0, stderr.ToString());
+        File.ReadAllText(registrationHelperPath).ShouldBe(beforeContent);
+        stdout.ToString().ShouldContain("APPDEF040");
+        stdout.ToString().ShouldContain("APPDEF032");
+    }
 }

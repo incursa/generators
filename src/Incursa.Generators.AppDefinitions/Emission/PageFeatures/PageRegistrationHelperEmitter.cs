@@ -15,6 +15,11 @@ public sealed class PageRegistrationHelperEmitter : IGenerationTargetEmitter
         FeatureFilter filter,
         DiagnosticBag diagnostics)
     {
+        if (!string.IsNullOrWhiteSpace(filter.RawPattern))
+        {
+            return [];
+        }
+
         var relativePath = "PageFeatureRegistrationExtensions.g.cs";
         var absolutePath = EmitterUtilities.BuildAbsolutePath(target, relativePath);
         var uiEngineNamespace = EmitterUtilities.ResolveImportNamespace(target, "uiEngines");
