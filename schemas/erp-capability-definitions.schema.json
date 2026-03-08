@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ERP Capability Definitions",
+  "description": "Schema for defining ERP capabilities and adapter profiles",
+  "type": "object",
+  "required": [
+    "generatedCapabilitiesNamespace",
+    "generatedInterfacesNamespace",
+    "capabilities"
+  ],
+  "properties": {
+    "generatedCapabilitiesNamespace": {
+      "type": "string",
+      "description": "The namespace for generated capability classes"
+    },
+    "generatedInterfacesNamespace": {
+      "type": "string",
+      "description": "The namespace for generated interface definitions"
+    },
+    "capabilities": {
+      "type": "array",
+      "description": "List of all possible ERP capabilities",
+      "items": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The unique name of the capability (e.g., 'Vendor.CanRead'). Interface name will be derived as 'I' + name with dots removed (e.g., 'IVendorCanRead')"
+          },
+          "interface": {
+            "type": "string",
+            "description": "Optional explicit interface name. If not provided, interface name will be derived from the capability name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of what this capability does"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "adapterProfiles": {
+      "type": "array",
+      "description": "List of ERP adapter profiles that specify which capabilities they support",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "targetNamespace",
+          "targetClassName"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the adapter profile (e.g., 'ViewpointVista')"
+          },
+          "targetNamespace": {
+            "type": "string",
+            "description": "The namespace where the adapter class will be generated"
+          },
+          "targetClassName": {
+            "type": "string",
+            "description": "The name of the adapter class that will be generated"
+          },
+          "supportedCapabilities": {
+            "type": "array",
+            "description": "List of capability names that this adapter supports",
+            "items": {
+              "type": "string",
+              "description": "Name of a capability defined in the capabilities array"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "default": []
+    }
+  },
+  "additionalProperties": false
+}

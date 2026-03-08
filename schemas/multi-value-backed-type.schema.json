@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://bravellian.com/schemas/multi-value-backed-type.schema.json",
+  "title": "Multi-Value Backed Type",
+  "description": "Schema for Bravellian multi-value backed types (.multi.json)",
+  "type": "object",
+  "required": ["name", "namespace", "values"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the multi-value type",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+    },
+    "namespace": {
+      "type": "string",
+      "description": "The .NET namespace for the generated type",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_.]*$"
+    },
+    "values": {
+      "type": "array",
+      "description": "The allowed values for this multi-value type",
+      "items": {
+        "type": "object",
+        "required": ["name", "value"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of this value option",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+          },
+          "value": {
+            "type": "string",
+            "description": "The string value for this option"
+          },
+          "display": {
+            "type": "string",
+            "description": "The display name for this option (defaults to the name)"
+          },
+          "documentation": {
+            "type": "string",
+            "description": "XML documentation comment for this value option"
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "properties": {
+      "type": "array",
+      "description": "Additional properties to add to the multi-value type",
+      "items": {
+        "type": "object",
+        "required": ["name", "type"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The property name",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+          },
+          "type": {
+            "type": "string",
+            "description": "The .NET type for this property",
+            "examples": ["string", "int", "bool", "DateTime", "decimal"]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "name": "ContactMethod",
+      "namespace": "Bravellian.ValueTypes",
+      "values": [
+        {
+          "name": "Email",
+          "value": "email",
+          "display": "Email Address",
+          "documentation": "Contact via email"
+        },
+        {
+          "name": "Phone",
+          "value": "phone",
+          "display": "Phone Number",
+          "documentation": "Contact via phone"
+        },
+        {
+          "name": "Mail",
+          "value": "postal_mail",
+          "display": "Postal Mail",
+          "documentation": "Contact via postal mail"
+        }
+      ],
+      "properties": [
+        {
+          "name": "IsPreferred",
+          "type": "bool"
+        },
+        {
+          "name": "Priority",
+          "type": "int"
+        }
+      ]
+    }
+  ]
+}
