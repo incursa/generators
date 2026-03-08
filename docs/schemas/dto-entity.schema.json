@@ -2,183 +2,375 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://incursa.com/schemas/dto-entity.schema.json",
   "title": "DTO/Entity Type",
-  "description": "Schema for Incursa DTO and Entity types (.dto.json, .entity.json)",
+  "description": "Schema for Incursa DTO and Entity definitions (.dto.json, .entity.json)",
   "type": "object",
   "required": ["name", "namespace"],
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name of the DTO/Entity class",
+      "description": "The name of the DTO/Entity class.",
       "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
     },
     "namespace": {
       "type": "string",
-      "description": "The .NET namespace for the generated class",
+      "description": "The .NET namespace for the generated class.",
       "pattern": "^[A-Za-z_][A-Za-z0-9_.]*$"
-    },
-    "parent": {
-      "type": "string",
-      "description": "The parent type name if this is a nested type",
-      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
     },
     "inherits": {
       "type": "string",
-      "description": "The base class or interfaces to inherit from",
-      "examples": ["BaseDto", "IValidatable", "BaseEntity, ITimestamped"]
+      "description": "Base type and/or interfaces, used as-is in generated type declaration.",
+      "examples": ["BaseDto", "BaseEntity, ITimestamped"]
     },
     "abstract": {
       "type": "boolean",
-      "description": "Whether this is an abstract class",
+      "description": "Whether this generated type is abstract.",
       "default": false
     },
     "accessibility": {
       "type": "string",
-      "description": "The access modifier for the class",
+      "description": "Access modifier emitted before the generated type.",
       "enum": ["public", "internal", "protected", "private"],
       "default": "public"
     },
     "documentation": {
       "type": "string",
-      "description": "XML documentation comment for the class"
+      "description": "XML documentation summary text for the type."
     },
     "classOnly": {
       "type": "boolean",
-      "description": "Generate only the class content without namespace wrapper",
+      "description": "Controls class-only generation mode used by nested generation paths.",
+      "default": false
+    },
+    "strict": {
+      "type": "boolean",
+      "description": "When true, strict DTO semantics are applied.",
+      "default": false
+    },
+    "useParentValidator": {
+      "type": "boolean",
+      "description": "When true, validator generation can chain to parent validator where applicable.",
+      "default": true
+    },
+    "noCreateMethod": {
+      "type": "boolean",
+      "description": "When true, suppresses generated Create(...) factory method.",
+      "default": false
+    },
+    "isRecordStruct": {
+      "type": "boolean",
+      "description": "When true, generates a record struct instead of record class.",
       "default": false
     },
     "properties": {
       "type": "array",
-      "description": "The properties of the DTO/Entity",
+      "description": "Property definitions for the generated type.",
       "items": {
-        "type": "object",
-        "required": ["name", "type"],
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The property name",
-            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
-          },
-          "type": {
-            "type": "string",
-            "description": "The .NET type for this property",
-            "examples": ["string", "int", "bool", "DateTime", "Guid", "decimal", "List<string>", "CustomType"]
-          },
-          "required": {
-            "type": "boolean",
-            "description": "Whether this property is required",
-            "default": false
-          },
-          "nullable": {
-            "type": "boolean",
-            "description": "Whether this property can be null",
-            "default": false
-          },
-          "settable": {
-            "type": "boolean",
-            "description": "Whether this property has a setter (true) or only init (false)",
-            "default": true
-          },
-          "noDefault": {
-            "type": "boolean",
-            "description": "Whether to suppress default value validation for required properties",
-            "default": false
-          },
-          "max": {
-            "type": "string",
-            "description": "Maximum value/length constraint",
-            "examples": ["100", "255", "2023-12-31"]
-          },
-          "min": {
-            "type": "string",
-            "description": "Minimum value/length constraint",
-            "examples": ["1", "0", "1900-01-01"]
-          },
-          "regex": {
-            "type": "string",
-            "description": "Regular expression pattern for validation"
-          },
-          "jsonProperty": {
-            "type": "string",
-            "description": "Custom JSON property name for serialization"
-          },
-          "defaultValue": {
-            "type": "string",
-            "description": "Default value for the property (e.g., '\"default\"', '0', 'true', 'new List<string>()')",
-            "examples": ["\"default value\"", "0", "true", "DateTime.UtcNow", "new List<string>()"]
-          },
-          "expression": {
-            "type": "string",
-            "description": "C# expression for computed properties",
-            "examples": ["$\"{FirstName} {LastName}\"", "DateTime.UtcNow"]
-          },
-          "documentation": {
-            "type": "string",
-            "description": "XML documentation comment for the property"
-          }
-        },
-        "additionalProperties": false
+        "$ref": "#/definitions/propertyDefinition"
+      }
+    },
+    "nestedEntities": {
+      "type": "array",
+      "description": "Nested DTO/entity definitions. Nested entries inherit parent namespace when namespace is omitted.",
+      "items": {
+        "$ref": "#/definitions/nestedEntityDefinition"
       }
     }
   },
+  "definitions": {
+    "propertyDefinition": {
+      "type": "object",
+      "required": ["name", "type"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Property name.",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "type": {
+          "type": "string",
+          "description": "C# type for this property.",
+          "examples": ["string", "int", "bool", "DateTime", "Guid", "List<string>"]
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Required-ness in generated validation and required-member keyword behavior.",
+          "default": true
+        },
+        "nullable": {
+          "type": "boolean",
+          "description": "Whether nullable syntax should be used for this property.",
+          "default": false
+        },
+        "settable": {
+          "type": "boolean",
+          "description": "When true, emits set accessor; otherwise init accessor.",
+          "default": false
+        },
+        "noDefault": {
+          "type": "boolean",
+          "description": "When true, suppresses default initializer usage even if defaultValue is provided.",
+          "default": false
+        },
+        "max": {
+          "type": "string",
+          "description": "Maximum constraint input used by generated validation attributes.",
+          "examples": ["100", "255", "2026-12-31"]
+        },
+        "min": {
+          "type": "string",
+          "description": "Minimum constraint input used by generated validation attributes.",
+          "examples": ["1", "0", "1900-01-01"]
+        },
+        "regex": {
+          "type": "string",
+          "description": "Regular expression constraint for string properties."
+        },
+        "jsonProperty": {
+          "type": "string",
+          "description": "Custom JSON property name via [JsonPropertyName]."
+        },
+        "defaultValue": {
+          "type": "string",
+          "description": "Raw C# initializer expression.",
+          "examples": ["\"default\"", "0", "true", "DateTime.UtcNow", "new List<string>()"]
+        },
+        "expression": {
+          "type": "string",
+          "description": "Computed property expression (expression-bodied property)."
+        },
+        "documentation": {
+          "type": "string",
+          "description": "XML documentation text for this property."
+        }
+      },
+      "additionalProperties": false
+    },
+    "nestedEntityDefinition": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Nested type name.",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "namespace": {
+          "type": "string",
+          "description": "Optional for nested entities; if omitted, parent namespace is used.",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_.]*$"
+        },
+        "inherits": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "boolean",
+          "default": false
+        },
+        "accessibility": {
+          "type": "string",
+          "enum": ["public", "internal", "protected", "private"],
+          "default": "public"
+        },
+        "documentation": {
+          "type": "string"
+        },
+        "classOnly": {
+          "type": "boolean",
+          "default": false
+        },
+        "strict": {
+          "type": "boolean",
+          "default": false
+        },
+        "useParentValidator": {
+          "type": "boolean",
+          "default": true
+        },
+        "noCreateMethod": {
+          "type": "boolean",
+          "default": false
+        },
+        "isRecordStruct": {
+          "type": "boolean",
+          "default": false
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/propertyDefinition"
+          }
+        },
+        "nestedEntities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/nestedEntityDefinition"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "not": {
+            "properties": {
+              "abstract": {
+                "const": true
+              },
+              "strict": {
+                "const": true
+              }
+            },
+            "required": ["abstract", "strict"]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "isRecordStruct": {
+                "const": true
+              }
+            },
+            "required": ["isRecordStruct"]
+          },
+          "then": {
+            "properties": {
+              "abstract": {
+                "const": false
+              },
+              "inherits": {
+                "maxLength": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "strict": {
+                "const": true
+              }
+            },
+            "required": ["strict"]
+          },
+          "then": {
+            "properties": {
+              "properties": {
+                "not": {
+                  "contains": {
+                    "type": "object",
+                    "properties": {
+                      "settable": {
+                        "const": true
+                      }
+                    },
+                    "required": ["settable"]
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "not": {
+        "properties": {
+          "abstract": {
+            "const": true
+          },
+          "strict": {
+            "const": true
+          }
+        },
+        "required": ["abstract", "strict"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "isRecordStruct": {
+            "const": true
+          }
+        },
+        "required": ["isRecordStruct"]
+      },
+      "then": {
+        "properties": {
+          "abstract": {
+            "const": false
+          },
+          "inherits": {
+            "maxLength": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "strict": {
+            "const": true
+          }
+        },
+        "required": ["strict"]
+      },
+      "then": {
+        "properties": {
+          "properties": {
+            "not": {
+              "contains": {
+                "type": "object",
+                "properties": {
+                  "settable": {
+                    "const": true
+                  }
+                },
+                "required": ["settable"]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "additionalProperties": false,
   "examples": [
     {
       "name": "PersonDto",
       "namespace": "Incursa.Models.Dtos",
-      "documentation": "Represents a person data transfer object",
+      "strict": true,
       "properties": [
         {
           "name": "Id",
           "type": "Guid",
           "required": true,
-          "noDefault": true,
-          "documentation": "The unique identifier for the person"
-        },
-        {
-          "name": "FirstName",
-          "type": "string",
-          "required": true,
-          "max": "50",
-          "min": "1",
-          "documentation": "The person's first name"
-        },
-        {
-          "name": "LastName",
-          "type": "string",
-          "required": true,
-          "max": "50",
-          "min": "1",
-          "documentation": "The person's last name"
+          "settable": false,
+          "documentation": "The unique identifier."
         },
         {
           "name": "Email",
           "type": "string",
           "required": true,
-          "max": "255",
           "regex": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
-          "jsonProperty": "email_address",
-          "documentation": "The person's email address"
+          "jsonProperty": "email"
         },
         {
-          "name": "Age",
-          "type": "int?",
-          "nullable": true,
-          "min": "0",
-          "max": "150",
-          "documentation": "The person's age in years"
-        },
-        {
-          "name": "FullName",
+          "name": "DisplayName",
           "type": "string",
-          "expression": "$\"{FirstName} {LastName}\"",
-          "documentation": "The person's full name"
-        },
+          "defaultValue": "\"Unknown\""
+        }
+      ],
+      "nestedEntities": [
         {
-          "name": "CreatedAt",
-          "type": "DateTime",
-          "required": true,
-          "settable": false,
-          "documentation": "When the record was created"
+          "name": "Metadata",
+          "properties": [
+            {
+              "name": "Source",
+              "type": "string",
+              "required": true
+            }
+          ]
         }
       ]
     }

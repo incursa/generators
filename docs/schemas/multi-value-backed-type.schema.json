@@ -4,63 +4,77 @@
   "title": "Multi-Value Backed Type",
   "description": "Schema for Incursa multi-value backed types (.multi.json)",
   "type": "object",
-  "required": ["name", "namespace", "values"],
+  "required": ["name", "namespace"],
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name of the multi-value type",
+      "description": "The name of the multi-value type.",
       "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
     },
     "namespace": {
       "type": "string",
-      "description": "The .NET namespace for the generated type",
+      "description": "The .NET namespace for the generated type.",
       "pattern": "^[A-Za-z_][A-Za-z0-9_.]*$"
     },
-    "values": {
-      "type": "array",
-      "description": "The allowed values for this multi-value type",
-      "items": {
-        "type": "object",
-        "required": ["name", "value"],
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The name of this value option",
-            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
-          },
-          "value": {
-            "type": "string",
-            "description": "The string value for this option"
-          },
-          "display": {
-            "type": "string",
-            "description": "The display name for this option (defaults to the name)"
-          },
-          "documentation": {
-            "type": "string",
-            "description": "XML documentation comment for this value option"
-          }
-        },
-        "additionalProperties": false
-      },
-      "minItems": 1
+    "separator": {
+      "type": "string",
+      "description": "Separator used between parts when format is not used.",
+      "default": "|"
     },
-    "properties": {
+    "format": {
+      "type": "string",
+      "description": "Optional composite format string behavior trigger."
+    },
+    "regex": {
+      "type": "string",
+      "description": "Optional explicit regex pattern used for parsing/validation generation."
+    },
+    "bookend": {
+      "type": "string",
+      "description": "Optional leading/trailing marker around serialized value."
+    },
+    "nullIdentifier": {
+      "type": "string",
+      "description": "Default token used for nullable part serialization."
+    },
+    "parts": {
       "type": "array",
-      "description": "Additional properties to add to the multi-value type",
+      "description": "Parts that compose the multi-value type.",
       "items": {
         "type": "object",
-        "required": ["name", "type"],
+        "required": ["name"],
         "properties": {
           "name": {
             "type": "string",
-            "description": "The property name",
+            "description": "Part name.",
             "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
           },
           "type": {
             "type": "string",
-            "description": "The .NET type for this property",
-            "examples": ["string", "int", "bool", "DateTime", "decimal"]
+            "description": "C# type for this part.",
+            "default": "string",
+            "examples": ["string", "int", "long", "Guid", "DateTime"]
+          },
+          "serializedName": {
+            "type": "string",
+            "description": "Optional serialized key/name prefix for this part."
+          },
+          "constantValue": {
+            "type": "string",
+            "description": "Optional constant textual value for this part."
+          },
+          "constantTypeValue": {
+            "type": "string",
+            "description": "Optional constant typed expression for this part."
+          },
+          "isNullable": {
+            "type": "boolean",
+            "description": "Whether the part is nullable.",
+            "default": false
+          },
+          "nullIdentifier": {
+            "type": "string",
+            "description": "Nullable token override for this part."
           }
         },
         "additionalProperties": false
@@ -70,36 +84,34 @@
   "additionalProperties": false,
   "examples": [
     {
-      "name": "ContactMethod",
+      "name": "CompositeCode",
       "namespace": "Incursa.ValueTypes",
-      "values": [
+      "separator": "|",
+      "parts": [
         {
-          "name": "Email",
-          "value": "email",
-          "display": "Email Address",
-          "documentation": "Contact via email"
+          "name": "Region",
+          "type": "string"
         },
         {
-          "name": "Phone",
-          "value": "phone",
-          "display": "Phone Number",
-          "documentation": "Contact via phone"
-        },
-        {
-          "name": "Mail",
-          "value": "postal_mail",
-          "display": "Postal Mail",
-          "documentation": "Contact via postal mail"
-        }
-      ],
-      "properties": [
-        {
-          "name": "IsPreferred",
-          "type": "bool"
-        },
-        {
-          "name": "Priority",
+          "name": "Sequence",
           "type": "int"
+        }
+      ]
+    },
+    {
+      "name": "BookendedCode",
+      "namespace": "Incursa.ValueTypes",
+      "bookend": "#",
+      "nullIdentifier": "NULL",
+      "parts": [
+        {
+          "name": "Tenant",
+          "type": "string"
+        },
+        {
+          "name": "Revision",
+          "type": "int",
+          "isNullable": true
         }
       ]
     }

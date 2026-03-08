@@ -8,17 +8,17 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name of the enum type",
+      "description": "The name of the enum type.",
       "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
     },
     "namespace": {
       "type": "string",
-      "description": "The .NET namespace for the generated enum",
+      "description": "The .NET namespace for the generated enum.",
       "pattern": "^[A-Za-z_][A-Za-z0-9_.]*$"
     },
     "values": {
       "type": "object",
-      "description": "The enum values and their configurations",
+      "description": "Enum members keyed by member name.",
       "patternProperties": {
         "^[A-Za-z_][A-Za-z0-9_]*$": {
           "type": "object",
@@ -26,15 +26,15 @@
           "properties": {
             "value": {
               "type": "string",
-              "description": "The string value for this enum member"
+              "description": "String value for the enum member."
             },
             "display": {
               "type": "string",
-              "description": "The display name for this enum member (defaults to the property name)"
+              "description": "Display name; defaults to member name when omitted."
             },
             "documentation": {
               "type": "string",
-              "description": "XML documentation comment for this enum member"
+              "description": "XML documentation text for this enum member."
             }
           },
           "additionalProperties": false
@@ -44,25 +44,23 @@
       "minProperties": 1
     },
     "properties": {
-      "type": "array",
-      "description": "Additional properties to add to the enum type",
-      "items": {
-        "type": "object",
-        "required": ["name", "type"],
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The property name",
-            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+      "type": "object",
+      "description": "Additional property definitions keyed by property name.",
+      "patternProperties": {
+        "^[A-Za-z_][A-Za-z0-9_]*$": {
+          "type": "object",
+          "required": ["type"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "C# type for this additional property.",
+              "examples": ["string", "int", "bool", "DateTime", "decimal"]
+            }
           },
-          "type": {
-            "type": "string",
-            "description": "The .NET type for this property",
-            "examples": ["string", "int", "bool", "DateTime", "decimal"]
-          }
-        },
-        "additionalProperties": false
-      }
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false,
@@ -70,34 +68,22 @@
     {
       "name": "AccountingSystemEnum",
       "namespace": "Incursa.Enums",
-      "properties": [
-        {
-          "name": "SystemId",
+      "properties": {
+        "SystemId": {
           "type": "int"
         },
-        {
-          "name": "ApiEndpoint",
+        "ApiEndpoint": {
           "type": "string"
-        },
-        {
-          "name": "IsCloudBased",
-          "type": "bool"
         }
-      ],
+      },
       "values": {
         "None": {
           "value": "none",
-          "documentation": "No accounting system selected"
+          "documentation": "No accounting system selected."
         },
         "ViewpointVista": {
           "value": "viewpoint_vista",
-          "display": "Viewpoint Vista",
-          "documentation": "Viewpoint Vista construction management system"
-        },
-        "Quickbooks": {
-          "value": "quickbooks",
-          "display": "Quickbooks",
-          "documentation": "QuickBooks accounting software"
+          "display": "Viewpoint Vista"
         }
       }
     }
