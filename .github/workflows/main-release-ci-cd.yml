@@ -71,7 +71,10 @@ jobs:
       run: dotnet test Incursa.Generators.slnx --no-build --configuration Release
   
     - name: Pack NuGet packages
-      run: dotnet pack src/Incursa.Generators/Incursa.Generators.csproj --configuration Release --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
+      shell: bash
+      run: |
+        dotnet pack src/Incursa.Generators/Incursa.Generators.csproj --configuration Release --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
+        dotnet pack src/Incursa.Generators.Tool/Incursa.Generators.Tool.csproj --configuration Release --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
 
     - name: Upload package artifact
       uses: actions/upload-artifact@v4

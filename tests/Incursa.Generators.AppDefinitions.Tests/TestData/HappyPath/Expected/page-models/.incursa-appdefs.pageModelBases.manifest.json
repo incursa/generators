@@ -1,0 +1,9 @@
+{
+  "Version": 1,
+  "Tool": "Incursa.Generators.Tool",
+  "TargetName": "pageModelBases",
+  "TargetKind": "page-model-base",
+  "Files": [
+    "Customer/CustomerListPageModelBase.g.cs"
+  ]
+}

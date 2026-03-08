@@ -1,0 +1,9 @@
+{
+  "Version": 1,
+  "Tool": "Incursa.Generators.Tool",
+  "TargetName": "contracts",
+  "TargetKind": "page-contract-models",
+  "Files": [
+    "Customer/CustomerListContracts.g.cs"
+  ]
+}

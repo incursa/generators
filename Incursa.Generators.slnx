@@ -4,6 +4,13 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
+  <Folder Name="/src/">
+    <Project Path="src/Incursa.Generators.AppDefinitions/Incursa.Generators.AppDefinitions.csproj" />
+    <Project Path="src/Incursa.Generators.Tool/Incursa.Generators.Tool.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Incursa.Generators.AppDefinitions.Tests/Incursa.Generators.AppDefinitions.Tests.csproj" />
+  </Folder>
   <Folder Name="/_src/">
     <File Path=".gitattributes" />
     <File Path=".gitignore" />

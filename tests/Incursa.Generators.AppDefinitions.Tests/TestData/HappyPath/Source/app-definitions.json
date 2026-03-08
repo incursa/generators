@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "definitionRoot": "defs",
+  "definitionPatterns": [
+    "*.page.xml"
+  ],
+  "validation": {
+    "knownTypeNames": [
+      "IReadOnlyList"
+    ]
+  },
+  "targets": {
+    "contracts": {
+      "kind": "page-contract-models",
+      "directory": "generated/contracts",
+      "namespace": "Example.Contracts.Pages"
+    },
+    "uiEngines": {
+      "kind": "page-ui-engine-interface",
+      "directory": "generated/ui-engines",
+      "namespace": "Example.Server.UiEngines",
+      "imports": {
+        "contracts": "Example.Contracts.Pages"
+      }
+    },
+    "pageModelBases": {
+      "kind": "page-model-base",
+      "directory": "generated/page-models",
+      "namespace": "Example.Web.Pages.Base",
+      "imports": {
+        "contracts": "Example.Contracts.Pages",
+        "uiEngines": "Example.Server.UiEngines"
+      }
+    },
+    "registrations": {
+      "kind": "page-registration-helper",
+      "directory": "generated/registrations",
+      "namespace": "Example.Server.Generated",
+      "imports": {
+        "uiEngines": "Example.Server.UiEngines"
+      }
+    }
+  }
+}

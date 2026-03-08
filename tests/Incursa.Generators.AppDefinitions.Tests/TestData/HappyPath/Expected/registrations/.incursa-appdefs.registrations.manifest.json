@@ -1,0 +1,9 @@
+{
+  "Version": 1,
+  "Tool": "Incursa.Generators.Tool",
+  "TargetName": "registrations",
+  "TargetKind": "page-registration-helper",
+  "Files": [
+    "PageFeatureRegistrationExtensions.g.cs"
+  ]
+}

@@ -1,0 +1,41 @@
+<PageFeature name="CustomerList" route="customers/{customerId}" navigable="true">
+  <Description>Displays customer data through a UI engine seam.</Description>
+
+  <PageParameters>
+    <Parameter name="customerId" type="string" source="route" required="true" />
+    <Parameter name="includeInactive" type="bool" source="query" required="false" />
+  </PageParameters>
+
+  <ViewModelProperties>
+    <Property name="Items" type="IReadOnlyList&lt;CustomerSummary&gt;" required="true" />
+    <Property name="Title" type="string" required="true" />
+  </ViewModelProperties>
+
+  <OwnedTypes>
+    <Type name="CustomerSummary">
+      <Property name="Id" type="string" required="true" json-property="id" />
+      <Property name="DisplayName" type="string" required="true" json-property="displayName" />
+    </Type>
+  </OwnedTypes>
+
+  <ApiModels>
+    <Type name="ArchiveCustomerRequest">
+      <Property name="Reason" type="string" required="true" />
+    </Type>
+    <Type name="ArchiveResult">
+      <Property name="Success" type="bool" required="true" />
+    </Type>
+  </ApiModels>
+
+  <Operations>
+    <Operation name="InitVm" returnType="CustomerListViewModel" />
+    <Operation
+      name="ArchiveCustomer"
+      apiMethod="POST"
+      apiRouteSegment="archives/{archiveId}"
+      returnType="ArchiveResult">
+      <RouteParameter name="archiveId" type="string" required="true" />
+      <BodyParameter type="ArchiveCustomerRequest" />
+    </Operation>
+  </Operations>
+</PageFeature>
