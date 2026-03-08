@@ -1,117 +1,69 @@
-# Incursa Code Generator JSON Schemas
+# Incursa Generator JSON Schemas
 
-This directory contains JSON Schema files for validating definition files used with the Incursa Code Generator CLI tool.
+This folder contains JSON Schema files for definition files consumed by generators implemented in this repository.
 
-## Available Schemas
+## Active Schemas (Implemented Generators)
 
-### String Backed Enums
-- **File**: `string-backed-enum.schema.json`
-- **Usage**: For `.enum.json` and `.string_enum.json` files
-- **Description**: Defines string-backed enum types with optional additional properties
+| Schema file | Input suffixes | Notes |
+| --- | --- | --- |
+| `string-backed-enum.schema.json` | `*.enum.json`, `*.string_enum.json` | `properties` is an object map keyed by property name |
+| `number-backed-enum.schema.json` | `*.number_enum.json` | Numeric enum values |
+| `string-backed-type.schema.json` | `*.string.json` | Uses `regex` and `regexConst` |
+| `fastid-backed-type.schema.json` | `*.fastid.json` | Minimal contract: `name`, `namespace` |
+| `guid-backed-type.schema.json` | `*.guid.json` | Supports optional `defaultFormat` |
+| `multi-value-backed-type.schema.json` | `*.multi.json` | Uses `parts`, not `values` |
+| `dto-entity.schema.json` | `*.dto.json`, `*.entity.json` | Includes strict DTO flags and nested entities |
 
-### Number Backed Enums
-- **File**: `number-backed-enum.schema.json`
-- **Usage**: For `.number_enum.json` files
-- **Description**: Defines number-backed enum types with configurable underlying numeric types
+## Legacy / External Schemas
 
-### String Backed Types
-- **File**: `string-backed-type.schema.json`
-- **Usage**: For `.string.json` files
-- **Description**: Defines validated string value types with optional regex patterns
+The following schema files are present for historical or external integration references and are not consumed by the JSON source generators in this repository snapshot:
 
-### FastId Backed Types
-- **File**: `fastid-backed-type.schema.json`
-- **Usage**: For `.fastid.json` files
-- **Description**: Defines FastId-backed identifier types
+- `erp-capability-definitions.schema.json`
+- `erp-capabilities-only.schema.json`
+- `erp-adapter-profile.schema.json`
+- `sql-config.schema.json`
 
-### GUID Backed Types
-- **File**: `guid-backed-type.schema.json`
-- **Usage**: For `.guid.json` files
-- **Description**: Defines GUID-backed identifier types
+## VS Code Setup
 
-### DTO/Entity Types
-- **File**: `dto-entity.schema.json`
-- **Usage**: For `.dto.json` and `.entity.json` files
-- **Description**: Defines data transfer objects and entity classes with validation attributes
-
-### ERP Capability Definitions
-
-- **File**: `erp-capability-definitions.schema.json`
-- **Usage**: For `.erp-capabilities.json` files
-- **Description**: Defines ERP capability definitions and adapter profiles
-
-### Multi-Value Types
-- **File**: `multi-value-backed-type.schema.json`
-- **Usage**: For `.multi.json` files
-- **Description**: Defines types that can have multiple predefined values
-
-## Using the Schemas
-
-### In VS Code
-1. Install the "JSON Schema Support" extension
-2. Configure your `settings.json` to associate the schemas with file patterns:
+Add schema mappings in `settings.json`:
 
 ```json
 {
   "json.schemas": [
     {
       "fileMatch": ["*.enum.json", "*.string_enum.json"],
-      "url": "./schemas/string-backed-enum.schema.json"
+      "url": "./docs/schemas/string-backed-enum.schema.json"
     },
     {
       "fileMatch": ["*.number_enum.json"],
-      "url": "./schemas/number-backed-enum.schema.json"
+      "url": "./docs/schemas/number-backed-enum.schema.json"
     },
     {
       "fileMatch": ["*.string.json"],
-      "url": "./schemas/string-backed-type.schema.json"
+      "url": "./docs/schemas/string-backed-type.schema.json"
     },
     {
       "fileMatch": ["*.fastid.json"],
-      "url": "./schemas/fastid-backed-type.schema.json"
+      "url": "./docs/schemas/fastid-backed-type.schema.json"
     },
     {
       "fileMatch": ["*.guid.json"],
-      "url": "./schemas/guid-backed-type.schema.json"
-    },
-    {
-      "fileMatch": ["*.dto.json", "*.entity.json"],
-      "url": "./schemas/dto-entity.schema.json"
-    },
-    {
-      "fileMatch": ["*.erp-capabilities.json"],
-      "url": "./schemas/erp-capability-definitions.schema.json"
+      "url": "./docs/schemas/guid-backed-type.schema.json"
     },
     {
       "fileMatch": ["*.multi.json"],
-      "url": "./schemas/multi-value-backed-type.schema.json"
+      "url": "./docs/schemas/multi-value-backed-type.schema.json"
+    },
+    {
+      "fileMatch": ["*.dto.json", "*.entity.json"],
+      "url": "./docs/schemas/dto-entity.schema.json"
     }
   ]
 }
 ```
 
-### In Other Editors
-Most modern editors with JSON support can use these schemas for validation and IntelliSense by referencing the schema URL in your JSON files:
+## Authoring Guidance
 
-```json
-{
-  "$schema": "./schemas/string-backed-enum.schema.json",
-  "name": "YourEnum",
-  "namespace": "Your.Namespace",
-  "values": {
-    // Your enum values here
-  }
-}
-```
-
-## Schema Features
-
-All schemas provide:
-- **Validation**: Ensures your definition files are correctly structured
-- **IntelliSense**: Auto-completion for properties and values
-- **Documentation**: Hover help for all properties
-- **Examples**: Complete working examples for each type
-
-## Contributing
-
-When adding new generator types or modifying existing ones, please update the corresponding schema files to maintain validation accuracy.
+- Prefer schema validation before build.
+- Keep property names exact and case-sensitive.
+- Use `docs/README.md` and `docs/LLM_Natural_Natural_Writing_Guide.md` for behavior details and examples.

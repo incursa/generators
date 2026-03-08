@@ -43,24 +43,6 @@
         "*.multi.json"
       ],
       "url": "./schemas/multi-value-backed-type.schema.json"
-    },
-    {
-      "fileMatch": [
-        "*.erp-capabilities.json"
-      ],
-      "url": "./schemas/erp-capability-definitions.schema.json"
-    },
-    {
-      "fileMatch": [
-        "*.erp-capabilities-only.json"
-      ],
-      "url": "./schemas/erp-capabilities-only.schema.json"
-    },
-    {
-      "fileMatch": [
-        "*.erp-adapter-profile.json"
-      ],
-      "url": "./schemas/erp-adapter-profile.schema.json"
     }
   ]
 }

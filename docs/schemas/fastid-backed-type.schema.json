@@ -8,34 +8,13 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name of the FastId type",
+      "description": "The name of the FastId type.",
       "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
     },
     "namespace": {
       "type": "string",
-      "description": "The .NET namespace for the generated type",
+      "description": "The .NET namespace for the generated type.",
       "pattern": "^[A-Za-z_][A-Za-z0-9_.]*$"
-    },
-    "properties": {
-      "type": "array",
-      "description": "Additional properties to add to the FastId type",
-      "items": {
-        "type": "object",
-        "required": ["name", "type"],
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The property name",
-            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
-          },
-          "type": {
-            "type": "string",
-            "description": "The .NET type for this property",
-            "examples": ["string", "int", "bool", "DateTime", "decimal"]
-          }
-        },
-        "additionalProperties": false
-      }
     }
   },
   "additionalProperties": false,
@@ -46,17 +25,7 @@
     },
     {
       "name": "OrderId",
-      "namespace": "Incursa.Identifiers",
-      "properties": [
-        {
-          "name": "CreationTimestamp",
-          "type": "DateTime"
-        },
-        {
-          "name": "OriginSystem",
-          "type": "string"
-        }
-      ]
+      "namespace": "Incursa.Identifiers"
     }
   ]
 }

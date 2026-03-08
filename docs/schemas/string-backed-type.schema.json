@@ -8,37 +8,37 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name of the value type",
+      "description": "The name of the value type.",
       "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
     },
     "namespace": {
       "type": "string",
-      "description": "The .NET namespace for the generated type",
+      "description": "The .NET namespace for the generated type.",
       "pattern": "^[A-Za-z_][A-Za-z0-9_.]*$"
     },
-    "validationRegex": {
+    "regex": {
       "type": "string",
-      "description": "Regular expression pattern for validation of the string value"
+      "description": "Inline regular expression pattern for validation."
     },
-    "validationRegexConstant": {
+    "regexConst": {
       "type": "string",
-      "description": "Constant name for the validation regex pattern"
+      "description": "Regex constant/expression reference used by the regex-constant generation branch."
     },
     "properties": {
       "type": "array",
-      "description": "Additional properties to add to the value type",
+      "description": "Additional properties to parse from the source value.",
       "items": {
         "type": "object",
         "required": ["name", "type"],
         "properties": {
           "name": {
             "type": "string",
-            "description": "The property name",
+            "description": "Property name.",
             "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
           },
           "type": {
             "type": "string",
-            "description": "The .NET type for this property",
+            "description": "C# type for the property.",
             "examples": ["string", "int", "bool", "DateTime", "decimal"]
           }
         },
@@ -51,21 +51,16 @@
     {
       "name": "EmailAddress",
       "namespace": "Incursa.ValueTypes",
-      "validationRegex": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
-      "validationRegexConstant": "EmailValidationPattern"
+      "regex": "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
     },
     {
       "name": "PhoneNumber",
       "namespace": "Incursa.ValueTypes",
-      "validationRegex": "^\\+?[1-9]\\d{1,14}$",
+      "regexConst": "PhoneValidationPatterns.E164",
       "properties": [
         {
           "name": "CountryCode",
           "type": "string"
-        },
-        {
-          "name": "IsInternational",
-          "type": "bool"
         }
       ]
     }
