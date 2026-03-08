@@ -168,7 +168,7 @@ Ensure your project file includes the generator package:
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Bravellian.Generators" Version="x.x.x" />
+  <PackageReference Include="Incursa.Generators" Version="x.x.x" />
 </ItemGroup>
 ```
 
