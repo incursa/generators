@@ -95,6 +95,27 @@ public sealed class PageModelBaseEmitter : IGenerationTargetEmitter
 
                     builder.AppendLine("}");
                 }
+                else if (feature.ViewModelProperties.Count > 0)
+                {
+                    builder.AppendLine();
+                    builder.AppendLine("public virtual async Task OnGetAsync(CancellationToken cancellationToken)");
+                    builder.AppendLine("{");
+                    using (builder.Indent())
+                    {
+                        builder.AppendLine("ViewModel = await InitializeViewModelAsync(cancellationToken);");
+                    }
+
+                    builder.AppendLine("}");
+                    builder.AppendLine();
+                    builder.AppendLine($"protected virtual Task<{feature.ViewModelTypeName}?> InitializeViewModelAsync(CancellationToken cancellationToken)");
+                    builder.AppendLine("{");
+                    using (builder.Indent())
+                    {
+                        builder.AppendLine("return Task.FromResult<" + feature.ViewModelTypeName + "?>(default);");
+                    }
+
+                    builder.AppendLine("}");
+                }
 
                 foreach (var operation in feature.Operations.Where(static operation => !string.Equals(operation.Name, "InitVm", StringComparison.Ordinal)))
                 {

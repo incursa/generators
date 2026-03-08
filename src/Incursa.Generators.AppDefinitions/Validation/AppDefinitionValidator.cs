@@ -77,7 +77,7 @@ public sealed partial class AppDefinitionValidator
         {
             diagnostics.AddWarning(
                 "APPDEF022",
-                $"Feature '{feature.Name}' defines view-model properties but does not declare an InitVm operation. Generated page model bases will not include OnGetAsync initialization.",
+                $"Feature '{feature.Name}' defines view-model properties but does not declare an InitVm operation. Generated page model bases will fall back to an overridable InitializeViewModelAsync hook instead of calling the UI engine automatically.",
                 feature.Location);
         }
     }

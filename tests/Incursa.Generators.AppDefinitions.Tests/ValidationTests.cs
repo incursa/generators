@@ -45,4 +45,36 @@ public sealed class ValidationTests
         result.Diagnostics.ShouldContain(static diagnostic => diagnostic.Code == "APPDEF029" && diagnostic.Message.Contains("otherId", StringComparison.Ordinal));
         result.Diagnostics.ShouldContain(static diagnostic => diagnostic.Code == "APPDEF030" && diagnostic.Message.Contains("id", StringComparison.Ordinal));
     }
+
+    [Fact]
+    public void Validate_warns_that_missing_initvm_uses_initialize_hook()
+    {
+        using var workspace = new TestWorkspace();
+        var configPath = workspace.WriteFile(
+            "app-definitions.json",
+            """
+            {
+              "version": 1,
+              "definitionRoot": "defs",
+              "definitionPatterns": [ "*.page.xml" ],
+              "targets": { }
+            }
+            """);
+
+        workspace.WriteFile(
+            Path.Combine("defs", "NoInit.page.xml"),
+            """
+            <PageFeature name="NoInit">
+              <ViewModelProperties>
+                <Property name="Title" type="string" required="true" />
+              </ViewModelProperties>
+            </PageFeature>
+            """);
+
+        var result = new AppDefinitionGenerator().Execute(new GenerationRequest(configPath), GenerationExecutionMode.Validate);
+
+        result.Success.ShouldBeTrue(string.Join(Environment.NewLine, result.Diagnostics));
+        result.Diagnostics.ShouldContain(static diagnostic => diagnostic.Code == "APPDEF022"
+            && diagnostic.Message.Contains("InitializeViewModelAsync", StringComparison.Ordinal));
+    }
 }
