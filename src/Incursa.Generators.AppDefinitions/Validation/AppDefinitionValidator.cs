@@ -3,17 +3,24 @@ namespace Incursa.Generators.AppDefinitions.Validation;
 using System.Text.RegularExpressions;
 using Incursa.Generators.AppDefinitions.Config;
 using Incursa.Generators.AppDefinitions.Diagnostics;
+using Incursa.Generators.AppDefinitions.Emission;
 using Incursa.Generators.AppDefinitions.Model;
 
 public sealed partial class AppDefinitionValidator
 {
     public void Validate(ResolvedGeneratorConfig config, ApplicationDefinitionSet model, DiagnosticBag diagnostics)
     {
+        var enforceModernStructuralContracts = config.Targets.Any(
+            static target => string.Equals(target.Kind, "page-contract-models", StringComparison.OrdinalIgnoreCase));
+        var enforceModernSignatureRules = config.Targets.Any(
+            static target => string.Equals(target.Kind, "page-ui-engine-interface", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(target.Kind, "page-model-base", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(target.Kind, "page-route-helper", StringComparison.OrdinalIgnoreCase));
         var featuresByName = new Dictionary<string, PageFeatureDefinition>(StringComparer.Ordinal);
 
         foreach (var feature in model.PageFeatures.OrderBy(static feature => feature.Name, StringComparer.Ordinal))
         {
-            ValidateFeature(feature, config.Validation, diagnostics);
+            ValidateFeature(feature, config.Validation, diagnostics, enforceModernStructuralContracts, enforceModernSignatureRules);
 
             if (!featuresByName.TryAdd(feature.Name, feature))
             {
@@ -25,7 +32,12 @@ public sealed partial class AppDefinitionValidator
         }
     }
 
-    private static void ValidateFeature(PageFeatureDefinition feature, ValidationSettings settings, DiagnosticBag diagnostics)
+    private static void ValidateFeature(
+        PageFeatureDefinition feature,
+        ValidationSettings settings,
+        DiagnosticBag diagnostics,
+        bool enforceModernStructuralContracts,
+        bool enforceModernSignatureRules)
     {
         ValidateIdentifier(feature.Name, "feature", feature.Location, diagnostics);
 
@@ -36,18 +48,26 @@ public sealed partial class AppDefinitionValidator
         var localTypes = new Dictionary<string, SourceLocation>(StringComparer.Ordinal);
         localTypes.Add(feature.ViewModelTypeName, feature.Location);
 
-        foreach (var type in feature.OwnedTypes.Concat(feature.ApiModels).OrderBy(static type => type.Name, StringComparer.Ordinal))
+        var localFeatureTypes = feature.OwnedTypes
+            .Concat(feature.ApiModels)
+            .OrderBy(static type => type.Name, StringComparer.Ordinal)
+            .ToArray();
+
+        foreach (var type in localFeatureTypes)
         {
             ValidateIdentifier(type.Name, "type", type.Location, diagnostics);
             if (!localTypes.TryAdd(type.Name, type.Location))
             {
                 diagnostics.AddError("APPDEF021", $"Duplicate local type name '{type.Name}' in feature '{feature.Name}'.", type.Location);
             }
+        }
 
+        foreach (var type in localFeatureTypes)
+        {
             ValidateDuplicateNames(type.Properties.Select(static property => (property.Name, property.Location)), $"property on type '{type.Name}'", diagnostics);
             foreach (var property in type.Properties)
             {
-                ValidateProperty(property, settings, localTypes.Keys, diagnostics);
+                ValidateProperty(property, settings, localTypes.Keys, diagnostics, enforceModernStructuralContracts);
             }
 
             if (!string.IsNullOrWhiteSpace(type.Inherits))
@@ -64,12 +84,12 @@ public sealed partial class AppDefinitionValidator
 
         foreach (var property in feature.ViewModelProperties)
         {
-            ValidateProperty(property, settings, localTypes.Keys, diagnostics);
+            ValidateProperty(property, settings, localTypes.Keys, diagnostics, enforceModernStructuralContracts);
         }
 
         foreach (var operation in feature.Operations)
         {
-            ValidateOperation(feature, operation, settings, localTypes.Keys, diagnostics);
+            ValidateOperation(feature, operation, settings, localTypes.Keys, diagnostics, enforceModernSignatureRules);
         }
 
         var initVm = feature.Operations.FirstOrDefault(static operation => string.Equals(operation.Name, "InitVm", StringComparison.Ordinal));
@@ -87,20 +107,40 @@ public sealed partial class AppDefinitionValidator
         OperationDefinition operation,
         ValidationSettings settings,
         IEnumerable<string> localTypeNames,
-        DiagnosticBag diagnostics)
+        DiagnosticBag diagnostics,
+        bool enforceModernSignatureRules)
     {
         ValidateIdentifier(operation.Name, "operation", operation.Location, diagnostics);
         ValidateDuplicateNames(operation.Parameters.Select(static parameter => (parameter.Name, parameter.Location)), $"parameter on operation '{operation.Name}'", diagnostics);
         ValidateDuplicateNames(operation.RouteParameters.Select(static parameter => (parameter.Name, parameter.Location)), $"route parameter on operation '{operation.Name}'", diagnostics);
         ValidateDuplicateNames(operation.QueryParameters.Select(static parameter => (parameter.Name, parameter.Location)), $"query parameter on operation '{operation.Name}'", diagnostics);
 
-        var methodScopeNames = new HashSet<string>(feature.PageParameters.Select(static parameter => parameter.Name), StringComparer.Ordinal);
+        if (enforceModernSignatureRules)
+        {
+            foreach (var pageParameter in feature.PageParameters.Where(static parameter => string.Equals(parameter.Name, "cancellationToken", StringComparison.OrdinalIgnoreCase)))
+            {
+                diagnostics.AddError(
+                    "APPDEF042",
+                    $"Feature '{feature.Name}' cannot use reserved page parameter name '{pageParameter.Name}'.",
+                    pageParameter.Location);
+            }
+        }
+
+        var methodScopeNames = new HashSet<string>(feature.PageParameters.Select(static parameter => parameter.Name), StringComparer.OrdinalIgnoreCase);
         foreach (var parameter in operation.Parameters.Concat(operation.RouteParameters).Concat(operation.QueryParameters))
         {
             ValidateIdentifier(parameter.Name, "operation parameter", parameter.Location, diagnostics);
             ValidateTypeExpression(parameter.Type, parameter.Location, settings, localTypeNames, diagnostics);
 
-            if (!methodScopeNames.Add(parameter.Name))
+            if (enforceModernSignatureRules && string.Equals(parameter.Name, "cancellationToken", StringComparison.OrdinalIgnoreCase))
+            {
+                diagnostics.AddError(
+                    "APPDEF042",
+                    $"Operation '{operation.Name}' cannot use reserved parameter name '{parameter.Name}'.",
+                    parameter.Location);
+            }
+
+            if (enforceModernSignatureRules && !methodScopeNames.Add(parameter.Name))
             {
                 diagnostics.AddError(
                     "APPDEF023",
@@ -130,7 +170,7 @@ public sealed partial class AppDefinitionValidator
 
         if (string.Equals(operation.Name, "InitVm", StringComparison.Ordinal)
             && !string.IsNullOrWhiteSpace(operation.ReturnType)
-            && !string.Equals(operation.ReturnType, feature.ViewModelTypeName, StringComparison.Ordinal))
+            && !InitVmReturnMatchesFeatureViewModel(feature, operation.ReturnType))
         {
             diagnostics.AddError(
                 "APPDEF025",
@@ -145,10 +185,38 @@ public sealed partial class AppDefinitionValidator
         PropertyDefinition property,
         ValidationSettings settings,
         IEnumerable<string> localTypeNames,
-        DiagnosticBag diagnostics)
+        DiagnosticBag diagnostics,
+        bool enforceModernStructuralContracts)
     {
         ValidateIdentifier(property.Name, "property", property.Location, diagnostics);
         ValidateTypeExpression(property.Type, property.Location, settings, localTypeNames, diagnostics);
+
+        if (!enforceModernStructuralContracts)
+        {
+            return;
+        }
+
+        if (property.Required && property.Nullable)
+        {
+            diagnostics.AddError(
+                "APPDEF043",
+                $"Property '{property.Name}' cannot be both required and nullable in the modern contract shape.",
+                property.Location);
+        }
+
+        if (!string.IsNullOrWhiteSpace(property.DefaultValue)
+            || !string.IsNullOrWhiteSpace(property.Regex)
+            || !string.IsNullOrWhiteSpace(property.Expression)
+            || property.Min is not null
+            || property.Max is not null
+            || property.NoDefault
+            || !property.Settable)
+        {
+            diagnostics.AddError(
+                "APPDEF044",
+                $"Property '{property.Name}' uses metadata that is not yet supported by the modern page-contract emitter. Remove the unsupported metadata or implement explicit modern semantics first.",
+                property.Location);
+        }
     }
 
     private static void ValidateTypeExpression(
@@ -230,6 +298,23 @@ public sealed partial class AppDefinitionValidator
                 $"Operation '{operation.Name}' route segment contains '{{{missingName}}}' but no matching RouteParameter is declared.",
                 operation.Location);
         }
+    }
+
+    private static bool InitVmReturnMatchesFeatureViewModel(PageFeatureDefinition feature, string rawReturnType)
+    {
+        if (string.Equals(rawReturnType, feature.ViewModelTypeName, StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        if (!EmitterUtilities.IsTaskLikeReturnType(rawReturnType))
+        {
+            return false;
+        }
+
+        var normalized = EmitterUtilities.NormalizeTaskLikeReturnType(rawReturnType);
+        return string.Equals(normalized, $"Task<{feature.ViewModelTypeName}>", StringComparison.Ordinal)
+            || string.Equals(normalized, $"ValueTask<{feature.ViewModelTypeName}>", StringComparison.Ordinal);
     }
 
     [GeneratedRegex("\\{(?<name>[A-Za-z_][A-Za-z0-9_]*)\\}", RegexOptions.CultureInvariant)]

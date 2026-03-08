@@ -28,6 +28,10 @@ public sealed class OutputTargetConfig
 
     public string? Namespace { get; init; }
 
+    public string? NamespaceMode { get; init; }
+
+    public string? BaseType { get; init; }
+
     public bool PreserveDefinitionFolders { get; init; } = true;
 
     public bool AppendRelativePathToNamespace { get; init; }
@@ -47,6 +51,8 @@ public sealed record ResolvedOutputTarget(
     string Kind,
     string Directory,
     string Namespace,
+    string NamespaceMode,
+    string? BaseType,
     bool PreserveDefinitionFolders,
     bool AppendRelativePathToNamespace,
     IReadOnlyDictionary<string, string> Imports);

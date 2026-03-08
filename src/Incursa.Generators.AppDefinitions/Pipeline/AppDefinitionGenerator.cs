@@ -19,9 +19,15 @@ public sealed class AppDefinitionGenerator
     private readonly IReadOnlyDictionary<string, IGenerationTargetEmitter> emitters = new Dictionary<string, IGenerationTargetEmitter>(StringComparer.OrdinalIgnoreCase)
     {
         ["page-contract-models"] = new PageContractModelsEmitter(),
+        ["page-contract-models-legacy"] = new LegacyPageContractModelsEmitter(),
         ["page-ui-engine-interface"] = new PageUiEngineInterfaceEmitter(),
+        ["page-ui-engine-interface-legacy"] = new LegacyPageUiEngineInterfaceEmitter(),
         ["page-model-base"] = new PageModelBaseEmitter(),
+        ["page-model-base-legacy"] = new LegacyPageModelBaseEmitter(),
         ["page-registration-helper"] = new PageRegistrationHelperEmitter(),
+        ["page-route-helper"] = new PageRouteHelperEmitter(),
+        ["page-registration-helper-legacy"] = new LegacyPageRegistrationHelperEmitter(),
+        ["page-route-helper-legacy"] = new LegacyPageRouteHelperEmitter(),
     };
 
     public GenerationResult Execute(GenerationRequest request, GenerationExecutionMode mode)
@@ -180,11 +186,13 @@ public sealed class AppDefinitionGenerator
             }
 
             var orphanRelativePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var manifestOwnedOrphanRelativePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             if (manifest is not null)
             {
                 foreach (var orphan in manifest.Files.Except(expectedRelativePaths, StringComparer.OrdinalIgnoreCase))
                 {
                     orphanRelativePaths.Add(orphan);
+                    manifestOwnedOrphanRelativePaths.Add(orphan);
                 }
             }
 
@@ -217,7 +225,9 @@ public sealed class AppDefinitionGenerator
                 }
 
                 var orphanContent = File.ReadAllText(orphanAbsolutePath);
-                if (!EmitterUtilities.IsOwnedGeneratedFile(orphanContent, target.Name, target.Kind, orphanRelativePath))
+                var isOwnedByContentMarker = EmitterUtilities.IsOwnedGeneratedFile(orphanContent, target.Name, target.Kind, orphanRelativePath);
+                var isOwnedByManifest = manifestOwnedOrphanRelativePaths.Contains(orphanRelativePath);
+                if (!isOwnedByContentMarker && !isOwnedByManifest)
                 {
                     diagnostics.AddError("APPDEF041", $"File '{orphanAbsolutePath}' is listed as orphaned for target '{target.Name}' but is not owned by this tool anymore. Remove it manually.", SourceLocation.FromFile(orphanAbsolutePath));
                     continue;

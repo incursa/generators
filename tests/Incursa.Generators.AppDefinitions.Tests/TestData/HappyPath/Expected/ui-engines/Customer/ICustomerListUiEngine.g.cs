@@ -14,6 +14,6 @@ namespace Example.Server.UiEngines;
 
 public interface ICustomerListUiEngine
 {
-    Task<ArchiveResult> ArchiveCustomerAsync(string customerId, bool includeInactive, string archiveId, ArchiveCustomerRequest body, CancellationToken cancellationToken);
-    Task<CustomerListViewModel> InitVmAsync(string customerId, bool includeInactive, CancellationToken cancellationToken);
+    Task<CustomerListViewModel> InitVmAsync(string customerId, bool? includeInactive, CancellationToken cancellationToken);
+    Task<ArchiveResult> ArchiveCustomerAsync(string customerId, bool? includeInactive, string archiveId, ArchiveCustomerRequest body, CancellationToken cancellationToken);
 }

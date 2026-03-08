@@ -21,7 +21,7 @@ public sealed class PageContractModelsEmitter : IGenerationTargetEmitter
         {
             var relativePath = EmitterUtilities.BuildRelativePath(target, feature.RelativeDirectory, $"{feature.Name}Contracts.g.cs");
             var absolutePath = EmitterUtilities.BuildAbsolutePath(target, relativePath);
-            var fileNamespace = EmitterUtilities.BuildNamespace(target, feature.RelativeDirectory);
+            var fileNamespace = EmitterUtilities.BuildFeatureNamespace(target, feature);
             var builder = new CodeBuilder();
 
             EmitterUtilities.AppendHeader(builder, target.Name, Kind, relativePath);

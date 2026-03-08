@@ -153,9 +153,9 @@ public sealed class AppDefinitionParser
             GetOptionalBoolAttribute(root, "navigable", true, filePath, diagnostics),
             pageParameters,
             viewModelProperties,
-            ownedTypes.OrderBy(static type => type.Name, StringComparer.Ordinal).ToArray(),
-            apiModels.OrderBy(static type => type.Name, StringComparer.Ordinal).ToArray(),
-            operations.OrderBy(static operation => operation.Name, StringComparer.Ordinal).ToArray());
+            ownedTypes.ToArray(),
+            apiModels.ToArray(),
+            operations.ToArray());
     }
 
     private static bool IsSupportedRootElement(string localName)
@@ -182,11 +182,13 @@ public sealed class AppDefinitionParser
             return null;
         }
 
+        var defaultRequired = source == PageParameterSource.Route;
+
         return new PageParameterDefinition(
             name,
             type,
             source,
-            GetOptionalBoolAttribute(element, "required", false, filePath, diagnostics),
+            GetOptionalBoolAttribute(element, "required", defaultRequired, filePath, diagnostics),
             element.GetLocation(filePath));
     }
 
@@ -200,12 +202,15 @@ public sealed class AppDefinitionParser
             return null;
         }
 
+        var nullable = GetOptionalBoolAttribute(element, "nullable", false, filePath, diagnostics);
+        var required = TryGetOptionalBoolAttribute(element, "required", filePath, diagnostics) ?? true;
+
         return new PropertyDefinition(
             name,
             type,
             element.GetLocation(filePath),
-            GetOptionalBoolAttribute(element, "required", false, filePath, diagnostics),
-            GetOptionalBoolAttribute(element, "nullable", false, filePath, diagnostics),
+            required,
+            nullable,
             GetOptionalBoolAttribute(element, "settable", true, filePath, diagnostics),
             GetOptionalAttribute(element, "json-property") ?? GetOptionalAttribute(element, "jsonProperty"),
             GetOptionalAttribute(element, "defaultValue"),
@@ -322,9 +327,9 @@ public sealed class AppDefinitionParser
             GetOptionalAttribute(element, "apiMethod") ?? GetOptionalAttribute(element, "httpMethod"),
             GetOptionalAttribute(element, "apiRouteSegment") ?? GetOptionalAttribute(element, "routeSegment"),
             returnType,
-            parameters.OrderBy(static parameter => parameter.Name, StringComparer.Ordinal).ToArray(),
-            routeParameters.OrderBy(static parameter => parameter.Name, StringComparer.Ordinal).ToArray(),
-            queryParameters.OrderBy(static parameter => parameter.Name, StringComparer.Ordinal).ToArray(),
+            parameters.ToArray(),
+            routeParameters.ToArray(),
+            queryParameters.ToArray(),
             bodyParameter,
             returns);
     }
@@ -341,7 +346,7 @@ public sealed class AppDefinitionParser
         return new OperationParameterDefinition(
             name,
             type,
-            GetOptionalBoolAttribute(element, "required", false, filePath, diagnostics),
+            GetOptionalBoolAttribute(element, "required", true, filePath, diagnostics),
             element.GetLocation(filePath));
     }
 
@@ -376,10 +381,15 @@ public sealed class AppDefinitionParser
 
     private static bool GetOptionalBoolAttribute(XElement element, string attributeName, bool defaultValue, string filePath, DiagnosticBag diagnostics)
     {
+        return TryGetOptionalBoolAttribute(element, attributeName, filePath, diagnostics) ?? defaultValue;
+    }
+
+    private static bool? TryGetOptionalBoolAttribute(XElement element, string attributeName, string filePath, DiagnosticBag diagnostics)
+    {
         var value = GetOptionalAttribute(element, attributeName);
         if (string.IsNullOrWhiteSpace(value))
         {
-            return defaultValue;
+            return null;
         }
 
         if (bool.TryParse(value, out var parsedValue))
@@ -388,7 +398,7 @@ public sealed class AppDefinitionParser
         }
 
         diagnostics.AddError("APPDEF016", $"Attribute '{attributeName}' on element '{element.Name.LocalName}' must be 'true' or 'false'.", element.GetLocation(filePath));
-        return defaultValue;
+        return null;
     }
 
     private static decimal? GetOptionalDecimalAttribute(XElement element, string attributeName, string filePath, DiagnosticBag diagnostics)

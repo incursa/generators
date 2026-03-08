@@ -31,6 +31,6 @@ public sealed class ParserTests
         feature.ViewModelProperties.Select(static property => property.Name).ShouldBe(["Items", "Title"]);
         feature.OwnedTypes.Select(static type => type.Name).ShouldBe(["CustomerSummary"]);
         feature.ApiModels.Select(static type => type.Name).ShouldBe(["ArchiveCustomerRequest", "ArchiveResult"]);
-        feature.Operations.Select(static operation => operation.Name).ShouldBe(["ArchiveCustomer", "InitVm"]);
+        feature.Operations.Select(static operation => operation.Name).ShouldBe(["InitVm", "ArchiveCustomer"]);
     }
 }

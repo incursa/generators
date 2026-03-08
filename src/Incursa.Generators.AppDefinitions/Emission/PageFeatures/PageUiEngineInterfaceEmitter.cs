@@ -22,7 +22,18 @@ public sealed class PageUiEngineInterfaceEmitter : IGenerationTargetEmitter
             var relativePath = EmitterUtilities.BuildRelativePath(target, feature.RelativeDirectory, $"I{feature.Name}UiEngine.g.cs");
             var absolutePath = EmitterUtilities.BuildAbsolutePath(target, relativePath);
             var fileNamespace = EmitterUtilities.BuildNamespace(target, feature.RelativeDirectory);
-            var contractNamespace = EmitterUtilities.ResolveImportNamespace(target, "contracts");
+            var contractNamespace = EmitterUtilities.BuildFeatureNamespace(
+                new ResolvedOutputTarget(
+                    "contracts",
+                    "page-contract-models",
+                    target.Directory,
+                    EmitterUtilities.ResolveImportNamespace(target, "contracts"),
+                    target.NamespaceMode,
+                    target.BaseType,
+                    target.PreserveDefinitionFolders,
+                    target.AppendRelativePathToNamespace,
+                    target.Imports),
+                feature);
 
             var builder = new CodeBuilder();
             EmitterUtilities.AppendHeader(builder, target.Name, Kind, relativePath);
@@ -49,7 +60,7 @@ public sealed class PageUiEngineInterfaceEmitter : IGenerationTargetEmitter
                     foreach (var operation in feature.Operations)
                     {
                         var resultType = EmitterUtilities.GetOperationResultType(feature, operation);
-                        var returnType = resultType is null ? "Task" : $"Task<{resultType}>";
+                        var returnType = EmitterUtilities.FormatAsyncReturnType(resultType);
                         var parameters = EmitterUtilities.BuildInterfaceMethodParameters(feature, operation);
                         builder.AppendLine($"{returnType} {EmitterUtilities.GetOperationMethodName(operation)}({EmitterUtilities.FormatMethodSignature(parameters, includeCancellationToken: true)});");
                     }

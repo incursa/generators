@@ -23,9 +23,32 @@ public sealed class PageModelBaseEmitter : IGenerationTargetEmitter
             var relativePath = EmitterUtilities.BuildRelativePath(target, feature.RelativeDirectory, $"{feature.Name}PageModelBase.g.cs");
             var absolutePath = EmitterUtilities.BuildAbsolutePath(target, relativePath);
             var fileNamespace = EmitterUtilities.BuildNamespace(target, feature.RelativeDirectory);
-            var contractNamespace = EmitterUtilities.ResolveImportNamespace(target, "contracts");
-            var uiEngineNamespace = EmitterUtilities.ResolveImportNamespace(target, "uiEngines");
+            var contractNamespace = EmitterUtilities.BuildFeatureNamespace(
+                new ResolvedOutputTarget(
+                    "contracts",
+                    "page-contract-models",
+                    target.Directory,
+                    EmitterUtilities.ResolveImportNamespace(target, "contracts"),
+                    target.NamespaceMode,
+                    target.BaseType,
+                    target.PreserveDefinitionFolders,
+                    target.AppendRelativePathToNamespace,
+                    target.Imports),
+                feature);
+            var uiEngineNamespace = EmitterUtilities.BuildNamespace(
+                new ResolvedOutputTarget(
+                    "uiEngines",
+                    "page-ui-engine-interface",
+                    target.Directory,
+                    EmitterUtilities.ResolveImportNamespace(target, "uiEngines"),
+                    target.NamespaceMode,
+                    target.BaseType,
+                    target.PreserveDefinitionFolders,
+                    target.AppendRelativePathToNamespace,
+                    target.Imports),
+                feature.RelativeDirectory);
             var initVm = feature.Operations.FirstOrDefault(static operation => string.Equals(operation.Name, "InitVm", StringComparison.Ordinal));
+            var baseType = string.IsNullOrWhiteSpace(target.BaseType) ? "PageModel" : target.BaseType!;
 
             var builder = new CodeBuilder();
             EmitterUtilities.AppendHeader(builder, target.Name, Kind, relativePath);
@@ -33,7 +56,10 @@ public sealed class PageModelBaseEmitter : IGenerationTargetEmitter
             builder.AppendLine("using System.Threading;");
             builder.AppendLine("using System.Threading.Tasks;");
             builder.AppendLine("using Microsoft.AspNetCore.Mvc;");
-            builder.AppendLine("using Microsoft.AspNetCore.Mvc.RazorPages;");
+            if (string.IsNullOrWhiteSpace(target.BaseType))
+            {
+                builder.AppendLine("using Microsoft.AspNetCore.Mvc.RazorPages;");
+            }
             if (!string.Equals(contractNamespace, fileNamespace, StringComparison.Ordinal))
             {
                 builder.AppendLine($"using {contractNamespace};");
@@ -47,7 +73,7 @@ public sealed class PageModelBaseEmitter : IGenerationTargetEmitter
             builder.AppendLine();
             builder.AppendLine($"namespace {fileNamespace};");
             builder.AppendLine();
-            builder.AppendLine($"public abstract partial class {feature.Name}PageModelBase : PageModel");
+            builder.AppendLine($"public abstract partial class {feature.Name}PageModelBase : {baseType}");
             builder.AppendLine("{");
             using (builder.Indent())
             {
@@ -75,7 +101,7 @@ public sealed class PageModelBaseEmitter : IGenerationTargetEmitter
                     var supportsGet = pageParameter.Source is PageParameterSource.Query or PageParameterSource.Route;
                     var propertyName = EmitterUtilities.ToPascalCase(pageParameter.Name);
                     builder.AppendLine(supportsGet ? "[BindProperty(SupportsGet = true)]" : "[BindProperty]");
-                    var typeName = EmitterUtilities.FormatTypeName(pageParameter.Type);
+                    var typeName = EmitterUtilities.FormatTypeName(pageParameter.Type, nullable: !pageParameter.Required);
                     var defaultInitializer = TypeNameClassifier.IsValueType(typeName.TrimEnd('?')) || typeName.EndsWith("?", StringComparison.Ordinal)
                         ? string.Empty
                         : " = default!;";
@@ -121,7 +147,7 @@ public sealed class PageModelBaseEmitter : IGenerationTargetEmitter
                 {
                     builder.AppendLine();
                     var resultType = EmitterUtilities.GetOperationResultType(feature, operation);
-                    var returnType = resultType is null ? "Task" : $"Task<{resultType}>";
+                    var returnType = EmitterUtilities.FormatAsyncReturnType(resultType);
                     var parameters = EmitterUtilities.BuildAdapterMethodParameters(operation);
                     builder.AppendLine($"protected {returnType} Execute{operation.Name}Async({EmitterUtilities.FormatMethodSignature(parameters, includeCancellationToken: true)})");
                     builder.AppendLine("{");

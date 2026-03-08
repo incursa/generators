@@ -88,11 +88,19 @@ public sealed class GeneratorConfigLoader
                 continue;
             }
 
+            var namespaceMode = NormalizeNamespaceMode(target.NamespaceMode, pair.Key, fullConfigPath, diagnostics);
+            if (namespaceMode is null)
+            {
+                continue;
+            }
+
             targets.Add(new ResolvedOutputTarget(
                 pair.Key,
                 target.Kind,
                 ResolvePath(configDirectory, target.Directory),
                 target.Namespace,
+                namespaceMode,
+                string.IsNullOrWhiteSpace(target.BaseType) ? null : target.BaseType.Trim(),
                 target.PreserveDefinitionFolders,
                 target.AppendRelativePathToNamespace,
                 new Dictionary<string, string>(target.Imports, StringComparer.OrdinalIgnoreCase)));
@@ -119,5 +127,25 @@ public sealed class GeneratorConfigLoader
         return Path.IsPathRooted(path)
             ? Path.GetFullPath(path)
             : Path.GetFullPath(Path.Combine(baseDirectory, path));
+    }
+
+    private static string? NormalizeNamespaceMode(string? namespaceMode, string targetName, string configPath, DiagnosticBag diagnostics)
+    {
+        if (string.IsNullOrWhiteSpace(namespaceMode))
+        {
+            return "default";
+        }
+
+        if (string.Equals(namespaceMode, "default", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(namespaceMode, "feature", StringComparison.OrdinalIgnoreCase))
+        {
+            return namespaceMode.ToLowerInvariant();
+        }
+
+        diagnostics.AddError(
+            "APPDEF041",
+            $"Target '{targetName}' uses unsupported namespaceMode '{namespaceMode}'. Supported values are 'default' and 'feature'.",
+            SourceLocation.FromFile(configPath));
+        return null;
     }
 }
