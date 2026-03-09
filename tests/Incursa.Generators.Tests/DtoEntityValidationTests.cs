@@ -21,6 +21,7 @@ public static class DtoEntityValidationTests
         diagnostics.ShouldBeEmpty();
     }
 
+    [Trait("Category", "Smoke")]
     [Fact]
     public static void RequiredNonNullableStringWithDefaultValueEmitsWarning()
     {
@@ -31,6 +32,7 @@ public static class DtoEntityValidationTests
         diagnostics.ShouldContain(d => d.Id == "BG006" && d.Severity == DiagnosticSeverity.Warning && d.GetMessage(null).Contains("Required non-nullable properties should not have a default value."));
     }
 
+    [Trait("Category", "Smoke")]
     [Fact]
     public static void OptionalNonNullableReferenceWithoutDefaultEmitsError()
     {

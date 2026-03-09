@@ -2,6 +2,14 @@
 
 This repository contains a Roslyn source generator package (`src/Incursa.Generators`) that reads definition files from `AdditionalFiles` and emits C# `.g.cs` files at build time.
 
+## Testing And Quality Lanes
+
+The repository now uses explicit quality lanes instead of a single undifferentiated test pass.
+
+- Operating model: [`testing-operating-model.md`](/C:/src/incursa/generators/docs/testing-operating-model.md)
+- Known-issue policy: [`testing-known-issues.md`](/C:/src/incursa/generators/docs/testing-known-issues.md)
+- Quality contract: [`test-gate.contract.yaml`](/C:/src/incursa/generators/docs/test-gate.contract.yaml)
+
 ## Repository Scope
 
 Implemented JSON generators in this repository:

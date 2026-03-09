@@ -5,6 +5,7 @@ using Incursa.Generators.AppDefinitions.Tests.Fixtures;
 
 public sealed class ToolPackagingTests
 {
+    [Trait("Category", "Smoke")]
     [Fact]
     public void Tool_project_is_configured_as_a_packable_dotnet_tool()
     {

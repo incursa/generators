@@ -1,0 +1,47 @@
+version: 1
+domain: Incursa.Generators quality lane contract
+scope:
+  solutionPath: Incursa.Generators.slnx
+  includes:
+    - src/**
+    - tests/**
+    - examples/AppDefinitions/**
+    - scripts/**
+    - runsettings/**
+    - .github/workflows/**
+  excludes:
+    - '**/bin/**'
+    - '**/obj/**'
+    - TestResults/**
+    - artifacts/**
+coverage:
+  evidenceLocation:
+    - TestResults/advisory/coverage/
+    - artifacts/quality/testing/
+expectations:
+  confidenceTarget: blocking delivery safety with additional advisory evidence from extended performance coverage and per-lane artifacts
+  evidence:
+    - Smoke is the fast-fail precheck and is intentionally limited to tests tagged with Category=Smoke.
+    - Blocking excludes ExtendedTest, Explicit, and KnownIssue and also verifies the checked-in example app-definition outputs with the CLI check mode.
+    - Observational is reserved for KnownIssue tests and is currently infrastructure-ready but empty.
+    - Advisory reruns the blocking suites with coverage and adds the extended string-backed enum performance suite.
+related:
+  docs:
+    - docs/testing-operating-model.md
+    - docs/testing-known-issues.md
+  files:
+    - scripts/run-smoke-tests.ps1
+    - scripts/run-blocking-tests.ps1
+    - scripts/run-observational-tests.ps1
+    - scripts/run-advisory-quality-tests.ps1
+    - scripts/run-quality-evidence.ps1
+    - runsettings/smoke.runsettings
+    - runsettings/blocking.runsettings
+    - runsettings/observational.runsettings
+intentionalGaps:
+  - subject: downstream consumer-package integration
+    rationale: The current lanes validate package shape, source-generator behavior, and CLI drift inside this repository, but they do not yet execute package-install or consumer-project end-to-end flows in a separate host repository.
+  - subject: external application-definition integration
+    rationale: The blocking lane checks the curated example application definitions in this repository, not a broader fleet of downstream application-definition repos.
+  - subject: known-issue backlog
+    rationale: The observational lane is ready for KnownIssue tests, but no current test has been intentionally classified into that bucket yet.

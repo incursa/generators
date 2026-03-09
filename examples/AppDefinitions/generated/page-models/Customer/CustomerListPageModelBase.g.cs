@@ -32,7 +32,7 @@ public abstract partial class CustomerListPageModelBase : PageModel
     public string CustomerId { get; set; } = default!;
 
     [BindProperty(SupportsGet = true)]
-    public bool IncludeInactive { get; set; }
+    public bool? IncludeInactive { get; set; }
 
     public virtual async Task OnGetAsync(CancellationToken cancellationToken)
     {

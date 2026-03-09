@@ -5,6 +5,7 @@ using Incursa.Generators.Tool.Console;
 
 public sealed class EndToEndTests
 {
+    [Trait("Category", "Smoke")]
     [Fact]
     public async Task Cli_generate_write_emits_expected_files()
     {

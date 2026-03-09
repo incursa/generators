@@ -5,6 +5,7 @@ using Incursa.Generators.AppDefinitions.Tests.Fixtures;
 
 public sealed class EmitterSnapshotTests
 {
+    [Trait("Category", "Smoke")]
     [Fact]
     public void Generate_write_matches_checked_in_golden_files()
     {

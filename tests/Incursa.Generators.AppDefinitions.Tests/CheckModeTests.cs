@@ -5,6 +5,7 @@ using Incursa.Generators.AppDefinitions.Tests.Fixtures;
 
 public sealed class CheckModeTests
 {
+    [Trait("Category", "Smoke")]
     [Fact]
     public void Generate_check_detects_out_of_date_outputs()
     {

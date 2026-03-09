@@ -1,4 +1,5 @@
-name: 'Continuous Integration on Commit'
+name: Continuous Integration on Commit
+
 on:
   workflow_dispatch:
   push:
@@ -8,102 +9,156 @@ on:
       - 'user/**'
       - 'users/**'
       - 'hotfix/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CONFIGURATION: Release
+  SOLUTION_PATH: Incursa.Generators.slnx
+
 jobs:
-  build:
-    name: Standard Commit - Build, Test, and Scan
+  smoke:
+    name: Smoke Lane
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0 
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set-up dotnet
-      uses: actions/setup-dotnet@v4
-      with:
-        global-json-file: global.json
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
 
-    - name: Cache NuGet
-      uses: actions/cache@v4
-      with:
-        path: ~/.nuget/packages
-        key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
-        restore-keys: |
-          nuget-${{ runner.os }}-
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
 
-    - name: Install PowerShell
-      uses: PSModule/install-powershell@v1
+      - name: Run smoke lane
+        shell: pwsh
+        run: ./scripts/run-smoke-tests.ps1 -Configuration ${{ env.CONFIGURATION }} -Solution ${{ env.SOLUTION_PATH }}
 
-    - name: Determine Version
-      id: git_version
-      shell: pwsh
-      run: |
-        $now = [System.DateTime]::UtcNow
-        $revision = $now.Hour * 60 + $now.Minute
-        $baseVersion = "$($now.Year).$($now.Month).$($now.Day).$revision"
-        $version = $baseVersion
+      - name: Upload smoke artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-results
+          path: TestResults/smoke/
 
-        try {
-          $branchName = (git rev-parse --abbrev-ref HEAD).Trim()
-          Write-Host "Branch name: $branchName"
-          $mainBranches = @("main", "master")
+  blocking:
+    name: Blocking Lane
+    needs: smoke
+    if: needs.smoke.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-          if ($branchName -and ($mainBranches -notcontains $branchName.ToLowerInvariant())) {
-            # Sanitize branch name for pre-release tag
-            $safeBranch = $branchName -replace '[^A-Za-z0-9-]', '-'
-            $version = "$baseVersion-$safeBranch"
-          }
-        } catch {
-          Write-Warning "Could not determine git branch. Using base version."
-        }
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
 
-        Write-Host "Calculated Version: $version"
-        echo "semVer=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
 
-    - name: Restore dependencies
-      run: dotnet restore Incursa.Generators.slnx
+      - name: Run blocking lane
+        shell: pwsh
+        run: ./scripts/run-blocking-tests.ps1 -Configuration ${{ env.CONFIGURATION }} -Solution ${{ env.SOLUTION_PATH }}
 
-    - name: Restore tools
-      run: dotnet tool restore
-          
-    - name: Build solution
-      run: dotnet build Incursa.Generators.slnx --no-restore --configuration Release -p:Version=${{ steps.git_version.outputs.semVer }}
+      - name: Upload blocking artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blocking-test-results
+          path: TestResults/blocking/
 
-    - name: Run Tests
-      run: dotnet test Incursa.Generators.slnx --no-build --configuration Release
-  
-  #   - name: Pack NuGet packages
-  #     shell: bash
-  #     run: |
-  #       dotnet pack src/Incursa.Generators/Incursa.Generators.csproj --configuration Release --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
-  #       dotnet pack src/Incursa.Generators.Tool/Incursa.Generators.Tool.csproj --configuration Release --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
+  observational:
+    name: Observational Lane
+    needs: smoke
+    if: needs.smoke.result == 'success'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #   - name: Upload package artifact
-  #     uses: actions/upload-artifact@v4
-  #     with:
-  #       name: nupkgs
-  #       path: ./nupkgs/*.nupkg
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
 
-  # publish-github-packages:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   # Pre-release = contains hyphen (e.g., 1.2.3-pre.4)
-  #   if: ${{ contains(github.ref_name, '-') }}
-  #   steps:
-  #     - uses: actions/download-artifact@v4
-  #       with:
-  #         name: nupkgs
-  #         path: out
-  #     - name: Configure GitHub Packages source
-  #       run: |
-  #         dotnet nuget remove source github || true
-  #         dotnet nuget add source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
-  #           --name "github" \
-  #           --username "${{ github.repository_owner }}" \
-  #           --password "${{ secrets.GITHUB_TOKEN }}" \
-  #           --store-password-in-clear-text
-  #     - name: Push to GitHub Packages
-  #       run: dotnet nuget push "out/*.nupkg" --source "github" --skip-duplicate
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Run observational lane
+        shell: pwsh
+        run: ./scripts/run-observational-tests.ps1 -Configuration ${{ env.CONFIGURATION }} -Solution ${{ env.SOLUTION_PATH }}
+
+      - name: Upload observational artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: observational-test-results
+          path: TestResults/observational/
+
+  advisory:
+    name: Advisory Quality Lane
+    needs: smoke
+    if: needs.smoke.result == 'success'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Run advisory lane
+        shell: pwsh
+        run: ./scripts/run-advisory-quality-tests.ps1 -Configuration ${{ env.CONFIGURATION }} -Solution ${{ env.SOLUTION_PATH }}
+
+      - name: Build quality evidence bundle
+        if: always()
+        shell: pwsh
+        run: ./scripts/run-quality-evidence.ps1 -ResultsDirectory TestResults/advisory -OutputDirectory artifacts/quality/testing
+
+      - name: Upload advisory artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: advisory-test-results
+          path: TestResults/advisory/
+
+      - name: Upload quality evidence artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: advisory-quality-evidence
+          path: artifacts/quality/testing/

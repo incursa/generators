@@ -11,6 +11,7 @@ Start here for the new tool:
 
 - [`docs/app-definitions-tool.md`](/C:/src/incursa/generators/docs/app-definitions-tool.md)
 - [`docs/app-definitions-tool-design.md`](/C:/src/incursa/generators/docs/app-definitions-tool-design.md)
+- [`docs/testing-operating-model.md`](/C:/src/incursa/generators/docs/testing-operating-model.md)
 - [`examples/AppDefinitions/app-definitions.json`](/C:/src/incursa/generators/examples/AppDefinitions/app-definitions.json)
 
 See [`LICENSE`](/C:/src/incursa/generators/LICENSE) and [`NOTICE`](/C:/src/incursa/generators/NOTICE) for licensing and attribution information.

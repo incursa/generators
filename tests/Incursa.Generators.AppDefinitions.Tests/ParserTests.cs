@@ -7,6 +7,7 @@ using Incursa.Generators.AppDefinitions.Tests.Fixtures;
 
 public sealed class ParserTests
 {
+    [Trait("Category", "Smoke")]
     [Fact]
     public void Parse_happy_path_definition_into_canonical_model()
     {
