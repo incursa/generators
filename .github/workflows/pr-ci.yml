@@ -209,11 +209,14 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore ${{ env.SOLUTION_PATH }}
 
+      - name: Build solution for packaging
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore -p:GeneratePackageOnBuild=false
+
       - name: Pack NuGet packages
         shell: pwsh
         run: |
-          dotnet pack src/Incursa.Generators/Incursa.Generators.csproj --configuration ${{ env.CONFIGURATION }} --no-restore --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
-          dotnet pack src/Incursa.Generators.Tool/Incursa.Generators.Tool.csproj --configuration ${{ env.CONFIGURATION }} --no-restore --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
+          dotnet pack src/Incursa.Generators/Incursa.Generators.csproj --configuration ${{ env.CONFIGURATION }} --no-build --no-restore --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
+          dotnet pack src/Incursa.Generators.Tool/Incursa.Generators.Tool.csproj --configuration ${{ env.CONFIGURATION }} --no-build --no-restore --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
 
       - name: Upload package artifact
         uses: actions/upload-artifact@v4
