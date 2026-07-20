@@ -139,7 +139,7 @@ public sealed class LegacyPageRouteHelperEmitter : IGenerationTargetEmitter
             foreach (var parameter in feature.PageParameters.Where(static parameter => parameter.Source == PageParameterSource.Route))
             {
                 var parameterName = LegacyPageFeatureUtilities.ToLegacyParameterName(parameter.Name);
-                builder.AppendLine($"url = url.Replace({EmitterUtilities.ToPascalCase(parameter.Name)}Param, {parameterName}.ToString(), StringComparison.OrdinalIgnoreCase);");
+                builder.AppendLine($"url = url.Replace({EmitterUtilities.ToPascalCase(parameter.Name)}Param, {FormatRouteParameterExpression(parameter, parameterName)}, StringComparison.OrdinalIgnoreCase);");
             }
 
             foreach (var parameter in feature.PageParameters.Where(static parameter => parameter.Source == PageParameterSource.Query))
@@ -152,5 +152,23 @@ public sealed class LegacyPageRouteHelperEmitter : IGenerationTargetEmitter
         }
 
         builder.AppendLine("}");
+    }
+
+    private static string FormatRouteParameterExpression(PageParameterDefinition parameter, string parameterName)
+    {
+        if (IsStringType(parameter.Type))
+        {
+            return parameter.Required ? parameterName : $"{parameterName} ?? string.Empty";
+        }
+
+        return $"{parameterName}.ToString()";
+    }
+
+    private static bool IsStringType(string rawType)
+    {
+        var normalized = rawType.Trim().TrimEnd('?');
+        return string.Equals(normalized, "string", StringComparison.Ordinal)
+            || string.Equals(normalized, "System.String", StringComparison.Ordinal)
+            || string.Equals(normalized, "global::System.String", StringComparison.Ordinal);
     }
 }

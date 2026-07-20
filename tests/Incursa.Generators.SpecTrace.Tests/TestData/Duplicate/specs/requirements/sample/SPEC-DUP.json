@@ -1,0 +1,18 @@
+{
+  "$schema": "https://github.com/incursa/spec-trace/raw/refs/heads/main/model/model.schema.json",
+  "artifact_id": "SPEC-DUP",
+  "artifact_type": "specification",
+  "title": "Duplicate fixture",
+  "requirements": [
+    {
+      "id": "REQ-DUP-0001",
+      "title": "First",
+      "statement": "The first requirement MUST exist."
+    },
+    {
+      "id": "REQ-DUP-0001",
+      "title": "Second",
+      "statement": "The duplicate requirement MUST fail export."
+    }
+  ]
+}

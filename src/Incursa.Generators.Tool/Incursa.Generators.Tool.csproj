@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Incursa.Generators.AppDefinitions\Incursa.Generators.AppDefinitions.csproj" />
+    <ProjectReference Include="..\Incursa.Generators.SpecTrace\Incursa.Generators.SpecTrace.csproj" />
     <None Include="..\..\assets\nuget_logo.png" Link="nuget_logo.png">
       <PackagePath>\</PackagePath>
       <Pack>True</Pack>

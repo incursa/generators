@@ -76,7 +76,7 @@ public sealed class PageRouteHelperEmitter : IGenerationTargetEmitter
             foreach (var routeParameter in feature.PageParameters.Where(static parameter => parameter.Source == PageParameterSource.Route))
             {
                 builder.AppendLine(
-                    $"path = path.Replace(\"{{{routeParameter.Name}}}\", Uri.EscapeDataString({routeParameter.Name}.ToString() ?? string.Empty), StringComparison.Ordinal);");
+                    $"path = path.Replace(\"{{{routeParameter.Name}}}\", Uri.EscapeDataString({FormatRouteParameterExpression(routeParameter)}), StringComparison.Ordinal);");
             }
 
             var queryParameters = feature.PageParameters.Where(static parameter => parameter.Source == PageParameterSource.Query).ToArray();
@@ -88,7 +88,7 @@ public sealed class PageRouteHelperEmitter : IGenerationTargetEmitter
                     if (queryParameter.Required)
                     {
                         builder.AppendLine(
-                            $"queryParameters.Add(\"{queryParameter.Name}=\" + Uri.EscapeDataString({queryParameter.Name}.ToString() ?? string.Empty));");
+                            $"queryParameters.Add(\"{queryParameter.Name}=\" + Uri.EscapeDataString({FormatQueryParameterExpression(queryParameter)}));");
                     }
                     else
                     {
@@ -97,7 +97,7 @@ public sealed class PageRouteHelperEmitter : IGenerationTargetEmitter
                         using (builder.Indent())
                         {
                             builder.AppendLine(
-                                $"queryParameters.Add(\"{queryParameter.Name}=\" + Uri.EscapeDataString({queryParameter.Name}.ToString() ?? string.Empty));");
+                                $"queryParameters.Add(\"{queryParameter.Name}=\" + Uri.EscapeDataString({FormatQueryParameterExpression(queryParameter)}));");
                         }
 
                         builder.AppendLine("}");
@@ -124,5 +124,30 @@ public sealed class PageRouteHelperEmitter : IGenerationTargetEmitter
     {
         var route = string.IsNullOrWhiteSpace(feature.Route) ? feature.Name : feature.Route;
         return "/" + route.TrimStart('/');
+    }
+
+    private static string FormatRouteParameterExpression(PageParameterDefinition parameter)
+    {
+        if (IsStringType(parameter.Type))
+        {
+            return parameter.Required ? parameter.Name : $"{parameter.Name} ?? string.Empty";
+        }
+
+        return $"{parameter.Name}.ToString() ?? string.Empty";
+    }
+
+    private static string FormatQueryParameterExpression(PageParameterDefinition parameter)
+    {
+        return IsStringType(parameter.Type)
+            ? parameter.Name
+            : $"{parameter.Name}.ToString() ?? string.Empty";
+    }
+
+    private static bool IsStringType(string rawType)
+    {
+        var normalized = rawType.Trim().TrimEnd('?');
+        return string.Equals(normalized, "string", StringComparison.Ordinal)
+            || string.Equals(normalized, "System.String", StringComparison.Ordinal)
+            || string.Equals(normalized, "global::System.String", StringComparison.Ordinal);
     }
 }

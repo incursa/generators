@@ -111,12 +111,13 @@ public sealed class PageModelBaseEmitter : IGenerationTargetEmitter
                 if (initVm is not null)
                 {
                     builder.AppendLine();
-                    builder.AppendLine("public virtual async Task OnGetAsync(CancellationToken cancellationToken)");
+                    builder.AppendLine("public virtual async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)");
                     builder.AppendLine("{");
                     using (builder.Indent())
                     {
                         var arguments = string.Join(", ", feature.PageParameters.Select(static parameter => EmitterUtilities.ToPascalCase(parameter.Name)).Concat(["cancellationToken"]));
                         builder.AppendLine($"ViewModel = await UiEngine.{EmitterUtilities.GetOperationMethodName(initVm)}({arguments});");
+                        builder.AppendLine("return Page();");
                     }
 
                     builder.AppendLine("}");
@@ -124,11 +125,12 @@ public sealed class PageModelBaseEmitter : IGenerationTargetEmitter
                 else if (feature.ViewModelProperties.Count > 0)
                 {
                     builder.AppendLine();
-                    builder.AppendLine("public virtual async Task OnGetAsync(CancellationToken cancellationToken)");
+                    builder.AppendLine("public virtual async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)");
                     builder.AppendLine("{");
                     using (builder.Indent())
                     {
                         builder.AppendLine("ViewModel = await InitializeViewModelAsync(cancellationToken);");
+                        builder.AppendLine("return Page();");
                     }
 
                     builder.AppendLine("}");

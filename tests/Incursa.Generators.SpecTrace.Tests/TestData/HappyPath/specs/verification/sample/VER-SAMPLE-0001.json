@@ -1,0 +1,10 @@
+{
+  "$schema": "https://github.com/incursa/spec-trace/raw/refs/heads/main/model/model.schema.json",
+  "artifact_id": "VER-SAMPLE-0001",
+  "artifact_type": "verification",
+  "title": "Sample passed verification",
+  "status": "passed",
+  "verifies": [
+    "REQ-SAMPLE-0001"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://github.com/incursa/spec-trace/raw/refs/heads/main/model/model.schema.json",
+  "artifact_id": "SPEC-SAMPLE",
+  "artifact_type": "specification",
+  "title": "Sample non-RFC specification",
+  "requirements": [
+    {
+      "id": "REQ-SAMPLE-ROLLUP-0001",
+      "title": "Rollup requirement",
+      "statement": "The exporter MUST keep non-RFC specifications in the repository rollup."
+    }
+  ]
+}

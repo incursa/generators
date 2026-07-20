@@ -11,6 +11,11 @@ public static class ToolCommandRunner
         ArgumentNullException.ThrowIfNull(stdout);
         ArgumentNullException.ThrowIfNull(stderr);
 
+        if (args.Length > 0 && string.Equals(args[0], "export-clickup-requirements", StringComparison.OrdinalIgnoreCase))
+        {
+            return SpecTraceClickUpCommand.RunAsync(args[1..], stdout, stderr);
+        }
+
         var showHelp = IsHelpRequest(args);
         if (!TryParseArguments(args, out var command, out var error))
         {
@@ -223,6 +228,7 @@ public static class ToolCommandRunner
         writer.WriteLine("Usage:");
         writer.WriteLine("  incursa-appdefs validate --config <path> [--definitions <path>] [--filter <pattern>] [--verbosity <level>]");
         writer.WriteLine("  incursa-appdefs generate --config <path> [--definitions <path>] [--filter <pattern>] (--write | --check) [--verbosity <level>]");
+        writer.WriteLine("  incursa-appdefs export-clickup-requirements --repo-root <path> --repository <owner/name> [--source-commit <sha>] [--out <path>] [--filter <glob-or-path>] [--exclude-filter <glob-or-path>] [--skip-lifecycle-state-derivation]");
         writer.WriteLine();
         writer.WriteLine("Verbosity:");
         writer.WriteLine("  quiet | normal | detailed");

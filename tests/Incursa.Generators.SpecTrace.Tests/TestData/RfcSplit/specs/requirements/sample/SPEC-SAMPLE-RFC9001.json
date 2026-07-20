@@ -1,0 +1,28 @@
+{
+  "$schema": "https://github.com/incursa/spec-trace/raw/refs/heads/main/model/model.schema.json",
+  "artifact_id": "SPEC-SAMPLE-RFC9001",
+  "artifact_type": "specification",
+  "title": "Sample RFC 9001 specification",
+  "requirements": [
+    {
+      "id": "REQ-SAMPLE-RFC9001-S1-0001",
+      "title": "RFC requirement",
+      "statement": "Endpoints that implement the sample RFC MUST preserve its normative section mapping.",
+      "trace": {
+        "upstream_refs": [
+          "RFC 9001 §1",
+          "RFC9001-S1-B1-P1-S1",
+          "https://www.rfc-editor.org/rfc/rfc9001.html#section-1"
+        ],
+        "x_test_refs": [
+          "tests/SampleRfcTests.cs::CoversRfc9001"
+        ],
+        "evidence_refs": [
+          "ARC-SAMPLE-RFC9001-0001",
+          "WI-SAMPLE-RFC9001-0001",
+          "VER-SAMPLE-RFC9001-0001"
+        ]
+      }
+    }
+  ]
+}

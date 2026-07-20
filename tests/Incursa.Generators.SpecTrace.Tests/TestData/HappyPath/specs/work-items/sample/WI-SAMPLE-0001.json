@@ -1,0 +1,10 @@
+{
+  "$schema": "https://github.com/incursa/spec-trace/raw/refs/heads/main/model/model.schema.json",
+  "artifact_id": "WI-SAMPLE-0001",
+  "artifact_type": "work_item",
+  "title": "Sample completed work",
+  "status": "complete",
+  "addresses": [
+    "REQ-SAMPLE-0001"
+  ]
+}

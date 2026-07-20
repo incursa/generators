@@ -1,0 +1,67 @@
+{
+  "$schema": "https://github.com/incursa/spec-trace/raw/refs/heads/main/model/model.schema.json",
+  "artifact_id": "SPEC-SAMPLE",
+  "artifact_type": "specification",
+  "title": "Sample SpecTrace fixture",
+  "requirements": [
+    {
+      "id": "REQ-SAMPLE-0001",
+      "title": "Quoted, requirement",
+      "statement": "The exporter MUST write \"quoted\" CSV fields, including commas.",
+      "source_section": "Section 1.1",
+      "x_coverage_expectations": {
+        "positive": "required",
+        "negative": "optional"
+      },
+      "trace": {
+        "satisfied_by": [
+          "ARC-SAMPLE-0001",
+          "ARC-SAMPLE-0002"
+        ],
+        "implemented_by": [
+          "WI-SAMPLE-0001"
+        ],
+        "verified_by": [
+          "VER-SAMPLE-0001"
+        ],
+        "upstream_refs": [
+          "src/SampleRequirement.cs",
+          "tests/SampleRequirementTests.cs",
+          "Section 1.1"
+        ],
+        "x_code_refs": [
+          "SampleRequirement.Handle",
+          "src/SampleRequirement.cs"
+        ]
+      },
+      "notes": [
+        "This note verifies multiline descriptions."
+      ]
+    },
+    {
+      "id": "REQ-SAMPLE-0002",
+      "title": "Default states",
+      "statement": "The exporter MUST default missing trace links conservatively.",
+      "trace": {
+        "x_code_refs": [
+          "src/DefaultRequirement.cs"
+        ]
+      }
+    },
+    {
+      "id": "REQ-SAMPLE-0003",
+      "title": "",
+      "statement": "",
+      "trace": {
+        "satisfied_by": [
+          "ARC-SAMPLE-0003"
+        ]
+      }
+    },
+    {
+      "id": "REQ-SAMPLE-0004",
+      "title": "No trace",
+      "statement": "The exporter MUST keep unlinked requirements conservative."
+    }
+  ]
+}
