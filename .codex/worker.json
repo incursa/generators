@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "name": "generators",
+  "platform": {
+    "os": "debian",
+    "majorVersion": 13
+  },
+  "workingDirectory": ".",
+  "dependencies": {
+    "aptPackages": [
+      "ca-certificates",
+      "curl",
+      "git"
+    ],
+    "dotnet": {
+      "globalJson": "global.json",
+      "installExactSdk": true
+    },
+    "codexCli": {
+      "install": true,
+      "updateOnBootstrap": true
+    },
+    "requiredCommands": [
+      "dotnet",
+      "git",
+      "pwsh"
+    ]
+  },
+  "commands": {
+    "bootstrap": [
+      {
+        "file": "dotnet",
+        "args": [
+          "restore",
+          "Incursa.Generators.slnx"
+        ]
+      },
+      {
+        "file": "dotnet",
+        "args": [
+          "build",
+          "Incursa.Generators.slnx",
+          "--configuration",
+          "Release",
+          "--no-restore"
+        ]
+      }
+    ],
+    "test": [
+      {
+        "file": "pwsh",
+        "args": [
+          "-NoProfile",
+          "-File",
+          "./scripts/run-smoke-tests.ps1",
+          "-Configuration",
+          "Release",
+          "-Solution",
+          "Incursa.Generators.slnx",
+          "-NoRestore",
+          "-NoBuild"
+        ]
+      },
+      {
+        "file": "pwsh",
+        "args": [
+          "-NoProfile",
+          "-File",
+          "./scripts/run-blocking-tests.ps1",
+          "-Configuration",
+          "Release",
+          "-Solution",
+          "Incursa.Generators.slnx",
+          "-NoRestore",
+          "-NoBuild"
+        ]
+      }
+    ]
+  },
+  "readiness": {
+    "codexAuthenticationRequired": true
+  }
+}
