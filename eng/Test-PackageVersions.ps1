@@ -7,6 +7,34 @@ param(
 Set-StrictMode -Version 3.0
 $ErrorActionPreference = "Stop"
 
+function Assert-SemanticPackageVersion {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$PackageId,
+        [Parameter(Mandatory = $true)]
+        [string]$Version
+    )
+
+    $semanticVersion = [regex]::Match(
+        $Version,
+        '^(?<major>0|[1-9][0-9]*)\.(?<minor>0|[1-9][0-9]*)\.(?<patch>0|[1-9][0-9]*)(?:-(?<prerelease>[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$')
+    if (-not $semanticVersion.Success) {
+        throw "Package '$PackageId' has non-semantic version '$Version'."
+    }
+
+    $prerelease = $semanticVersion.Groups["prerelease"].Value
+    foreach ($identifier in @($prerelease.Split('.', [System.StringSplitOptions]::RemoveEmptyEntries))) {
+        if ($identifier -match '^[0-9]+$' -and $identifier.Length -gt 1 -and $identifier.StartsWith('0', [System.StringComparison]::Ordinal)) {
+            throw "Package '$PackageId' has non-semantic version '$Version': numeric prerelease identifiers cannot contain leading zeroes."
+        }
+    }
+
+    $major = $semanticVersion.Groups["major"].Value
+    if ($major -match '^20[0-9]{2}$') {
+        throw "Package '$PackageId' uses a forbidden calendar version '$Version'."
+    }
+}
+
 if (-not (Test-Path -LiteralPath $VersionsPath)) {
     throw "Package version manifest not found at '$VersionsPath'."
 }
@@ -31,14 +59,7 @@ foreach ($package in @($manifest.packages)) {
 
     [void]$seenGroups.Add($releaseGroup)
 
-    if ($version -notmatch '^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?$') {
-        throw "Package '$packageId' has non-semantic version '$version'."
-    }
-
-    $major = [int]($version.Split('.')[0])
-    if ($major -ge 2000 -and $major -le 2099) {
-        throw "Package '$packageId' uses a forbidden calendar version '$version'."
-    }
+    Assert-SemanticPackageVersion -PackageId $packageId -Version $version
 
     if (-not (Test-Path -LiteralPath $projectPath)) {
         throw "Package '$packageId' project was not found at '$projectPath'."
