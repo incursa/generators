@@ -1,0 +1,16 @@
+{
+  "packages": [
+    {
+      "packageId": "Incursa.Generators",
+      "projectPath": "src/Incursa.Generators/Incursa.Generators.csproj",
+      "version": "6.0.0",
+      "releaseGroup": "generator"
+    },
+    {
+      "packageId": "Incursa.Generators.Tool",
+      "projectPath": "src/Incursa.Generators.Tool/Incursa.Generators.Tool.csproj",
+      "version": "6.0.0",
+      "releaseGroup": "tool"
+    }
+  ]
+}
