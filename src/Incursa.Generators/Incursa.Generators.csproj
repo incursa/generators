@@ -8,7 +8,7 @@
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
-        <NoWarn>$(NoWarn);CS8632</NoWarn>
+        <NoWarn>$(NoWarn);CS8632;NU5128</NoWarn>
 
         <!-- This ensures the generator dll is included as an analyzer -->
         <IncludeBuildOutput>false</IncludeBuildOutput>
@@ -18,14 +18,14 @@
 
 
         <!-- Package metadata -->
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <PackageId>Incursa.Generators</PackageId>
-        <Version>1.0.0</Version>
+        <Version>6.0.0</Version>
         <Authors>Incursa</Authors>
         <Owners>Incursa</Owners>
         <Description>Roslyn source generators for strongly typed identifiers, enums, DTOs, and value objects from JSON or XML definitions.</Description>
-        <PackageTags>source-generator;roslyn;code-generation;dto;value-objects;strongly-typed</PackageTags>
+        <PackageTags>incursa;source-generator;roslyn;code-generation;dto;value-objects;strongly-typed</PackageTags>
         <PackageProjectUrl>https://github.com/incursa/generators</PackageProjectUrl>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/incursa/generators</RepositoryUrl>
@@ -57,8 +57,8 @@
           <PackagePath>\</PackagePath>
           <Pack>True</Pack>
         </None>
-		<None Include="Incursa.Generators.props" Pack="true" PackagePath="build\" />
-		<None Include="Incursa.Generators.props" Pack="true" PackagePath="buildTransitive\" />
+		<None Include="Incursa.Generators.props" Pack="true" PackagePath="build" />
+		<None Include="Incursa.Generators.props" Pack="true" PackagePath="buildTransitive" />
 		<None Include="README.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 

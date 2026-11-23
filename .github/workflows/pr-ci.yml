@@ -32,7 +32,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props') }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props', 'Directory.Build.targets') }}
           restore-keys: |
             nuget-${{ runner.os }}-
 
@@ -65,7 +65,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props') }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props', 'Directory.Build.targets') }}
           restore-keys: |
             nuget-${{ runner.os }}-
 
@@ -99,7 +99,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props') }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props', 'Directory.Build.targets') }}
           restore-keys: |
             nuget-${{ runner.os }}-
 
@@ -133,7 +133,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props') }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props', 'Directory.Build.targets') }}
           restore-keys: |
             nuget-${{ runner.os }}-
 
@@ -178,47 +178,29 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props') }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props', 'Directory.Build.targets') }}
           restore-keys: |
             nuget-${{ runner.os }}-
 
-      - name: Determine version
-        id: git_version
+      - name: Validate semantic package versions
         shell: pwsh
-        run: |
-          $now = [System.DateTime]::UtcNow
-          $revision = $now.Hour * 60 + $now.Minute
-          $baseVersion = "$($now.Year).$($now.Month).$($now.Day).$revision"
-          $version = $baseVersion
-
-          try {
-            $branchName = (git rev-parse --abbrev-ref HEAD).Trim()
-            $mainBranches = @('main', 'master')
-
-            if ($branchName -and ($mainBranches -notcontains $branchName.ToLowerInvariant())) {
-              $safeBranch = $branchName -replace '[^A-Za-z0-9-]', '-'
-              $version = "$baseVersion-$safeBranch"
-            }
-          }
-          catch {
-            Write-Warning 'Could not determine git branch. Using base version.'
-          }
-
-          "semVer=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        run: ./eng/Test-PackageVersions.ps1
 
       - name: Restore dependencies
         run: dotnet restore ${{ env.SOLUTION_PATH }}
 
       - name: Build solution for packaging
-        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore -p:GeneratePackageOnBuild=false
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore
 
-      - name: Pack NuGet packages
+      - name: Pack all NuGet packages
         shell: pwsh
-        run: |
-          dotnet pack src/Incursa.Generators/Incursa.Generators.csproj --configuration ${{ env.CONFIGURATION }} --no-build --no-restore --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
-          dotnet pack src/Incursa.Generators.Tool/Incursa.Generators.Tool.csproj --configuration ${{ env.CONFIGURATION }} --no-build --no-restore --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
+        run: ./eng/Pack-Packages.ps1 -ReleaseGroup all -Configuration ${{ env.CONFIGURATION }} -OutputPath ./nupkgs -NoBuild -NoRestore
 
-      - name: Upload package artifact
+      - name: Validate all package artifacts
+        shell: pwsh
+        run: ./eng/Test-PackageArtifacts.ps1 -PackagePath ./nupkgs -ReleaseGroup all
+
+      - name: Upload package artifacts
         uses: actions/upload-artifact@v4
         with:
           name: nupkgs

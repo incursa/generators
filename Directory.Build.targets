@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup Condition="'$(PackageId)' == 'Incursa.Generators' or '$(PackageId)' == 'Incursa.Generators.Tool'">
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Title Condition="'$(Title)' == ''">$(PackageId)</Title>
+    <Authors Condition="'$(Authors)' == ''">Incursa</Authors>
+    <Owners Condition="'$(Owners)' == ''">Incursa</Owners>
+    <Company Condition="'$(Company)' == ''">Incursa</Company>
+    <Copyright Condition="'$(Copyright)' == ''">Copyright © Incursa</Copyright>
+    <PackageProjectUrl Condition="'$(PackageProjectUrl)' == ''">https://github.com/incursa/generators</PackageProjectUrl>
+    <RepositoryUrl Condition="'$(RepositoryUrl)' == ''">https://github.com/incursa/generators</RepositoryUrl>
+    <RepositoryType Condition="'$(RepositoryType)' == ''">git</RepositoryType>
+    <PackageLicenseExpression Condition="'$(PackageLicenseExpression)' == ''">Apache-2.0</PackageLicenseExpression>
+    <PackageIcon Condition="'$(PackageIcon)' == ''">nuget_logo.png</PackageIcon>
+    <PackageReadmeFile Condition="'$(PackageReadmeFile)' == ''">README.md</PackageReadmeFile>
+    <PackageTags Condition="'$(PackageTags)' == ''">incursa;source-generator;dotnet</PackageTags>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+  </PropertyGroup>
+</Project>

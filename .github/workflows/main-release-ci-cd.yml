@@ -2,9 +2,21 @@ name: Main/Release CI/CD
 
 on:
   push:
-    branches:
-      - main
-      - 'release/**'
+    branches: [main, 'release/**']
+    tags: ['generator-v*', 'tool-v*']
+  workflow_dispatch:
+    inputs:
+      publish_packages:
+        description: Publish the selected release group to NuGet.org
+        required: true
+        type: boolean
+        default: false
+      release_group:
+        description: Package release group
+        required: true
+        type: choice
+        options: [generator, tool]
+        default: generator
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,26 +31,18 @@ jobs:
     name: Smoke Lane
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-
-      - name: Cache NuGet
-        uses: actions/cache@v4
+      - uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props') }}
-          restore-keys: |
-            nuget-${{ runner.os }}-
-
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props', 'Directory.Build.targets') }}
+          restore-keys: nuget-${{ runner.os }}-
       - name: Run smoke lane
         shell: pwsh
         run: ./scripts/run-smoke-tests.ps1 -Configuration ${{ env.CONFIGURATION }} -Solution ${{ env.SOLUTION_PATH }}
-
       - name: Upload smoke artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -52,26 +56,18 @@ jobs:
     if: needs.smoke.result == 'success'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-
-      - name: Cache NuGet
-        uses: actions/cache@v4
+      - uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props') }}
-          restore-keys: |
-            nuget-${{ runner.os }}-
-
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props', 'Directory.Build.targets') }}
+          restore-keys: nuget-${{ runner.os }}-
       - name: Run blocking lane
         shell: pwsh
         run: ./scripts/run-blocking-tests.ps1 -Configuration ${{ env.CONFIGURATION }} -Solution ${{ env.SOLUTION_PATH }}
-
       - name: Upload blocking artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -86,26 +82,18 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-
-      - name: Cache NuGet
-        uses: actions/cache@v4
+      - uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props') }}
-          restore-keys: |
-            nuget-${{ runner.os }}-
-
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props', 'Directory.Build.targets') }}
+          restore-keys: nuget-${{ runner.os }}-
       - name: Run observational lane
         shell: pwsh
         run: ./scripts/run-observational-tests.ps1 -Configuration ${{ env.CONFIGURATION }} -Solution ${{ env.SOLUTION_PATH }}
-
       - name: Upload observational artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -120,38 +108,28 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-
-      - name: Cache NuGet
-        uses: actions/cache@v4
+      - uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props') }}
-          restore-keys: |
-            nuget-${{ runner.os }}-
-
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props', 'Directory.Build.targets') }}
+          restore-keys: nuget-${{ runner.os }}-
       - name: Run advisory lane
         shell: pwsh
         run: ./scripts/run-advisory-quality-tests.ps1 -Configuration ${{ env.CONFIGURATION }} -Solution ${{ env.SOLUTION_PATH }}
-
       - name: Build quality evidence bundle
         if: always()
         shell: pwsh
         run: ./scripts/run-quality-evidence.ps1 -ResultsDirectory TestResults/advisory -OutputDirectory artifacts/quality/testing
-
       - name: Upload advisory artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: advisory-test-results
           path: TestResults/advisory/
-
       - name: Upload quality evidence artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -164,93 +142,93 @@ jobs:
     needs: blocking
     if: needs.blocking.result == 'success'
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.git_version.outputs.semVer }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-
-      - name: Cache NuGet
-        uses: actions/cache@v4
+      - uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props') }}
-          restore-keys: |
-            nuget-${{ runner.os }}-
-
-      - name: Determine version
-        id: git_version
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'global.json', 'Directory.Build.props', 'Directory.Build.targets') }}
+          restore-keys: nuget-${{ runner.os }}-
+      - name: Validate semantic package versions
         shell: pwsh
-        run: |
-          $now = [System.DateTime]::UtcNow
-          $revision = $now.Hour * 60 + $now.Minute
-          $baseVersion = "$($now.Year).$($now.Month).$($now.Day).$revision"
-          $version = $baseVersion
-
-          try {
-            $branchName = (git rev-parse --abbrev-ref HEAD).Trim()
-            $mainBranches = @('main', 'master')
-
-            if ($branchName -and ($mainBranches -notcontains $branchName.ToLowerInvariant())) {
-              $safeBranch = $branchName -replace '[^A-Za-z0-9-]', '-'
-              $version = "$baseVersion-$safeBranch"
-            }
-          }
-          catch {
-            Write-Warning 'Could not determine git branch. Using base version.'
-          }
-
-          "semVer=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-
+        run: ./eng/Test-PackageVersions.ps1
       - name: Restore dependencies
         run: dotnet restore ${{ env.SOLUTION_PATH }}
-
       - name: Build solution for packaging
-        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore -p:GeneratePackageOnBuild=false
-
-      - name: Pack NuGet packages
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore
+      - name: Pack all NuGet packages
         shell: pwsh
-        run: |
-          dotnet pack src/Incursa.Generators/Incursa.Generators.csproj --configuration ${{ env.CONFIGURATION }} --no-build --no-restore --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
-          dotnet pack src/Incursa.Generators.Tool/Incursa.Generators.Tool.csproj --configuration ${{ env.CONFIGURATION }} --no-build --no-restore --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
-
-      - name: Upload package artifact
+        run: ./eng/Pack-Packages.ps1 -ReleaseGroup all -Configuration ${{ env.CONFIGURATION }} -OutputPath ./nupkgs -NoBuild -NoRestore
+      - name: Validate all package artifacts
+        shell: pwsh
+        run: ./eng/Test-PackageArtifacts.ps1 -PackagePath ./nupkgs -ReleaseGroup all
+      - name: Upload package artifacts
         uses: actions/upload-artifact@v4
         with:
           name: nupkgs
           path: ./nupkgs/*.nupkg
+      - name: Select release group
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish_packages) || startsWith(github.ref, 'refs/tags/generator-v') || startsWith(github.ref, 'refs/tags/tool-v') }}
+        id: release
+        shell: pwsh
+        run: |
+          if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
+            $group = '${{ inputs.release_group }}'
+          }
+          elseif ('${{ github.ref }}'.StartsWith('refs/tags/tool-v')) {
+            $group = 'tool'
+          }
+          else {
+            $group = 'generator'
+          }
+
+          if ('${{ github.ref }}'.StartsWith('refs/tags/')) {
+            $tagVersion = '${{ github.ref_name }}' -replace '^(generator|tool)-v', ''
+            $manifest = Get-Content ./eng/package-versions.json -Raw | ConvertFrom-Json
+            $expectedVersion = [string]($manifest.packages | Where-Object { $_.releaseGroup -eq $group }).version
+            if ($tagVersion -ne $expectedVersion) {
+              throw "Tag version '$tagVersion' does not match the '$group' manifest version '$expectedVersion'."
+            }
+          }
+
+          "group=$group" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+      - name: Prepare selected release group
+        if: steps.release.outputs.group != ''
+        shell: pwsh
+        run: |
+          ./eng/Pack-Packages.ps1 -ReleaseGroup ${{ steps.release.outputs.group }} -Configuration ${{ env.CONFIGURATION }} -OutputPath ./release-nupkgs -NoBuild -NoRestore
+          ./eng/Test-PackageArtifacts.ps1 -PackagePath ./release-nupkgs -ReleaseGroup ${{ steps.release.outputs.group }}
+      - name: Upload selected release group
+        if: steps.release.outputs.group != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-nupkgs
+          path: ./release-nupkgs/*.nupkg
 
   publish-nuget-org:
     name: Publish NuGet.org
     needs: package
-    if: needs.package.result == 'success' && !contains(needs.package.outputs.version, '-')
+    if: ${{ needs.package.result == 'success' && ((github.event_name == 'workflow_dispatch' && inputs.publish_packages) || startsWith(github.ref, 'refs/tags/generator-v') || startsWith(github.ref, 'refs/tags/tool-v')) }}
     runs-on: ubuntu-latest
     env:
       NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-
-      - name: Download package artifact
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
-          name: nupkgs
+          name: release-nupkgs
           path: out
-
-      - name: Skip publish when key is missing
+      - name: Require NuGet API key
         if: ${{ env.NUGET_API_KEY == '' }}
-        run: echo "NUGET_API_KEY is not set; skipping NuGet publish."
-
-      - name: Push to nuget.org
+        run: |
+          echo "NUGET_API_KEY is required for an explicit publish request."
+          exit 1
+      - name: Push to NuGet.org
         if: ${{ env.NUGET_API_KEY != '' }}
         run: dotnet nuget push "out/*.nupkg" --api-key "${{ env.NUGET_API_KEY }}" --source "https://api.nuget.org/v3/index.json" --skip-duplicate
