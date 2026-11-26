@@ -20,8 +20,8 @@ incursa-appdefs generate --config <path> --check
 Local pack and install:
 
 ```powershell
-dotnet pack C:\src\incursa\generators\src\Incursa.Generators.Tool\Incursa.Generators.Tool.csproj -c Debug -o C:\src\incursa\generators\nupkgs-test
-dotnet tool install Incursa.Generators.Tool --tool-path C:\src\incursa\generators\.tools --add-source C:\src\incursa\generators\nupkgs-test
+dotnet pack .\src\Incursa.Generators.Tool\Incursa.Generators.Tool.csproj -c Debug -o .\nupkgs-test
+dotnet tool install Incursa.Generators.Tool --tool-path .\.tools --add-source .\nupkgs-test
 ```
 
 Ownership and cleanup:

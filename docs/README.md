@@ -4,11 +4,11 @@ This repository contains a Roslyn source generator package (`src/Incursa.Generat
 
 ## Testing And Quality Lanes
 
-The repository now uses explicit quality lanes instead of a single undifferentiated test pass.
+The repository uses explicit quality lanes instead of a single undifferentiated test pass.
 
-- Operating model: [`testing-operating-model.md`](/C:/src/incursa/generators/docs/testing-operating-model.md)
-- Known-issue policy: [`testing-known-issues.md`](/C:/src/incursa/generators/docs/testing-known-issues.md)
-- Quality contract: [`test-gate.contract.yaml`](/C:/src/incursa/generators/docs/test-gate.contract.yaml)
+- Operating model: [`testing-operating-model.md`](testing-operating-model.md)
+- Known-issue policy: [`testing-known-issues.md`](testing-known-issues.md)
+- Quality contract: [`test-gate.contract.yaml`](test-gate.contract.yaml)
 
 ## Repository Scope
 
@@ -26,8 +26,8 @@ Implemented JSON generators in this repository:
 
 Notes:
 
-- This repo does not currently include a maintained CLI entrypoint. Use package/source-generator integration.
-- Legacy ERP/SQL schema docs exist in `docs/schemas`, but they are not consumed by the generators in this codebase snapshot.
+- The Roslyn source-generator package is consumed through package integration. The separate deterministic CLI is documented in [`app-definitions-tool.md`](app-definitions-tool.md).
+- Legacy ERP/SQL schema docs under `docs/schemas` are authoring references; the generators do not consume them at runtime.
 
 ## How Input Files Are Discovered
 

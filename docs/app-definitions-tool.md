@@ -42,7 +42,7 @@ The tool uses a two-stage pipeline:
    - build deterministic file content and paths
    - either write files or check for drift
 
-The reusable pieces live in [`src/Incursa.Generators.AppDefinitions`](/C:/src/incursa/generators/src/Incursa.Generators.AppDefinitions). The CLI lives in [`src/Incursa.Generators.Tool`](/C:/src/incursa/generators/src/Incursa.Generators.Tool).
+The reusable pieces live in [`src/Incursa.Generators.AppDefinitions`](../src/Incursa.Generators.AppDefinitions). The CLI lives in [`src/Incursa.Generators.Tool`](../src/Incursa.Generators.Tool).
 
 ## Config Shape
 
@@ -91,7 +91,7 @@ Config is JSON and versioned. Paths are resolved relative to the config file.
 }
 ```
 
-Supported target kinds in this first pass:
+Supported target kinds:
 
 - `page-contract-models`
 - `page-ui-engine-interface`
@@ -103,49 +103,49 @@ Supported target kinds in this first pass:
 Build the tool:
 
 ```powershell
-dotnet build C:\src\incursa\generators\src\Incursa.Generators.Tool\Incursa.Generators.Tool.csproj
+dotnet build .\src\Incursa.Generators.Tool\Incursa.Generators.Tool.csproj
 ```
 
 Pack the tool locally:
 
 ```powershell
-dotnet pack C:\src\incursa\generators\src\Incursa.Generators.Tool\Incursa.Generators.Tool.csproj -c Debug -o C:\src\incursa\generators\nupkgs-test
+dotnet pack .\src\Incursa.Generators.Tool\Incursa.Generators.Tool.csproj -c Debug -o .\nupkgs-test
 ```
 
 Install the packed tool to a local tool path:
 
 ```powershell
-dotnet tool install Incursa.Generators.Tool --tool-path C:\src\incursa\generators\.tools --add-source C:\src\incursa\generators\nupkgs-test
+dotnet tool install Incursa.Generators.Tool --tool-path .\.tools --add-source .\nupkgs-test
 ```
 
 Update the local install:
 
 ```powershell
-dotnet tool update Incursa.Generators.Tool --tool-path C:\src\incursa\generators\.tools --add-source C:\src\incursa\generators\nupkgs-test
+dotnet tool update Incursa.Generators.Tool --tool-path .\.tools --add-source .\nupkgs-test
 ```
 
 Uninstall the local install:
 
 ```powershell
-dotnet tool uninstall Incursa.Generators.Tool --tool-path C:\src\incursa\generators\.tools
+dotnet tool uninstall Incursa.Generators.Tool --tool-path .\.tools
 ```
 
 Validate definitions:
 
 ```powershell
-dotnet run --project C:\src\incursa\generators\src\Incursa.Generators.Tool\Incursa.Generators.Tool.csproj -- validate --config C:\src\incursa\generators\examples\AppDefinitions\app-definitions.json
+dotnet run --project .\src\Incursa.Generators.Tool\Incursa.Generators.Tool.csproj -- validate --config .\examples\AppDefinitions\app-definitions.json
 ```
 
 Write generated outputs:
 
 ```powershell
-dotnet run --project C:\src\incursa\generators\src\Incursa.Generators.Tool\Incursa.Generators.Tool.csproj -- generate --config C:\src\incursa\generators\examples\AppDefinitions\app-definitions.json --write
+dotnet run --project .\src\Incursa.Generators.Tool\Incursa.Generators.Tool.csproj -- generate --config .\examples\AppDefinitions\app-definitions.json --write
 ```
 
 Check for drift in CI:
 
 ```powershell
-dotnet run --project C:\src\incursa\generators\src\Incursa.Generators.Tool\Incursa.Generators.Tool.csproj -- generate --config C:\src\incursa\generators\examples\AppDefinitions\app-definitions.json --check
+dotnet run --project .\src\Incursa.Generators.Tool\Incursa.Generators.Tool.csproj -- generate --config .\examples\AppDefinitions\app-definitions.json --check
 ```
 
 Optional flags:
@@ -192,15 +192,15 @@ There is also an ownership-header scan fallback inside configured target directo
 
 Sample source inputs live here:
 
-- [`examples/AppDefinitions/app-definitions.json`](/C:/src/incursa/generators/examples/AppDefinitions/app-definitions.json)
-- [`examples/AppDefinitions/defs/Customer/CustomerList.page.xml`](/C:/src/incursa/generators/examples/AppDefinitions/defs/Customer/CustomerList.page.xml)
+- [`examples/AppDefinitions/app-definitions.json`](../examples/AppDefinitions/app-definitions.json)
+- [`examples/AppDefinitions/defs/Customer/CustomerList.page.xml`](../examples/AppDefinitions/defs/Customer/CustomerList.page.xml)
 
 ## Adding Another Emitter Later
 
 To add another deterministic generator scenario:
 
 1. Add a new emitter implementing `IGenerationTargetEmitter`.
-2. Register its `kind` in [`AppDefinitionGenerator`](/C:/src/incursa/generators/src/Incursa.Generators.AppDefinitions/Pipeline/AppDefinitionGenerator.cs).
+2. Register its `kind` in [`AppDefinitionGenerator`](../src/Incursa.Generators.AppDefinitions/Pipeline/AppDefinitionGenerator.cs).
 3. Extend validation if the new emitter depends on additional shape rules.
 4. Add sample config and golden-file tests for the new target kind.
 
