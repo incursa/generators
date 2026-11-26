@@ -1,10 +1,8 @@
 # Testing Operating Model
 
-Date: 2026-03-08
-
 ## Purpose
 
-This repository now uses a four-lane quality model so fast critical checks, required validation, visible known issues, and broader confidence evidence are no longer mixed into one undifferentiated `dotnet test` pass.
+This repository uses a four-lane quality model so fast critical checks, required validation, visible known issues, and broader confidence evidence are not mixed into one undifferentiated `dotnet test` pass.
 
 The lane split is intentionally pragmatic:
 
@@ -13,11 +11,11 @@ The lane split is intentionally pragmatic:
 - observational is reserved for runnable known-issue tests and stays non-blocking
 - advisory is broader than blocking and collects coverage plus evidence artifacts
 
-## Current lane definitions
+## Lane definitions
 
 ### Smoke
 
-Smoke is driven by tests tagged with `Category=Smoke` and currently covers:
+Smoke is driven by tests tagged with `Category=Smoke` and covers high-signal behavior such as:
 
 - DTO validation failures in the Roslyn generator
 - happy-path parsing for the application-definition pipeline
@@ -58,22 +56,18 @@ Policy:
 
 - the lane is visible in CI
 - the lane is non-blocking
-- the lane keeps writing results even when no known-issue tests are currently registered
+- the lane writes a well-formed empty result when no known-issue tests are registered
 
 Primary entrypoints:
 
 - runsettings: `runsettings/observational.runsettings`
 - script: `scripts/run-observational-tests.ps1`
 
-Current state:
-
-- there are no `KnownIssue` tests registered in this repository today
-
 ### Advisory
 
 Advisory broadens confidence beyond blocking without controlling merge eligibility directly.
 
-The current advisory lane includes:
+The advisory lane includes:
 
 - the full blocking suites with coverage enabled
 - the `ExtendedTest` string-backed enum performance suite
